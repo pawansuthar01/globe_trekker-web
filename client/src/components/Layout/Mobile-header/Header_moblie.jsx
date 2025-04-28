@@ -66,7 +66,7 @@ export const Mobile_header = ({ isOpen, isClose }) => {
                 <li>
                   <a
                     href="#"
-                    className="block px-2 py-1.5 text-sm hover:text-amber-600 transition-colors"
+                    className="block px-2 py-1.5 text-sm hover:text-primary-600 transition-colors"
                   >
                     Golden Bridge, Da Nang
                   </a>
@@ -74,7 +74,7 @@ export const Mobile_header = ({ isOpen, isClose }) => {
                 <li>
                   <a
                     href="#"
-                    className="block px-2 py-1.5 text-sm hover:text-amber-600 transition-colors"
+                    className="block px-2 py-1.5 text-sm hover:text-primary-600 transition-colors"
                   >
                     Cappadocia, Turkey
                   </a>
@@ -82,7 +82,7 @@ export const Mobile_header = ({ isOpen, isClose }) => {
                 <li>
                   <a
                     href="#"
-                    className="block px-2 py-1.5 text-sm hover:text-amber-600 transition-colors"
+                    className="block px-2 py-1.5 text-sm hover:text-primary-600 transition-colors"
                   >
                     Santorini, Greece
                   </a>
@@ -90,7 +90,7 @@ export const Mobile_header = ({ isOpen, isClose }) => {
                 <li>
                   <a
                     href="#"
-                    className="block px-2 py-1.5 text-sm hover:text-amber-600 transition-colors"
+                    className="block px-2 py-1.5 text-sm hover:text-primary-600 transition-colors"
                   >
                     Machu Picchu, Peru
                   </a>
@@ -101,12 +101,12 @@ export const Mobile_header = ({ isOpen, isClose }) => {
 
           {/* Footer */}
           <div className="p-4 border-t">
-            <button className="w-full py-2 px-4 bg-amber-500 hover:bg-amber-600 text-white rounded-md transition-colors">
+            <button className="w-full py-2 px-4 bg-primary-500 hover:bg-primary-600 text-white rounded-md transition-colors">
               Sign Up
             </button>
             <div className="mt-2 text-center text-sm text-gray-500">
               Already have an account?{" "}
-              <a href="#" className="text-amber-600 hover:underline">
+              <a href="#" className="text-primary-600 hover:underline">
                 Log in
               </a>
             </div>
@@ -122,7 +122,7 @@ const NavItem = ({ icon, label, active }) => {
       <a
         href="#"
         className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
-          active ? "bg-amber-50 text-amber-600" : "hover:bg-gray-100"
+          active ? "bg-primary-50 text-primary-600" : "hover:bg-primary-100"
         }`}
       >
         {icon}

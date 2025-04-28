@@ -1,21 +1,10 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Search, Menu, X, Search as GlobeSearch } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Menu, Search as GlobeSearch } from "lucide-react";
 import { Mobile_header } from "../Mobile-header/Header_moblie";
-
+import { Search_bar } from "../../Search-bar";
 const Header = ({ isScrolled, toggleMobileMenu, isMobileMenuOpen }) => {
   const [searchVisible, setSearchVisible] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const navigate = useNavigate();
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (searchTerm.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
-      setSearchTerm("");
-      setSearchVisible(false);
-    }
-  };
 
   return (
     <header
@@ -66,32 +55,11 @@ const Header = ({ isScrolled, toggleMobileMenu, isMobileMenuOpen }) => {
         </nav>
 
         <div className="flex items-center space-x-4">
-          {searchVisible ? (
-            <form onSubmit={handleSearchSubmit} className="relative transform">
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-neutral-100 rounded-full py-2 px-4 pl-10 outline-none w-[200px] focus:ring-2 focus:ring-primary-300"
-              />
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-neutral-500" />
-              <button
-                type="button"
-                onClick={() => setSearchVisible(false)}
-                className="absolute right-3 top-2.5"
-              >
-                <X className="h-4 w-4 text-neutral-500" />
-              </button>
-            </form>
-          ) : (
-            <button
-              onClick={() => setSearchVisible(true)}
-              className="p-2 rounded-full hover:bg-neutral-100"
-            >
-              <Search className="h-5 w-5 text-neutral-700" />
-            </button>
-          )}
+          <Search_bar
+            searchVisible={searchVisible}
+            setSearchVisible={setSearchVisible}
+          />
+
           <div>
             <Mobile_header
               isClose={toggleMobileMenu}
