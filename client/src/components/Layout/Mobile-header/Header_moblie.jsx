@@ -51,11 +51,23 @@ export const Mobile_header = ({ isOpen, isClose }) => {
           {/* Navigation Links */}
           <nav className="flex-1 overflow-y-auto p-4">
             <ul className="space-y-2">
-              <NavItem icon={<Home size={20} />} label="Home" active />
-              <NavItem icon={<Map size={20} />} label="Destinations" />
-              <NavItem icon={<Compass size={20} />} label="Explore" />
-              <NavItem icon={<BookOpen size={20} />} label="Stories" />
-              <NavItem icon={<User size={20} />} label="Profile" />
+              <NavItem icon={<Home size={20} />} label="Home" active path="/" />
+              <NavItem
+                icon={<Map size={20} />}
+                label="Destinations"
+                path="/destinations"
+              />
+              <NavItem
+                icon={<Compass size={20} />}
+                label="About"
+                path="/about"
+              />
+              <NavItem
+                icon={<BookOpen size={20} />}
+                label="Stories"
+                path="/stories"
+              />
+              <NavItem icon={<User size={20} />} label="Profile" path="/" />
             </ul>
 
             <div className="mt-8 border-t pt-4">
@@ -116,11 +128,11 @@ export const Mobile_header = ({ isOpen, isClose }) => {
     </>
   );
 };
-const NavItem = ({ icon, label, active }) => {
+const NavItem = ({ icon, label, active, path }) => {
   return (
     <li>
       <a
-        href="#"
+        href={path}
         className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
           active ? "bg-primary-50 text-primary-600" : "hover:bg-primary-100"
         }`}
