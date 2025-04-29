@@ -157,7 +157,7 @@ const LatestStories = () => {
                     <Clock className="h-3 w-3 mr-1 " />
                     <span>{story.readTime}</span>
                   </div>
-                  <h3 className="text-base font-medium text-neutral-800 mb-1 group-hover:text-primary-600 transition-colors">
+                  <h3 className="text-base max-sm:text-sm font-medium text-neutral-800 mb-1 group-hover:text-primary-600 transition-colors">
                     {story.title}
                   </h3>
                 </div>
