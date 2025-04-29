@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Calendar, Clock, Search } from "lucide-react";
+import ImageWithLoaderPercentage from "../../components/Skeleton/imageLoder";
 
 // Mock data - would come from backend in real implementation
-const storiesData = [
+export const storiesData = [
   {
     id: 1,
 
@@ -231,7 +232,7 @@ const storiesData = [
     category: "Africa",
     featured: false,
     coverImage: {
-      url: "https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=1280",
+      url: "https://images.pexels.com/photos/4388167/pexels-photo-4388167.jpeg?auto=compress&cs=tinysrgb&w=600",
       alt: "Ancient temple in Kyoto surrounded by autumn foliage",
     },
   },
@@ -240,7 +241,7 @@ const storiesData = [
 
     images: [
       {
-        url: "https://images.pexels.com/photos/5169056/pexels-photo-5169056.jpeg?auto=compress&cs=tinysrgb&w=1280",
+        url: "https://images.pexels.com/photos/4388167/pexels-photo-4388167.jpeg?auto=compress&cs=tinysrgb&w=600",
         caption: "Stone statues at Otagi Nenbutsu-ji Temple",
       },
       {
@@ -378,7 +379,7 @@ const StoriesPage = () => {
             >
               <div className="grid grid-cols-1 md:grid-cols-2">
                 <div className="relative h-64 md:h-auto overflow-hidden">
-                  <img
+                  <ImageWithLoaderPercentage
                     src={featuredStory.image}
                     alt={featuredStory.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -449,7 +450,7 @@ const StoriesPage = () => {
                   className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow"
                 >
                   <div className="relative h-48 overflow-hidden">
-                    <img
+                    <ImageWithLoaderPercentage
                       src={story.image}
                       alt={story.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

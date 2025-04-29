@@ -6,7 +6,7 @@ import TrekkersHighlights from "../components/Home/TrekkerHighlights";
 
 export const Home = () => {
   return (
-    <div>
+    <div className="  select-none">
       <HeroSection />
       <TopDestinations />
       <LatestStories />

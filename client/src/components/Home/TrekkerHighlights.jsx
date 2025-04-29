@@ -2,6 +2,7 @@ import React from "react";
 import { ChevronRight, Star } from "lucide-react";
 import video from "../../assets/Video by ojaswini.kapoor.mp4";
 import { Link } from "react-router-dom";
+import ImageWithLoaderPercentage from "../Skeleton/imageLoder";
 // Mock data - would come from backend in real implementation
 const highlights = [
   {
@@ -15,17 +16,6 @@ const highlights = [
     image:
       "https://images.pexels.com/photos/2325446/pexels-photo-2325446.jpeg?auto=compress&cs=tinysrgb&w=600",
   },
-  //   {
-  //     id: 2,
-  //     name: "James Wilson",
-  //     avatar:
-  //       "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     location: "Kyoto, Japan",
-  //     text: "Exploring the bamboo forests and hidden temples of Arashiyama was unforgettable. The insider tips from Globe Trekker helped me avoid the crowds and discover authentic local experiences.",
-  //     rating: 5,
-  //     image:
-  //       "https://images.pexels.com/photos/1440476/pexels-photo-1440476.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //   },
 ];
 
 const TrekkersHighlights = () => {
@@ -45,7 +35,7 @@ const TrekkersHighlights = () => {
               <div className="flex flex-col sm:flex-row h-full">
                 <div className="p-6 sm:w-2/3 flex flex-col">
                   <div className="flex items-center mb-4">
-                    <img
+                    <ImageWithLoaderPercentage
                       src={highlight.avatar}
                       alt={highlight.name}
                       className="w-12 h-12 rounded-full object-cover mr-4"
@@ -69,14 +59,10 @@ const TrekkersHighlights = () => {
                   <blockquote className=" italic flex-grow mb-4">
                     "{highlight.text}"
                   </blockquote>
-
-                  <div className="text-primary-400 cursor-pointer text-sm font-medium group-hover:text-primary-300 transition-colors mt-auto">
-                    Read full story
-                  </div>
                 </div>
                 <div className="flex gap-5 max-sm:flex-col">
                   <div className="w-full sm:w-60 h-40 sm:h-72 overflow-hidden rounded-lg ">
-                    <img
+                    <ImageWithLoaderPercentage
                       src={highlight.image}
                       alt={highlight.location}
                       className="w-full h-full rounded-lg object-cover transition-transform duration-500 group-hover:scale-105"

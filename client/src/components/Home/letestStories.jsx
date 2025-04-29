@@ -1,73 +1,12 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ChevronRight, Calendar, Clock } from "lucide-react";
-
+import ImageWithLoaderPercentage from "../Skeleton/imageLoder";
+import { storiesData } from "../../pages/StoriesPage/Stories";
 // Mock data - would come from backend in real implementation
-const storiesData = [
-  {
-    id: 1,
-    title: "The Hidden Temples of Kyoto That Most Tourists Miss",
-    excerpt:
-      "Beyond the famous shrines lies a world of serene temples nestled in bamboo forests...",
-    image:
-      "https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=600",
-    date: "2025-04-12",
-    readTime: "8 min read",
-    category: "Asia",
-    featured: true,
-  },
-  {
-    id: 2,
-    title:
-      "Los Angeles food & drink guide: 10 things to try in Los Angeles, California",
-    excerpt:
-      "Exploring food in California, where the culinary arts and local ingredients create unforgettable dining experiences...",
-    image:
-      "https://images.pexels.com/photos/2983101/pexels-photo-2983101.jpeg?auto=compress&cs=tinysrgb&w=600",
-    date: "2025-04-08",
-    readTime: "6 min read",
-    category: "Food",
-    featured: true,
-  },
-  {
-    id: 3,
-    title: "Hiking through Patagonia: Ultimate Guide to Torres del Paine",
-    excerpt:
-      "Everything you need to know about hiking the famous W Trek and O Circuit in Chile's most famous national park...",
-    image:
-      "https://images.pexels.com/photos/2563689/pexels-photo-2563689.jpeg?auto=compress&cs=tinysrgb&w=600",
-    date: "2025-04-03",
-    readTime: "10 min read",
-    category: "Adventure",
-    featured: false,
-  },
-  {
-    id: 4,
-    title: "Hiking through Patagonia: Ultimate Guide to Torres del Paine",
-    excerpt:
-      "Everything you need to know about hiking the famous W Trek and O Circuit in Chile's most famous national park...",
-    image:
-      "https://images.pexels.com/photos/2563689/pexels-photo-2563689.jpeg?auto=compress&cs=tinysrgb&w=600",
-    date: "2025-04-03",
-    readTime: "10 min read",
-    category: "Adventure",
-    featured: false,
-  },
-  {
-    id: 5,
-    title: "Hiking through Patagonia: Ultimate Guide to Torres del Paine",
-    excerpt:
-      "Everything you need to know about hiking the famous W Trek and O Circuit in Chile's most famous national park...",
-    image:
-      "https://images.pexels.com/photos/2563689/pexels-photo-2563689.jpeg?auto=compress&cs=tinysrgb&w=600",
-    date: "2025-04-03",
-    readTime: "10 min read",
-    category: "Adventure",
-    featured: false,
-  },
-];
 
 const LatestStories = () => {
+  const navigate = useNavigate();
   const featuredStories = storiesData.filter((story) => story.featured);
   const regularStories = storiesData.filter((story) => !story.featured);
 
@@ -89,13 +28,15 @@ const LatestStories = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-8">
           {featuredStories.map((story) => (
-            <Link
+            <div
               key={story.id}
-              to={`/stories/${story.id}`}
+              onClick={() =>
+                navigate(`/stories/${story.id}`, { state: { story: story } })
+              }
               className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow"
             >
               <div className="relative h-48 overflow-hidden">
-                <img
+                <ImageWithLoaderPercentage
                   src={story.image}
                   alt={story.title}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -129,17 +70,19 @@ const LatestStories = () => {
                   Read more
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
           <div className="flex flex-col gap-4    ">
             {regularStories.map((story) => (
               <div
                 key={story.id}
-                to={`/stories/${story.id}`}
+                onClick={() =>
+                  navigate(`/stories/${story.id}`, { state: { story: story } })
+                }
                 className=" flex rounded-lg items-center overflow-hidden  group  cursor-pointer "
               >
                 <div className="relative flex justify-center  max-w-20 max-h-20 overflow-hidden">
-                  <img
+                  <ImageWithLoaderPercentage
                     src={story.image}
                     alt={story.title}
                     className=" object-cover rounded-xl transition-transform duration-500 "

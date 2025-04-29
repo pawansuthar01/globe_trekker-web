@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { Calendar, Clock, User, Heart, Share2 } from "lucide-react";
+import ImageWithLoaderPercentage from "../../components/Skeleton/imageLoder";
 
 const StoryDetailPage = () => {
   const { id } = useParams();
@@ -15,6 +16,7 @@ const StoryDetailPage = () => {
           //   const response = await fetch(`/api/stories/${id}`);
           //   const data = await response.json();
           //   setStory(data);
+          setLoading(false);
         } catch (error) {
           console.error("Error fetching story:", error);
         } finally {
@@ -29,7 +31,7 @@ const StoryDetailPage = () => {
     }
   }, [id]);
 
-  if (story == null || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen pt-24 pb-16">
         <div className="container mx-auto px-4">
@@ -74,7 +76,7 @@ const StoryDetailPage = () => {
           </h1>
 
           <div className="flex items-center gap-4">
-            <img
+            <ImageWithLoaderPercentage
               src={story.author.avatar}
               alt={story.author.name}
               className="w-12 h-12 rounded-full object-cover"
@@ -91,7 +93,7 @@ const StoryDetailPage = () => {
         {/* Cover image */}
         <div className="max-w-5xl mx-auto mb-12">
           <div className="relative aspect-[2/1] rounded-lg overflow-hidden">
-            <img
+            <ImageWithLoaderPercentage
               src={story.coverImage.url}
               alt={story.coverImage.alt}
               className="w-full h-full object-cover"
@@ -153,7 +155,7 @@ const StoryDetailPage = () => {
                 key={index}
                 className="relative aspect-video rounded-lg overflow-hidden"
               >
-                <img
+                <ImageWithLoaderPercentage
                   src={image.url}
                   alt={image.caption}
                   className="w-full h-full object-cover"

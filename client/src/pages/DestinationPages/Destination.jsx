@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { MapPin, Filter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { caption } from "framer-motion/client";
+import ImageWithLoaderPercentage from "../../components/Skeleton/imageLoder";
 
 // Mock data - would come from backend in real implementation
 const aata = {
@@ -9,7 +10,7 @@ const aata = {
   description:
     "A stunning volcanic island known for its white-washed buildings and blue-domed churches perched on cliffs overlooking the Aegean Sea.",
 };
-const destinationsData = [
+export const destinationsData = [
   {
     id: 1,
     longDescription:
@@ -542,7 +543,7 @@ const DestinationsPage = () => {
                 className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all hover:-translate-y-1"
               >
                 <div className="relative h-48 overflow-hidden">
-                  <img
+                  <ImageWithLoaderPercentage
                     src={destination.image}
                     alt={destination.name}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

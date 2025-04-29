@@ -12,6 +12,7 @@ import StoryDetailPage from "./pages/StoriesPage/StoriesDetail";
 import LoginPage from "./pages/auth/login";
 import SignupPage from "./pages/auth/Signup";
 import ResetPasswordPage from "./pages/PasswordPages/ResetPasswordPage";
+import HighlightsPage from "./pages/HighlightsPage";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="/destinations" element={<DestinationsPage />} />
+        <Route path="/highlight" element={<HighlightsPage />} />
         <Route path="/destinations/:id" element={<DestinationDetailPage />} />
         <Route path="/stories" element={<StoriesPage />} />
         <Route path="/stories/:id" element={<StoryDetailPage />} />

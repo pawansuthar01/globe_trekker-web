@@ -1,87 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { motion, useInView } from "framer-motion";
-// Mock data - would come from backend in real implementation
-const destinationsData = [
-  {
-    id: 1,
-    name: "Santorini, Greece",
-    image:
-      "https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg?auto=compress&cs=tinysrgb&w=600",
-    category: "europe",
-  },
-  {
-    id: 2,
-    name: "Kyoto, Japan",
-    image:
-      "https://images.pexels.com/photos/1440476/pexels-photo-1440476.jpeg?auto=compress&cs=tinysrgb&w=600",
-    category: "asia",
-  },
-  {
-    id: 3,
-    name: "Amalfi Coast, Italy",
-    image:
-      "https://images.pexels.com/photos/4502965/pexels-photo-4502965.jpeg?auto=compress&cs=tinysrgb&w=600",
-    category: "europe",
-  },
-  {
-    id: 4,
-    name: "Bali, Indonesia",
-    image:
-      "https://images.pexels.com/photos/2474689/pexels-photo-2474689.jpeg?auto=compress&cs=tinysrgb&w=600",
-    category: "asia",
-  },
-  {
-    id: 5,
-    name: "Marrakech, Morocco",
-    image:
-      "https://images.pexels.com/photos/2387871/pexels-photo-2387871.jpeg?auto=compress&cs=tinysrgb&w=600",
-    category: "africa",
-  },
-  {
-    id: 6,
-    name: "Grand Canyon, USA",
-    image:
-      "https://images.pexels.com/photos/33041/antelope-canyon-lower-canyon-arizona.jpg?auto=compress&cs=tinysrgb&w=600",
-    category: "americas",
-  },
-  {
-    id: 7,
-    name: "Grand Canyon, USA",
-    image:
-      "https://images.pexels.com/photos/33041/antelope-canyon-lower-canyon-arizona.jpg?auto=compress&cs=tinysrgb&w=600",
-    category: "americas",
-  },
-  {
-    id: 8,
-    name: "Grand Canyon, USA",
-    image:
-      "https://images.pexels.com/photos/33041/antelope-canyon-lower-canyon-arizona.jpg?auto=compress&cs=tinysrgb&w=600",
-    category: "americas",
-  },
-  {
-    id: 9,
-    name: "Grand Canyon, USA",
-    image:
-      "https://images.pexels.com/photos/33041/antelope-canyon-lower-canyon-arizona.jpg?auto=compress&cs=tinysrgb&w=600",
-    category: "americas",
-  },
-  {
-    id: 10,
-    name: "Grand Canyon, USA",
-    image:
-      "https://images.pexels.com/photos/33041/antelope-canyon-lower-canyon-arizona.jpg?auto=compress&cs=tinysrgb&w=600",
-    category: "americas",
-  },
-  {
-    id: 11,
-    name: "Grand Canyon, USA",
-    image:
-      "https://images.pexels.com/photos/33041/antelope-canyon-lower-canyon-arizona.jpg?auto=compress&cs=tinysrgb&w=600",
-    category: "americas",
-  },
-];
+import ImageWithLoaderPercentage from "../Skeleton/imageLoder";
+import { destinationsData } from "../../pages/DestinationPages/Destination";
 
 const categories = [
   { id: "popular", name: "Popular" },
@@ -93,6 +15,7 @@ const categories = [
 ];
 
 const TopDestinations = () => {
+  const navigate = useNavigate();
   const [hasAnimated, setHasAnimated] = useState(true);
   const containerRef = useRef(null);
   const isInView = useInView(containerRef, { once: true });
@@ -137,8 +60,12 @@ const TopDestinations = () => {
 
         <div className="flex pl-1     overflow-x-auto  gap-6">
           {filteredDestinations.map((destination) => (
-            <Link
-              to={`/destinations/${destination.id}`}
+            <div
+              onClick={() =>
+                navigate(`/destinations/${destination.id}`, {
+                  state: { destination },
+                })
+              }
               key={destination.id}
               className="group"
             >
@@ -152,7 +79,7 @@ const TopDestinations = () => {
                 }}
                 className="relative  w-52 overflow-hidden rounded-lg shadow-md transition-transform group-hover:shadow-xl group-hover:-translate-y-1"
               >
-                <img
+                <ImageWithLoaderPercentage
                   src={destination.image}
                   alt={destination.name}
                   className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
@@ -162,7 +89,7 @@ const TopDestinations = () => {
                   <h3 className="text-lg font-semibold">{destination.name}</h3>
                 </div>
               </motion.div>
-            </Link>
+            </div>
           ))}
         </div>
 

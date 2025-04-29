@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Search, MapPin, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
+import ImageWithLoaderPercentage from "../components/Skeleton/imageLoder";
 
 const SearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -111,7 +112,7 @@ const SearchPage = () => {
               className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all hover:-translate-y-1"
             >
               <div className="relative h-48 overflow-hidden">
-                <img
+                <ImageWithLoaderPercentage
                   src={result.image}
                   alt={result.name || result.title}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

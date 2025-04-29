@@ -115,14 +115,20 @@ export const Mobile_header = ({ isOpen, isClose }) => {
           {/* Footer */}
           <div className="p-4 border-t">
             <button
-              onClick={() => navigate("/signup")}
+              onClick={() => {
+                navigate("/signup"), isClose();
+              }}
               className="w-full py-2 px-4 bg-primary-500 hover:bg-primary-600 text-white rounded-md transition-colors"
             >
               Sign Up
             </button>
             <div className="mt-2 text-center text-sm text-gray-500">
               Already have an account?{" "}
-              <a href="/login" className="text-primary-600 hover:underline">
+              <a
+                onClick={isClose}
+                href="/login"
+                className="text-primary-600 hover:underline"
+              >
                 Log in
               </a>
             </div>

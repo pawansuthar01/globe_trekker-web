@@ -1,6 +1,7 @@
 import React from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import ImageWithLoaderPercentage from "../Skeleton/imageLoder";
 const HeroSection = () => {
   return (
     <section className="relative pt-20 pb-16 md:pt-32 md:pb-24">
@@ -37,19 +38,19 @@ const HeroSection = () => {
             <div className="relative">
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex justify-center items-center h-full w-full">
-                  <img
-                    src="https://images.pexels.com/photos/3889843/pexels-photo-3889843.jpeg?auto=compress&cs=tinysrgb&w=600"
+                  <ImageWithLoaderPercentage
                     alt="Machu Picchu"
-                    className="rounded-lg   h-[80%] md:h-[80%] md:w-[80%] object-cover shadow-lg transform hover:scale-102 transition-transform hover:shadow-xl"
+                    className="rounded-lg w-full  h-[80%] md:h-[80%] md:w-[80%] object-cover shadow-lg transform hover:scale-102 transition-transform hover:shadow-xl"
+                    src="https://images.pexels.com/photos/3155666/pexels-photo-3155666.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                   />
                 </div>
                 <div className="flex flex-col gap-3 w-full md:w-[90%]">
-                  <img
+                  <ImageWithLoaderPercentage
                     src="https://images.pexels.com/photos/4275885/pexels-photo-4275885.jpeg?auto=compress&cs=tinysrgb&w=600"
                     alt="Santorini"
                     className=" relative  rounded-lg h-48 md:h-54 w-full  object-cover shadow-lg transform hover:scale-102 transition-transform hover:shadow-xl"
                   />
-                  <img
+                  <ImageWithLoaderPercentage
                     src="https://images.pexels.com/photos/4388167/pexels-photo-4388167.jpeg?auto=compress&cs=tinysrgb&w=600"
                     alt="Mountain landscape"
                     className="rounded-lg  h-48 md:h-60 w-full object-cover shadow-lg transform hover:scale-102 transition-transform hover:shadow-xl"
