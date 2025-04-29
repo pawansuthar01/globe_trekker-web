@@ -7,7 +7,7 @@ const DestinationDetailPage = () => {
   const DataDestination = useLocation().state.destination;
 
   const [destination, setDestination] = useState(DataDestination);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Simulated API call - replace with actual API integration
@@ -26,8 +26,8 @@ const DestinationDetailPage = () => {
       };
       fetchDestination();
     } else {
-      //   setDestination(});
-      console.log(destination);
+      setDestination(DataDestination);
+      setLoading(false);
     }
   }, [id]);
 
@@ -45,44 +45,6 @@ const DestinationDetailPage = () => {
       </div>
     );
   }
-
-  // Temporary mock data - remove when API is integrated
-  const mockDestination = {
-    name: "Santorini, Greece",
-    description:
-      "A stunning volcanic island known for its white-washed buildings and blue-domed churches perched on cliffs overlooking the Aegean Sea.",
-    longDescription:
-      "Santorini is one of the Cyclades islands in the Aegean Sea. It was devastated by a volcanic eruption in the 16th century BC, forever shaping its rugged landscape. The whitewashed, cubiform houses of its 2 principal towns, Fira and Oia, cling to cliffs above an underwater caldera (crater). They overlook the sea, small islands to the west and beaches made up of black, red and white lava pebbles.",
-    images: [
-      {
-        url: "https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg?auto=compress&cs=tinysrgb&w=1280",
-        caption: "Iconic blue domes of Santorini",
-      },
-      {
-        url: "https://images.pexels.com/photos/3225531/pexels-photo-3225531.jpeg?auto=compress&cs=tinysrgb&w=1280",
-        caption: "Sunset view from Oia",
-      },
-    ],
-    location: {
-      country: "Greece",
-      region: "Cyclades",
-      coordinates: {
-        latitude: 36.3932,
-        longitude: 25.4615,
-      },
-    },
-    rating: {
-      value: 4.8,
-      count: 1250,
-    },
-    bestTimeToVisit: "April to October",
-    travelTips: [
-      "Book accommodations well in advance, especially during peak season",
-      "Visit Oia early in the morning to avoid crowds",
-      "Take a sunset cruise around the caldera",
-      "Try local wines at a traditional vineyard",
-    ],
-  };
 
   return (
     <div className="min-h-screen pt-24 pb-16">

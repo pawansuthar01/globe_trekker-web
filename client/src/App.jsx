@@ -8,6 +8,10 @@ import AboutPage from "./pages/About";
 import ContactPage from "./pages/contact";
 import SearchPage from "./pages/SearchPage";
 import DestinationDetailPage from "./pages/DestinationPages/DestinationDetail";
+import StoryDetailPage from "./pages/StoriesPage/StoriesDetail";
+import LoginPage from "./pages/auth/login";
+import SignupPage from "./pages/auth/Signup";
+import ResetPasswordPage from "./pages/PasswordPages/ResetPasswordPage";
 
 function App() {
   return (
@@ -17,8 +21,12 @@ function App() {
         <Route path="/destinations" element={<DestinationsPage />} />
         <Route path="/destinations/:id" element={<DestinationDetailPage />} />
         <Route path="/stories" element={<StoriesPage />} />
+        <Route path="/stories/:id" element={<StoryDetailPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/search" element={<SearchPage />} />
       </Route>
     </Routes>

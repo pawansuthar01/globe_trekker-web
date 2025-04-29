@@ -1,11 +1,41 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Calendar, Clock, Search } from "lucide-react";
 
 // Mock data - would come from backend in real implementation
 const storiesData = [
   {
     id: 1,
+
+    images: [
+      {
+        url: "https://images.pexels.com/photos/5169056/pexels-photo-5169056.jpeg?auto=compress&cs=tinysrgb&w=1280",
+        caption: "Stone statues at Otagi Nenbutsu-ji Temple",
+      },
+      {
+        url: "https://images.pexels.com/photos/6498998/pexels-photo-6498998.jpeg?auto=compress&cs=tinysrgb&w=1280",
+        caption: "Peaceful garden at Honen-in Temple",
+      },
+    ],
+    publishedAt: "2025-04-12",
+    readTime: "8 min read",
+    category: "Asia",
+    tags: ["japan", "temples", "culture", "hidden-gems"],
+    content: `
+    Kyoto, the former imperial capital of Japan, is home to over 1,600 Buddhist temples and 400 Shinto shrines. While most visitors flock to the famous Kinkaku-ji (Golden Pavilion) and Fushimi Inari Shrine, there's a whole other world of hidden temples waiting to be discovered.
+
+    One such hidden gem is Otagi Nenbutsu-ji, located in the outskirts of Arashiyama. This unique temple features over 1,200 stone statues, each with its own distinct personality and expression. Unlike the crowded pathways of popular temples, here you can wander in peace, discovering new details with every visit.
+
+    Another lesser-known treasure is Honen-in Temple, nestled in the peaceful Higashiyama district. The approach to the temple is through a moss-covered gate, instantly transporting you away from the modern world. The temple's gardens are particularly beautiful during the autumn months when the maple leaves turn brilliant shades of red and orange.
+
+    For those seeking spiritual experiences, Kōsan-ji offers morning meditation sessions that few tourists know about. The temple's head monk leads these sessions, providing insights into Zen practices that have been preserved for centuries.
+  `,
+    author: {
+      name: "Sarah Johnson",
+      avatar:
+        "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600",
+      bio: "Travel writer specializing in Asian culture and hidden destinations",
+    },
     title: "The Hidden Temples of Kyoto That Most Tourists Miss",
     excerpt:
       "Beyond the famous shrines lies a world of serene temples nestled in bamboo forests that most tourists never discover. Our guide takes you to the most peaceful and authentic experiences in Kyoto.",
@@ -15,9 +45,43 @@ const storiesData = [
     readTime: "8 min read",
     category: "Asia",
     featured: true,
+    coverImage: {
+      url: "https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=1280",
+      alt: "Ancient temple in Kyoto surrounded by autumn foliage",
+    },
   },
   {
     id: 2,
+
+    images: [
+      {
+        url: "https://images.pexels.com/photos/5169056/pexels-photo-5169056.jpeg?auto=compress&cs=tinysrgb&w=1280",
+        caption: "Stone statues at Otagi Nenbutsu-ji Temple",
+      },
+      {
+        url: "https://images.pexels.com/photos/6498998/pexels-photo-6498998.jpeg?auto=compress&cs=tinysrgb&w=1280",
+        caption: "Peaceful garden at Honen-in Temple",
+      },
+    ],
+    publishedAt: "2025-04-12",
+    readTime: "8 min read",
+    category: "Asia",
+    tags: ["japan", "temples", "culture", "hidden-gems"],
+    content: `
+    Kyoto, the former imperial capital of Japan, is home to over 1,600 Buddhist temples and 400 Shinto shrines. While most visitors flock to the famous Kinkaku-ji (Golden Pavilion) and Fushimi Inari Shrine, there's a whole other world of hidden temples waiting to be discovered.
+
+    One such hidden gem is Otagi Nenbutsu-ji, located in the outskirts of Arashiyama. This unique temple features over 1,200 stone statues, each with its own distinct personality and expression. Unlike the crowded pathways of popular temples, here you can wander in peace, discovering new details with every visit.
+
+    Another lesser-known treasure is Honen-in Temple, nestled in the peaceful Higashiyama district. The approach to the temple is through a moss-covered gate, instantly transporting you away from the modern world. The temple's gardens are particularly beautiful during the autumn months when the maple leaves turn brilliant shades of red and orange.
+
+    For those seeking spiritual experiences, Kōsan-ji offers morning meditation sessions that few tourists know about. The temple's head monk leads these sessions, providing insights into Zen practices that have been preserved for centuries.
+  `,
+    author: {
+      name: "Sarah Johnson",
+      avatar:
+        "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600",
+      bio: "Travel writer specializing in Asian culture and hidden destinations",
+    },
     title:
       "Los Angeles food & drink guide: 10 things to try in Los Angeles, California",
     excerpt:
@@ -28,9 +92,43 @@ const storiesData = [
     readTime: "6 min read",
     category: "Food",
     featured: true,
+    coverImage: {
+      url: "https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=1280",
+      alt: "Ancient temple in Kyoto surrounded by autumn foliage",
+    },
   },
   {
     id: 3,
+
+    images: [
+      {
+        url: "https://images.pexels.com/photos/5169056/pexels-photo-5169056.jpeg?auto=compress&cs=tinysrgb&w=1280",
+        caption: "Stone statues at Otagi Nenbutsu-ji Temple",
+      },
+      {
+        url: "https://images.pexels.com/photos/6498998/pexels-photo-6498998.jpeg?auto=compress&cs=tinysrgb&w=1280",
+        caption: "Peaceful garden at Honen-in Temple",
+      },
+    ],
+    publishedAt: "2025-04-12",
+    readTime: "8 min read",
+    category: "Asia",
+    tags: ["japan", "temples", "culture", "hidden-gems"],
+    content: `
+    Kyoto, the former imperial capital of Japan, is home to over 1,600 Buddhist temples and 400 Shinto shrines. While most visitors flock to the famous Kinkaku-ji (Golden Pavilion) and Fushimi Inari Shrine, there's a whole other world of hidden temples waiting to be discovered.
+
+    One such hidden gem is Otagi Nenbutsu-ji, located in the outskirts of Arashiyama. This unique temple features over 1,200 stone statues, each with its own distinct personality and expression. Unlike the crowded pathways of popular temples, here you can wander in peace, discovering new details with every visit.
+
+    Another lesser-known treasure is Honen-in Temple, nestled in the peaceful Higashiyama district. The approach to the temple is through a moss-covered gate, instantly transporting you away from the modern world. The temple's gardens are particularly beautiful during the autumn months when the maple leaves turn brilliant shades of red and orange.
+
+    For those seeking spiritual experiences, Kōsan-ji offers morning meditation sessions that few tourists know about. The temple's head monk leads these sessions, providing insights into Zen practices that have been preserved for centuries.
+  `,
+    author: {
+      name: "Sarah Johnson",
+      avatar:
+        "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600",
+      bio: "Travel writer specializing in Asian culture and hidden destinations",
+    },
     title: "Hiking through Patagonia: Ultimate Guide to Torres del Paine",
     excerpt:
       "Everything you need to know about hiking the famous W Trek and O Circuit in Chile's most famous national park. Our comprehensive guide includes packing tips, best seasons, and trail advice.",
@@ -40,9 +138,43 @@ const storiesData = [
     readTime: "10 min read",
     category: "Adventure",
     featured: false,
+    coverImage: {
+      url: "https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=1280",
+      alt: "Ancient temple in Kyoto surrounded by autumn foliage",
+    },
   },
   {
     id: 4,
+
+    images: [
+      {
+        url: "https://images.pexels.com/photos/5169056/pexels-photo-5169056.jpeg?auto=compress&cs=tinysrgb&w=1280",
+        caption: "Stone statues at Otagi Nenbutsu-ji Temple",
+      },
+      {
+        url: "https://images.pexels.com/photos/6498998/pexels-photo-6498998.jpeg?auto=compress&cs=tinysrgb&w=1280",
+        caption: "Peaceful garden at Honen-in Temple",
+      },
+    ],
+    publishedAt: "2025-04-12",
+    readTime: "8 min read",
+    category: "Asia",
+    tags: ["japan", "temples", "culture", "hidden-gems"],
+    content: `
+    Kyoto, the former imperial capital of Japan, is home to over 1,600 Buddhist temples and 400 Shinto shrines. While most visitors flock to the famous Kinkaku-ji (Golden Pavilion) and Fushimi Inari Shrine, there's a whole other world of hidden temples waiting to be discovered.
+
+    One such hidden gem is Otagi Nenbutsu-ji, located in the outskirts of Arashiyama. This unique temple features over 1,200 stone statues, each with its own distinct personality and expression. Unlike the crowded pathways of popular temples, here you can wander in peace, discovering new details with every visit.
+
+    Another lesser-known treasure is Honen-in Temple, nestled in the peaceful Higashiyama district. The approach to the temple is through a moss-covered gate, instantly transporting you away from the modern world. The temple's gardens are particularly beautiful during the autumn months when the maple leaves turn brilliant shades of red and orange.
+
+    For those seeking spiritual experiences, Kōsan-ji offers morning meditation sessions that few tourists know about. The temple's head monk leads these sessions, providing insights into Zen practices that have been preserved for centuries.
+  `,
+    author: {
+      name: "Sarah Johnson",
+      avatar:
+        "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600",
+      bio: "Travel writer specializing in Asian culture and hidden destinations",
+    },
     title: "The Ultimate Guide to Bali's Hidden Waterfalls",
     excerpt:
       "Beyond the popular beaches, Bali is home to dozens of spectacular waterfalls tucked away in the jungle. We've mapped the most breathtaking ones that aren't overrun with tourists.",
@@ -52,9 +184,43 @@ const storiesData = [
     readTime: "7 min read",
     category: "Asia",
     featured: false,
+    coverImage: {
+      url: "https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=1280",
+      alt: "Ancient temple in Kyoto surrounded by autumn foliage",
+    },
   },
   {
     id: 5,
+
+    images: [
+      {
+        url: "https://images.pexels.com/photos/5169056/pexels-photo-5169056.jpeg?auto=compress&cs=tinysrgb&w=1280",
+        caption: "Stone statues at Otagi Nenbutsu-ji Temple",
+      },
+      {
+        url: "https://images.pexels.com/photos/6498998/pexels-photo-6498998.jpeg?auto=compress&cs=tinysrgb&w=1280",
+        caption: "Peaceful garden at Honen-in Temple",
+      },
+    ],
+    publishedAt: "2025-04-12",
+    readTime: "8 min read",
+    category: "Asia",
+    tags: ["japan", "temples", "culture", "hidden-gems"],
+    content: `
+    Kyoto, the former imperial capital of Japan, is home to over 1,600 Buddhist temples and 400 Shinto shrines. While most visitors flock to the famous Kinkaku-ji (Golden Pavilion) and Fushimi Inari Shrine, there's a whole other world of hidden temples waiting to be discovered.
+
+    One such hidden gem is Otagi Nenbutsu-ji, located in the outskirts of Arashiyama. This unique temple features over 1,200 stone statues, each with its own distinct personality and expression. Unlike the crowded pathways of popular temples, here you can wander in peace, discovering new details with every visit.
+
+    Another lesser-known treasure is Honen-in Temple, nestled in the peaceful Higashiyama district. The approach to the temple is through a moss-covered gate, instantly transporting you away from the modern world. The temple's gardens are particularly beautiful during the autumn months when the maple leaves turn brilliant shades of red and orange.
+
+    For those seeking spiritual experiences, Kōsan-ji offers morning meditation sessions that few tourists know about. The temple's head monk leads these sessions, providing insights into Zen practices that have been preserved for centuries.
+  `,
+    author: {
+      name: "Sarah Johnson",
+      avatar:
+        "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600",
+      bio: "Travel writer specializing in Asian culture and hidden destinations",
+    },
     title: "Exploring Morocco's Blue City: Chefchaouen",
     excerpt:
       "Tucked in the Rif Mountains, this azure-hued city feels like stepping into another world. Our guide to Chefchaouen covers the best photo spots, cultural experiences, and hidden gems.",
@@ -64,9 +230,43 @@ const storiesData = [
     readTime: "5 min read",
     category: "Africa",
     featured: false,
+    coverImage: {
+      url: "https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=1280",
+      alt: "Ancient temple in Kyoto surrounded by autumn foliage",
+    },
   },
   {
     id: 6,
+
+    images: [
+      {
+        url: "https://images.pexels.com/photos/5169056/pexels-photo-5169056.jpeg?auto=compress&cs=tinysrgb&w=1280",
+        caption: "Stone statues at Otagi Nenbutsu-ji Temple",
+      },
+      {
+        url: "https://images.pexels.com/photos/6498998/pexels-photo-6498998.jpeg?auto=compress&cs=tinysrgb&w=1280",
+        caption: "Peaceful garden at Honen-in Temple",
+      },
+    ],
+    publishedAt: "2025-04-12",
+    readTime: "8 min read",
+    category: "Asia",
+    tags: ["japan", "temples", "culture", "hidden-gems"],
+    content: `
+    Kyoto, the former imperial capital of Japan, is home to over 1,600 Buddhist temples and 400 Shinto shrines. While most visitors flock to the famous Kinkaku-ji (Golden Pavilion) and Fushimi Inari Shrine, there's a whole other world of hidden temples waiting to be discovered.
+
+    One such hidden gem is Otagi Nenbutsu-ji, located in the outskirts of Arashiyama. This unique temple features over 1,200 stone statues, each with its own distinct personality and expression. Unlike the crowded pathways of popular temples, here you can wander in peace, discovering new details with every visit.
+
+    Another lesser-known treasure is Honen-in Temple, nestled in the peaceful Higashiyama district. The approach to the temple is through a moss-covered gate, instantly transporting you away from the modern world. The temple's gardens are particularly beautiful during the autumn months when the maple leaves turn brilliant shades of red and orange.
+
+    For those seeking spiritual experiences, Kōsan-ji offers morning meditation sessions that few tourists know about. The temple's head monk leads these sessions, providing insights into Zen practices that have been preserved for centuries.
+  `,
+    author: {
+      name: "Sarah Johnson",
+      avatar:
+        "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600",
+      bio: "Travel writer specializing in Asian culture and hidden destinations",
+    },
     title: "Island Hopping in Greece: A Two-Week Itinerary",
     excerpt:
       "From the iconic blue domes of Santorini to the hidden beaches of Milos, our comprehensive itinerary helps you make the most of your Greek island adventure.",
@@ -75,6 +275,10 @@ const storiesData = [
     date: "2025-03-15",
     readTime: "9 min read",
     category: "Europe",
+    coverImage: {
+      url: "https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=1280",
+      alt: "Ancient temple in Kyoto surrounded by autumn foliage",
+    },
     featured: false,
   },
 ];
@@ -95,7 +299,7 @@ const categories = [
 const StoriesPage = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-
+  const navigate = useNavigate();
   // Featured story is the first one
   const featuredStory = storiesData[0];
 
@@ -164,8 +368,12 @@ const StoriesPage = () => {
         {activeCategory === "all" && !searchTerm && (
           <div className="mb-12">
             <h2 className="text-xl font-semibold mb-6">Featured Story</h2>
-            <Link
-              to={`/stories/${featuredStory.id}`}
+            <div
+              onClick={() =>
+                navigate(`/stories/${featuredStory.id}`, {
+                  state: { story: featuredStory },
+                })
+              }
               className="group block bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
             >
               <div className="grid grid-cols-1 md:grid-cols-2">
@@ -219,7 +427,7 @@ const StoriesPage = () => {
                   </div>
                 </div>
               </div>
-            </Link>
+            </div>
           </div>
         )}
 
@@ -231,9 +439,13 @@ const StoriesPage = () => {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredStories.map((story) => (
-                <Link
+                <div
                   key={story.id}
-                  to={`/stories/${story.id}`}
+                  onClick={() =>
+                    navigate(`/stories/${story.id}`, {
+                      state: { story: story },
+                    })
+                  }
                   className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow"
                 >
                   <div className="relative h-48 overflow-hidden">
@@ -273,7 +485,7 @@ const StoriesPage = () => {
                       Read more
                     </div>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
           </div>

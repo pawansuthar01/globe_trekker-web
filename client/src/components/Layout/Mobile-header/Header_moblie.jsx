@@ -1,9 +1,10 @@
 import { BookOpen, Compass, Home, Map, User, X } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const Mobile_header = ({ isOpen, isClose }) => {
   const ref = useRef(null);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const handelMouseClick = (e) => {
       if (ref.current && ref.current.contains(e.target)) {
@@ -113,12 +114,15 @@ export const Mobile_header = ({ isOpen, isClose }) => {
 
           {/* Footer */}
           <div className="p-4 border-t">
-            <button className="w-full py-2 px-4 bg-primary-500 hover:bg-primary-600 text-white rounded-md transition-colors">
+            <button
+              onClick={() => navigate("/signup")}
+              className="w-full py-2 px-4 bg-primary-500 hover:bg-primary-600 text-white rounded-md transition-colors"
+            >
               Sign Up
             </button>
             <div className="mt-2 text-center text-sm text-gray-500">
               Already have an account?{" "}
-              <a href="#" className="text-primary-600 hover:underline">
+              <a href="/login" className="text-primary-600 hover:underline">
                 Log in
               </a>
             </div>
