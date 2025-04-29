@@ -1,6 +1,7 @@
-import { BookOpen, Compass, Home, Map, User, X } from "lucide-react";
+import { BookOpen, Compass, Home, Map, Sparkles, User, X } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { GiHighTide } from "react-icons/gi";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 export const Mobile_header = ({ isOpen, isClose }) => {
   const ref = useRef(null);
@@ -68,7 +69,11 @@ export const Mobile_header = ({ isOpen, isClose }) => {
                 label="Stories"
                 path="/stories"
               />
-              <NavItem icon={<User size={20} />} label="Profile" path="/" />
+              <NavItem
+                icon={<Sparkles size={20} />}
+                label="highlights"
+                path="/highlight"
+              />
             </ul>
 
             <div className="mt-8 border-t pt-4">
@@ -139,12 +144,16 @@ export const Mobile_header = ({ isOpen, isClose }) => {
   );
 };
 const NavItem = ({ icon, label, active, path }) => {
+  const { pathname } = useLocation();
+
   return (
     <li>
       <a
         href={path}
         className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
-          active ? "bg-primary-50 text-primary-600" : "hover:bg-primary-100"
+          pathname == path
+            ? "bg-primary-50 text-primary-600"
+            : "hover:bg-primary-100"
         }`}
       >
         {icon}

@@ -5,14 +5,10 @@ import { caption } from "framer-motion/client";
 import ImageWithLoaderPercentage from "../../components/Skeleton/imageLoder";
 
 // Mock data - would come from backend in real implementation
-const aata = {
-  name: "Santorini, Greece",
-  description:
-    "A stunning volcanic island known for its white-washed buildings and blue-domed churches perched on cliffs overlooking the Aegean Sea.",
-};
 export const destinationsData = [
   {
-    id: 1,
+    id: 15555,
+    type: "Destinations",
     longDescription:
       "Santorini is one of the Cyclades islands in the Aegean Sea. It was devastated by a volcanic eruption in the 16th century BC, forever shaping its rugged landscape. The whitewashed, cubiform houses of its 2 principal towns, Fira and Oia, cling to cliffs above an underwater caldera (crater). They overlook the sea, small islands to the west and beaches made up of black, red and white lava pebbles.",
     name: "Santorini, Greece",
@@ -54,7 +50,8 @@ export const destinationsData = [
     ],
   },
   {
-    id: 2,
+    id: 2654,
+    type: "Destinations",
     name: "Kyoto, Japan",
     bestTimeToVisit: "April to October",
     longDescription:
@@ -96,7 +93,8 @@ export const destinationsData = [
   },
 
   {
-    id: 3,
+    id: 36546489,
+    type: "Destinations",
     longDescription:
       "Santorini is one of the Cyclades islands in the Aegean Sea. It was devastated by a volcanic eruption in the 16th century BC, forever shaping its rugged landscape. The whitewashed, cubiform houses of its 2 principal towns, Fira and Oia, cling to cliffs above an underwater caldera (crater). They overlook the sea, small islands to the west and beaches made up of black, red and white lava pebbles.",
     name: "Amalfi Coast, Italy",
@@ -138,7 +136,8 @@ export const destinationsData = [
     ],
   },
   {
-    id: 4,
+    id: 4656546,
+    type: "Destinations",
     name: "Bali, Indonesia",
     bestTimeToVisit: "April to October",
     longDescription:
@@ -180,7 +179,8 @@ export const destinationsData = [
     ],
   },
   {
-    id: 5,
+    id: 56464988,
+    type: "Destinations",
     name: "Marrakech, Morocco",
     bestTimeToVisit: "April to October",
     longDescription:
@@ -222,7 +222,8 @@ export const destinationsData = [
     ],
   },
   {
-    id: 6,
+    id: 66638698,
+    type: "Destinations",
     name: "Grand Canyon, USA",
     bestTimeToVisit: "April to October",
     longDescription:
@@ -264,7 +265,8 @@ export const destinationsData = [
     ],
   },
   {
-    id: 7,
+    id: 7753662,
+    type: "Destinations",
     name: "Machu Picchu, Peru",
     bestTimeToVisit: "April to October",
     longDescription:
@@ -305,7 +307,8 @@ export const destinationsData = [
     ],
   },
   {
-    id: 8,
+    id: 8897654321,
+    type: "Destinations",
     name: "Sydney, Australia",
     longDescription:
       "Santorini is one of the Cyclades islands in the Aegean Sea. It was devastated by a volcanic eruption in the 16th century BC, forever shaping its rugged landscape. The whitewashed, cubiform houses of its 2 principal towns, Fira and Oia, cling to cliffs above an underwater caldera (crater). They overlook the sea, small islands to the west and beaches made up of black, red and white lava pebbles.",

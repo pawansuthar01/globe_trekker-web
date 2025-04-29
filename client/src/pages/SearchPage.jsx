@@ -1,44 +1,17 @@
 import React, { useState } from "react";
 import { Search, MapPin, Calendar } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ImageWithLoaderPercentage from "../components/Skeleton/imageLoder";
-
+import { destinationsData } from "./DestinationPages/Destination";
+import { storiesData } from "./StoriesPage/Stories";
 const SearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
-
+  const navigate = useNavigate();
   // Mock search results - replace with API integration
   const results = {
-    destinations: [
-      {
-        id: 1,
-        name: "Santorini, Greece",
-        image:
-          "https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg?auto=compress&cs=tinysrgb&w=600",
-        description:
-          "Famous for its stunning sunsets and white-washed buildings.",
-        category: "Destinations",
-      },
-      {
-        id: 2,
-        name: "Kyoto, Japan",
-        image:
-          "https://images.pexels.com/photos/1440476/pexels-photo-1440476.jpeg?auto=compress&cs=tinysrgb&w=600",
-        description: "Historic temples and traditional gardens.",
-        category: "Destinations",
-      },
-    ],
-    stories: [
-      {
-        id: 1,
-        title: "Hidden Temples of Kyoto",
-        image:
-          "https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=600",
-        excerpt: "Discover the secret temples that most tourists miss.",
-        date: "2025-04-12",
-        category: "Stories",
-      },
-    ],
+    destinations: destinationsData,
+    stories: storiesData,
   };
 
   const allResults = [...results.destinations, ...results.stories];
@@ -102,12 +75,16 @@ const SearchPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayResults.map((result) => (
-            <Link
+            <div
               key={result.id}
-              to={
-                result.category === "Destinations"
-                  ? `/destinations/${result.id}`
-                  : `/stories/${result.id}`
+              onClick={() =>
+                result.type === "Destinations"
+                  ? navigate(`/destinations/${result.id}`, {
+                      state: { destination: result },
+                    })
+                  : navigate(`/stories/${result.id}`, {
+                      state: { story: result },
+                    })
               }
               className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all hover:-translate-y-1"
             >
@@ -147,7 +124,7 @@ const SearchPage = () => {
                   </div>
                 )}
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       </div>

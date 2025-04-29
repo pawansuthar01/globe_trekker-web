@@ -21,6 +21,7 @@ export const storiesData = [
     publishedAt: "2025-04-12",
     readTime: "8 min read",
     category: "Asia",
+    type: "Stories",
     tags: ["japan", "temples", "culture", "hidden-gems"],
     content: `
     Kyoto, the former imperial capital of Japan, is home to over 1,600 Buddhist temples and 400 Shinto shrines. While most visitors flock to the famous Kinkaku-ji (Golden Pavilion) and Fushimi Inari Shrine, there's a whole other world of hidden temples waiting to be discovered.
@@ -44,6 +45,7 @@ export const storiesData = [
       "https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=600",
     date: "2025-04-12",
     readTime: "8 min read",
+    type: "Stories",
     category: "Asia",
     featured: true,
     coverImage: {
@@ -66,6 +68,7 @@ export const storiesData = [
     ],
     publishedAt: "2025-04-12",
     readTime: "8 min read",
+    type: "Stories",
     category: "Asia",
     tags: ["japan", "temples", "culture", "hidden-gems"],
     content: `
@@ -92,6 +95,7 @@ export const storiesData = [
     date: "2025-04-08",
     readTime: "6 min read",
     category: "Food",
+    type: "Stories",
     featured: true,
     coverImage: {
       url: "https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=1280",
@@ -113,6 +117,7 @@ export const storiesData = [
     ],
     publishedAt: "2025-04-12",
     readTime: "8 min read",
+    type: "Stories",
     category: "Asia",
     tags: ["japan", "temples", "culture", "hidden-gems"],
     content: `
@@ -138,6 +143,7 @@ export const storiesData = [
     date: "2025-04-03",
     readTime: "10 min read",
     category: "Adventure",
+    type: "Stories",
     featured: false,
     coverImage: {
       url: "https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=1280",
@@ -160,6 +166,7 @@ export const storiesData = [
     publishedAt: "2025-04-12",
     readTime: "8 min read",
     category: "Asia",
+    type: "Stories",
     tags: ["japan", "temples", "culture", "hidden-gems"],
     content: `
     Kyoto, the former imperial capital of Japan, is home to over 1,600 Buddhist temples and 400 Shinto shrines. While most visitors flock to the famous Kinkaku-ji (Golden Pavilion) and Fushimi Inari Shrine, there's a whole other world of hidden temples waiting to be discovered.
@@ -184,6 +191,7 @@ export const storiesData = [
     date: "2025-03-28",
     readTime: "7 min read",
     category: "Asia",
+    type: "Stories",
     featured: false,
     coverImage: {
       url: "https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=1280",
@@ -205,6 +213,7 @@ export const storiesData = [
     ],
     publishedAt: "2025-04-12",
     readTime: "8 min read",
+    type: "Stories",
     category: "Asia",
     tags: ["japan", "temples", "culture", "hidden-gems"],
     content: `
@@ -230,6 +239,7 @@ export const storiesData = [
     date: "2025-03-21",
     readTime: "5 min read",
     category: "Africa",
+    type: "Stories",
     featured: false,
     coverImage: {
       url: "https://images.pexels.com/photos/4388167/pexels-photo-4388167.jpeg?auto=compress&cs=tinysrgb&w=600",
@@ -252,6 +262,7 @@ export const storiesData = [
     publishedAt: "2025-04-12",
     readTime: "8 min read",
     category: "Asia",
+    type: "Stories",
     tags: ["japan", "temples", "culture", "hidden-gems"],
     content: `
     Kyoto, the former imperial capital of Japan, is home to over 1,600 Buddhist temples and 400 Shinto shrines. While most visitors flock to the famous Kinkaku-ji (Golden Pavilion) and Fushimi Inari Shrine, there's a whole other world of hidden temples waiting to be discovered.
@@ -276,6 +287,7 @@ export const storiesData = [
     date: "2025-03-15",
     readTime: "9 min read",
     category: "Europe",
+    type: "Stories",
     coverImage: {
       url: "https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=1280",
       alt: "Ancient temple in Kyoto surrounded by autumn foliage",

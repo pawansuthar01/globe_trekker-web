@@ -26,7 +26,6 @@ const StoryDetailPage = () => {
       fetchStory();
     } else {
       setLoading(false);
-
       setStory(DataStory);
     }
   }, [id]);
@@ -53,12 +52,12 @@ const StoryDetailPage = () => {
         <header className="max-w-4xl mx-auto mb-8">
           <div className="flex items-center gap-4 text-neutral-600 mb-6">
             <span className="bg-accent-500 text-white text-sm font-medium px-3 py-1 rounded-full">
-              {story.category}
+              {story?.category}
             </span>
             <div className="flex items-center">
               <Calendar className="h-4 w-4 mr-2" />
               <span>
-                {new Date(story.publishedAt).toLocaleDateString("en-US", {
+                {new Date(story?.publishedAt).toLocaleDateString("en-US", {
                   month: "long",
                   day: "numeric",
                   year: "numeric",
@@ -67,25 +66,27 @@ const StoryDetailPage = () => {
             </div>
             <div className="flex items-center">
               <Clock className="h-4 w-4 mr-2" />
-              <span>{story.readTime}</span>
+              <span>{story?.readTime}</span>
             </div>
           </div>
 
           <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-6">
-            {story.title}
+            {story?.title}
           </h1>
 
           <div className="flex items-center gap-4">
             <ImageWithLoaderPercentage
-              src={story.author.avatar}
-              alt={story.author.name}
+              src={story?.author?.avatar}
+              alt={story?.author?.name}
               className="w-12 h-12 rounded-full object-cover"
             />
             <div>
               <div className="font-medium text-neutral-900">
-                {story.author.name}
+                {story?.author?.name}
               </div>
-              <div className="text-sm text-neutral-600">{story.author.bio}</div>
+              <div className="text-sm text-neutral-600">
+                {story?.author?.bio}
+              </div>
             </div>
           </div>
         </header>
@@ -94,8 +95,8 @@ const StoryDetailPage = () => {
         <div className="max-w-5xl mx-auto mb-12">
           <div className="relative aspect-[2/1] rounded-lg overflow-hidden">
             <ImageWithLoaderPercentage
-              src={story.coverImage.url}
-              alt={story.coverImage.alt}
+              src={story?.coverImage?.url}
+              alt={story?.coverImage?.alt}
               className="w-full h-full object-cover"
             />
           </div>
@@ -120,7 +121,7 @@ const StoryDetailPage = () => {
           {/* Main content */}
           <article className="lg:col-span-8 prose prose-lg max-w-none">
             <p className="text-xl text-neutral-600 mb-8">{story.excerpt}</p>
-            {story.content.split("\n\n").map((paragraph, index) => (
+            {story?.content?.split("\n\n").map((paragraph, index) => (
               <p key={index} className="text-neutral-700 mb-6">
                 {paragraph}
               </p>
@@ -132,7 +133,7 @@ const StoryDetailPage = () => {
             <div className="sticky top-24">
               <h3 className="text-lg font-semibold mb-4">Tags</h3>
               <div className="flex flex-wrap gap-2">
-                {story.tags.map((tag) => (
+                {story?.tags?.map((tag) => (
                   <a
                     key={tag}
                     href={`/tags/${tag}`}
@@ -150,18 +151,18 @@ const StoryDetailPage = () => {
         <div className="max-w-5xl mx-auto mt-12">
           <h2 className="text-2xl font-semibold mb-6">Photo Gallery</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {story.images.map((image, index) => (
+            {story?.images?.map((image, index) => (
               <div
                 key={index}
                 className="relative aspect-video rounded-lg overflow-hidden"
               >
                 <ImageWithLoaderPercentage
-                  src={image.url}
-                  alt={image.caption}
+                  src={image?.url}
+                  alt={image?.caption}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-3 text-sm">
-                  {image.caption}
+                  {image?.caption}
                 </div>
               </div>
             ))}

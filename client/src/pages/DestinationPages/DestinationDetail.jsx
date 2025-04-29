@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { Calendar, MapPin, Star, Clock, Heart } from "lucide-react";
+import ImageWithLoaderPercentage from "../../components/Skeleton/imageLoder";
 
 const DestinationDetailPage = () => {
   const { id } = useParams();
@@ -27,6 +28,7 @@ const DestinationDetailPage = () => {
       fetchDestination();
     } else {
       setDestination(DataDestination);
+
       setLoading(false);
     }
   }, [id]);
@@ -76,7 +78,7 @@ const DestinationDetailPage = () => {
               key={index}
               className="relative aspect-video rounded-lg overflow-hidden"
             >
-              <img
+              <ImageWithLoaderPercentage
                 src={image.url}
                 alt={image.caption}
                 className="w-full h-full object-cover"
