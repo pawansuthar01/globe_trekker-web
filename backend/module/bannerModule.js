@@ -7,8 +7,8 @@ const BannerModule = new mongoose.Schema(
     smallDescription: { type: String, required: true },
     images: [
       {
-        public_url: String,
-        secure_url: String,
+        public_id: String,
+        secure_url: { type: String, required: true },
       },
     ],
     active: { type: Boolean, default: false },

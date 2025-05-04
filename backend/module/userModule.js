@@ -84,5 +84,6 @@ userSchema.method = {
     this.forgotPasswordExpiry = Date.now() + 10 * 60 * 1000;
   },
 };
+
 const User = mongoose.model("User", userSchema);
 export default User;
