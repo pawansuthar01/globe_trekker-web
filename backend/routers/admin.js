@@ -6,6 +6,7 @@ import {
   updateBanner,
 } from "../controller/bannerController.js";
 import upload from "../middleware/multerMiddleware.js";
+import { newStory, updateStory } from "../controller/storiesController.js";
 
 const Admin = Router();
 // < **  Banner routes -- start ** >
@@ -15,4 +16,19 @@ Admin.route("/banner/:id")
 Admin.route("/banner").get(getBanner);
 Admin.put("/banner-active/:id", ActiveBanner);
 // < **  Banner routes -- End ** >
+// < **  stories routes -- Start ** >
+Admin.route("/stories").post(
+  upload.fields([
+    { name: "coverImage", maxCount: 1 },
+    { name: "image", maxCount: 5 },
+  ]),
+  newStory
+);
+Admin.route("/stories/:id").put(
+  upload.fields([
+    { name: "coverImage", maxCount: 1 },
+    { name: "image", maxCount: 5 },
+  ]),
+  updateStory
+);
 export default Admin;

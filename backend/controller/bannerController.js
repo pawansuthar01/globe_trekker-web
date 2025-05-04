@@ -2,7 +2,7 @@ import AppError from "../utils/AppError.js";
 import cloudinary from "cloudinary";
 import fs from "fs/promises";
 import Banner from "../module/bannerModule.js";
-
+// new banner add//
 export const newBanner = async (req, res, next) => {
   const { title, description, smallDescription, active } = req.body;
   if (!title || !description || !smallDescription || !req.files) {
@@ -61,7 +61,7 @@ export const newBanner = async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 };
-
+// active banner get //
 export const activeBannerGet = async (req, res, next) => {
   try {
     const banner = await Banner.find({ active: true });
@@ -75,7 +75,7 @@ export const activeBannerGet = async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 };
-
+// update banner //
 export const updateBanner = async (req, res, next) => {
   const { id } = req.params;
   if (!id) {
@@ -93,8 +93,6 @@ export const updateBanner = async (req, res, next) => {
     if (req.files && req.files.length > 0) {
       const files = req.files;
 
-      console.log(index);
-      console.log(index && Array.isArray(index));
       if (index && Array.isArray(index)) {
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
@@ -157,7 +155,7 @@ export const updateBanner = async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 };
-
+// delete banner =//
 export const deleteBanner = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -180,6 +178,7 @@ export const deleteBanner = async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 };
+// set active banner //
 export const ActiveBanner = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -214,7 +213,7 @@ export const ActiveBanner = async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 };
-
+// All  banner get//
 export const getBanner = async (req, res, next) => {
   try {
     const banner = await Banner.find({});
