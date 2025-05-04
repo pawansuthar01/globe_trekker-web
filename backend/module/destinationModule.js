@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import slugify from "slugify";
 const destinationSchema = new mongoose.Schema(
   {
-    type: { type: String, required: true },
+    type: { type: String, default: "Destination" },
     name: { type: String, required: true, trim: true },
     slug: { type: String, unique: true, lowercase: true },
 
@@ -73,6 +73,7 @@ const destinationSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+// Compound index for efficient search
 
 destinationSchema.index({
   name: "text",
