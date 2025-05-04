@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 import { DataBaseConnection } from "./config/DB.js";
 import ErrorMiddleware from "./middleware/ErrorMiddleware.js";
 import banner from "./routers/banner.js";
+import Admin from "./routers/admin.js";
 // call connect to DB//
 DataBaseConnection();
 
@@ -39,6 +40,7 @@ App.use((req, res, next) => {
 
 //routes
 App.use("/banner", banner);
+App.use("/admin", Admin);
 App.use("/", (req, res, next) => {
   res.status(404).send("Oops ! page not found..");
 });
