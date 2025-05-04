@@ -10,7 +10,8 @@ const userContactSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    number: {
+
+    subject: {
       type: String,
       required: true,
     },
