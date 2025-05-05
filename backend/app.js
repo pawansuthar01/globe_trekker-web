@@ -9,6 +9,7 @@ import { DataBaseConnection } from "./config/DB.js";
 import ErrorMiddleware from "./middleware/ErrorMiddleware.js";
 import banner from "./routers/banner.js";
 import Admin from "./routers/admin.js";
+import story from "./routers/stories.js";
 // call connect to DB//
 DataBaseConnection();
 
@@ -40,6 +41,7 @@ App.use((req, res, next) => {
 
 //routes
 App.use("/banner", banner);
+App.use("/stories", story);
 App.use("/admin", Admin);
 App.use("/", (req, res, next) => {
   res.status(404).send("Oops ! page not found..");

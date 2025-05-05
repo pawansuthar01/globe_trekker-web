@@ -80,7 +80,7 @@ const Header = ({ isScrolled, toggleMobileMenu, isMobileMenuOpen }) => {
 
           <button
             onClick={() => navigate("/login")}
-            className="hidden md:block  bg-primary-600 text-white px-2 py-2 rounded-full font-medium hover:bg-primary-700 transition-colors"
+            className="hidden md:block  bg-primary-600 text-white px-4 py-2 rounded-full font-medium hover:bg-primary-700 transition-colors"
           >
             Log In
           </button>

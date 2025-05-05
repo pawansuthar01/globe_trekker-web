@@ -183,3 +183,111 @@ export const updateStory = async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 };
+
+export const Featured_FalseStory = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return next(
+        new AppError("Id is required to set  Featured_False Story...", 400)
+      );
+    }
+    const featured_FalseStory = await Story.findByIdAndUpdate(
+      id,
+      { $set: { featured: false } },
+      { new: true, runValidators: true }
+    );
+
+    if (!featured_FalseStory) {
+      return next(new AppError("Story does not found, try next time...", 400));
+    }
+    res.status(200).json({
+      success: true,
+      message: "SuccessFully featured_False Story...",
+      data: featured_FalseStory,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
+export const Featured_TrueStory = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return next(
+        new AppError("Id is required to set  Featured_True Story...", 400)
+      );
+    }
+    const featured_trueStory = await Story.findByIdAndUpdate(
+      id,
+      { $set: { featured: true } },
+      { new: true, runValidators: true }
+    );
+
+    if (!featured_trueStory) {
+      return next(new AppError("Story does not found, try next time...", 400));
+    }
+    res.status(200).json({
+      success: true,
+      message: "SuccessFully featured_true Story...",
+      data: featured_trueStory,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
+export const deleteStory = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return next(new AppError("Id is required to delete story...", 400));
+    }
+    const DeleteStory = await Story.findByIdAndDelete(id);
+
+    if (!DeleteStory) {
+      return next(new AppError("Story does not found, try next time...", 400));
+    }
+    res.status(200).json({
+      success: true,
+      message: "SuccessFully Delete Story...",
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
+export const GetFeaturedStory = async (req, res, next) => {
+  try {
+    const stories = await Story.find({ featured: true });
+    const storiesCount = await Story.countDocuments({ featured: true });
+    if (!stories) {
+      return next(new AppError("Story does not found, try next time...", 400));
+    }
+    res.status(200).json({
+      success: true,
+      message: "SuccessFully Get Featured  Story...",
+      data: stories,
+      count: storiesCount,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
+export const GetStory = async (req, res, next) => {
+  try {
+    const stories = await Story.find({});
+    const storiesCount = await Story.countDocuments({});
+    const storiesFeaturedCount = await Story.countDocuments({ featured: true });
+    if (!stories) {
+      return next(new AppError("Story does not found, try next time...", 400));
+    }
+    res.status(200).json({
+      success: true,
+      message: "SuccessFully Get All Story...",
+      data: stories,
+      count: storiesCount,
+      FeaturedCount: storiesFeaturedCount,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
