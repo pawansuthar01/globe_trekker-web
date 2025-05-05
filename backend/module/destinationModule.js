@@ -7,8 +7,8 @@ const destinationSchema = new mongoose.Schema(
     slug: { type: String, unique: true, lowercase: true },
 
     thumbnail: {
-      public_id: String,
-      secure_url: String,
+      url: String,
+      alt: String,
     },
 
     images: [

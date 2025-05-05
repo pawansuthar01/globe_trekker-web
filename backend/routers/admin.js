@@ -13,6 +13,7 @@ import {
   newStory,
   updateStory,
 } from "../controller/storiesController.js";
+import { newDestination } from "../controller/destinationController.js";
 
 const Admin = Router();
 // < **  Banner routes -- start ** >
@@ -41,4 +42,13 @@ Admin.route("/stories/:id")
   .delete(deleteStory);
 Admin.route("/stories/featured-false/:id").put(Featured_FalseStory);
 Admin.route("/stories/featured-true/:id").put(Featured_TrueStory);
+// < **  stories routes -- End ** >
+// < **  Destination routes -- Start newDestination** >
+Admin.route("/destination").post(
+  upload.fields([
+    { name: "thumbnail", maxCount: 1 },
+    { name: "image", maxCount: 5 },
+  ]),
+  newDestination
+);
 export default Admin;
