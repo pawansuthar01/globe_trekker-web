@@ -8,14 +8,14 @@ const highlightSchema = new mongoose.Schema(
     avatar: { type: String },
     video: { type: String },
     image: { type: String },
-
+    isPublished: { type: Boolean, default: true },
     location: { type: String, index: true },
     region: { type: String, index: true },
 
     description: { type: String, required: true },
     rating: { type: Number, default: 0, min: 0, max: 5 },
 
-    date: { type: String },
+    date: { type: String, default: Date.now },
   },
   { timestamps: true }
 );

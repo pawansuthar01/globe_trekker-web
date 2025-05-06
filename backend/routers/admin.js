@@ -20,6 +20,12 @@ import {
   PublishedDestination,
   updateDestination,
 } from "../controller/destinationController.js";
+import {
+  addHighlight,
+  deleteHighlight,
+  PublishedHighlight,
+  updateHighlight,
+} from "../controller/highlight.controller.js";
 
 const Admin = Router();
 // < **  Banner routes -- start ** >
@@ -69,4 +75,22 @@ Admin.route("/destination/:id")
 Admin.route("/destination/featured/:id").put(FeaturedDestination);
 Admin.route("/destination/Published/:id").put(PublishedDestination);
 // < **  Destination routes -- End newDestination** >
+// < **  Destination routes -- End newDestination** >
+Admin.route("/highlight").post(
+  upload.fields([
+    { name: "video", maxCount: 1 },
+    { name: "image", maxCount: 1 },
+  ]),
+  addHighlight
+);
+Admin.route("/highlight/:id")
+  .put(
+    upload.fields([
+      { name: "video", maxCount: 1 },
+      { name: "image", maxCount: 1 },
+    ]),
+    updateHighlight
+  )
+  .delete(deleteHighlight);
+Admin.route("/highlight/published/:id").put(PublishedHighlight);
 export default Admin;

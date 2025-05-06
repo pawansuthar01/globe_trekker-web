@@ -554,3 +554,22 @@ export const getPublishedDestination = async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 };
+export const getDestinationById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return next(new AppError("id are required to get destination...", 400));
+    }
+    const destination = await destinationModule.findById(id);
+    if (!destination) {
+      return next(new AppError("destination not found...", 404));
+    }
+    res.status(200).json({
+      success: true,
+      message: "successFully get destination...",
+      data: destination,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};

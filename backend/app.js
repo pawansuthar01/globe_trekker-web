@@ -11,6 +11,7 @@ import banner from "./routers/banner.js";
 import Admin from "./routers/admin.js";
 import story from "./routers/stories.js";
 import destination from "./routers/destination.js";
+import highlight from "./routers/highlight.route.js";
 // call connect to DB//
 DataBaseConnection();
 
@@ -43,6 +44,7 @@ App.use((req, res, next) => {
 //routes
 App.use("/banner", banner);
 App.use("/stories", story);
+App.use("/highlight", highlight);
 App.use("/admin", Admin);
 App.use("/destination", destination);
 App.use("/", (req, res, next) => {

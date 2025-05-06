@@ -291,3 +291,22 @@ export const GetStory = async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 };
+export const getStoriesById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return next(new AppError("id are required to get Story...", 400));
+    }
+    const story = await Story.findById(id);
+    if (!story) {
+      return next(new AppError("story not found...", 404));
+    }
+    res.status(200).json({
+      success: true,
+      message: "successFully get story...",
+      data: story,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
