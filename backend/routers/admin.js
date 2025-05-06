@@ -13,7 +13,13 @@ import {
   newStory,
   updateStory,
 } from "../controller/storiesController.js";
-import { newDestination } from "../controller/destinationController.js";
+import {
+  deleteDestination,
+  FeaturedDestination,
+  newDestination,
+  PublishedDestination,
+  updateDestination,
+} from "../controller/destinationController.js";
 
 const Admin = Router();
 // < **  Banner routes -- start ** >
@@ -51,4 +57,16 @@ Admin.route("/destination").post(
   ]),
   newDestination
 );
+Admin.route("/destination/:id")
+  .put(
+    upload.fields([
+      { name: "thumbnail", maxCount: 1 },
+      { name: "image", maxCount: 5 },
+    ]),
+    updateDestination
+  )
+  .delete(deleteDestination);
+Admin.route("/destination/featured/:id").put(FeaturedDestination);
+Admin.route("/destination/Published/:id").put(PublishedDestination);
+// < **  Destination routes -- End newDestination** >
 export default Admin;

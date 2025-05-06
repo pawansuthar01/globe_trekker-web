@@ -61,10 +61,11 @@ const destinationSchema = new mongoose.Schema(
     isPublished: { type: Boolean, default: false },
 
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-
+    savedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     reviews: [
       {
         user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        userName: String,
         rating: Number,
         comment: String,
         createdAt: { type: Date, default: Date.now },
