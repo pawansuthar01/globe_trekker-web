@@ -26,6 +26,11 @@ import {
   PublishedHighlight,
   updateHighlight,
 } from "../controller/highlight.controller.js";
+import {
+  GetContact,
+  markAsReadContact,
+} from "../controller/userContact.controller.js";
+import { addAbout, updateAbout } from "../controller/about.controller.js";
 
 const Admin = Router();
 // < **  Banner routes -- start ** >
@@ -74,8 +79,8 @@ Admin.route("/destination/:id")
   .delete(deleteDestination);
 Admin.route("/destination/featured/:id").put(FeaturedDestination);
 Admin.route("/destination/Published/:id").put(PublishedDestination);
-// < **  Destination routes -- End newDestination** >
-// < **  Destination routes -- End newDestination** >
+// < **  Destination routes -- End Destination** >
+// < **  Destination routes -- Start highlight** >
 Admin.route("/highlight").post(
   upload.fields([
     { name: "video", maxCount: 1 },
@@ -93,4 +98,13 @@ Admin.route("/highlight/:id")
   )
   .delete(deleteHighlight);
 Admin.route("/highlight/published/:id").put(PublishedHighlight);
+// < **  Destination routes -- End highlight** >
+// < **  Destination routes --  UserContact** >
+Admin.get("/contact", GetContact);
+Admin.put("/contact/:id", markAsReadContact);
+// < **  Destination routes --  End-Contact** >
+// < **  Destination routes --  End-About** >
+Admin.route("/about")
+  .put(upload.fields([{ name: "teamImages", maxCount: 10 }]), updateAbout)
+  .post(upload.fields([{ name: "teamImages", maxCount: 10 }]), addAbout);
 export default Admin;

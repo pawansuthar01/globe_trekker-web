@@ -1,6 +1,6 @@
 import cloudinary from "cloudinary";
 import AppError from "../utils/AppError.js";
-import Story from "../module/storiesModule.js";
+import Story from "../module/stories.Module.js";
 export const newStory = async (req, res, next) => {
   try {
     const {

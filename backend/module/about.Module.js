@@ -9,6 +9,7 @@ const TeamMemberSchema = new mongoose.Schema({
 
 const AboutSchema = new mongoose.Schema(
   {
+    key: { type: String, default: "About_key", unique: true },
     title: String,
     intro: String,
     mission: [String],

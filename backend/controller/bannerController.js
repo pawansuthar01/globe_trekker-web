@@ -1,7 +1,7 @@
 import AppError from "../utils/AppError.js";
 import cloudinary from "cloudinary";
 import fs from "fs/promises";
-import Banner from "../module/bannerModule.js";
+import Banner from "../module/banner.Module.js";
 // new banner add//
 export const newBanner = async (req, res, next) => {
   const { title, description, smallDescription, active } = req.body;

@@ -1,4 +1,4 @@
-import destinationModule from "../module/destinationModule.js";
+import destinationModule from "../module/destination.Module.js";
 import AppError from "../utils/AppError.js";
 import cloudinary from "cloudinary";
 /*<=  add =>*/
