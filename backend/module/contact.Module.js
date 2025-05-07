@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const ContactSchema = new mongoose.Schema(
   {
+    key: { type: String, default: "Contact_key", unique: true },
     location: {
       address: { type: String, required: true },
       city: { type: String, required: true },

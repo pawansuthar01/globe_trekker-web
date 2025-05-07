@@ -12,8 +12,9 @@ import Admin from "./routers/admin.js";
 import story from "./routers/stories.js";
 import destination from "./routers/destination.js";
 import highlight from "./routers/highlight.route.js";
-import userContact from "./routers/contact.route.js";
+import userContact from "./routers/Usercontact.route.js";
 import about from "./routers/about.route.js";
+import contact from "./routers/contact.route.js";
 // call connect to DB//
 DataBaseConnection();
 
@@ -50,6 +51,7 @@ App.use("/highlight", highlight);
 App.use("/admin", Admin);
 App.use("/contact", userContact);
 App.use("/about", about);
+App.use("/web-contact-del", contact);
 App.use("/destination", destination);
 App.use("/", (req, res, next) => {
   res.status(404).send("Oops ! page not found..");

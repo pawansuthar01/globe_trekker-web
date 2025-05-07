@@ -31,6 +31,7 @@ import {
   markAsReadContact,
 } from "../controller/userContact.controller.js";
 import { addAbout, updateAbout } from "../controller/about.controller.js";
+import { addContact, updateContact } from "../controller/contact.controller.js";
 
 const Admin = Router();
 // < **  Banner routes -- start ** >
@@ -60,7 +61,7 @@ Admin.route("/stories/:id")
 Admin.route("/stories/featured-false/:id").put(Featured_FalseStory);
 Admin.route("/stories/featured-true/:id").put(Featured_TrueStory);
 // < **  stories routes -- End ** >
-// < **  Destination routes -- Start newDestination** >
+// < **   routes -- Start newDestination** >
 Admin.route("/destination").post(
   upload.fields([
     { name: "thumbnail", maxCount: 1 },
@@ -79,8 +80,8 @@ Admin.route("/destination/:id")
   .delete(deleteDestination);
 Admin.route("/destination/featured/:id").put(FeaturedDestination);
 Admin.route("/destination/Published/:id").put(PublishedDestination);
-// < **  Destination routes -- End Destination** >
-// < **  Destination routes -- Start highlight** >
+// < **   routes -- End Destination** >
+// < **   routes -- Start highlight** >
 Admin.route("/highlight").post(
   upload.fields([
     { name: "video", maxCount: 1 },
@@ -98,13 +99,18 @@ Admin.route("/highlight/:id")
   )
   .delete(deleteHighlight);
 Admin.route("/highlight/published/:id").put(PublishedHighlight);
-// < **  Destination routes -- End highlight** >
-// < **  Destination routes --  UserContact** >
+// < **   routes -- End highlight** >
+// < **   routes --  UserContact** >
 Admin.get("/contact", GetContact);
 Admin.put("/contact/:id", markAsReadContact);
-// < **  Destination routes --  End-Contact** >
-// < **  Destination routes --  End-About** >
+// < **   routes --  End-Contact** >
+// < **   routes --  Start-About** >
 Admin.route("/about")
   .put(upload.fields([{ name: "teamImages", maxCount: 10 }]), updateAbout)
   .post(upload.fields([{ name: "teamImages", maxCount: 10 }]), addAbout);
+// < **  routes --  End-About** >
+
+// < **   routes -- Start web -contact-del** >
+Admin.route("/web-contact").post(addContact).put(updateContact);
+// < **   routes -- Start web -contact-del** >
 export default Admin;
