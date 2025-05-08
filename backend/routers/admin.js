@@ -4,7 +4,7 @@ import {
   deleteBanner,
   getBanner,
   updateBanner,
-} from "../controller/bannerController.js";
+} from "../controller/banner.Controller.js";
 import upload from "../middleware/multerMiddleware.js";
 import {
   deleteStory,
@@ -12,14 +12,14 @@ import {
   Featured_TrueStory,
   newStory,
   updateStory,
-} from "../controller/storiesController.js";
+} from "../controller/stories.Controller.js";
 import {
   deleteDestination,
   FeaturedDestination,
   newDestination,
   PublishedDestination,
   updateDestination,
-} from "../controller/destinationController.js";
+} from "../controller/destination.Controller.js";
 import {
   addHighlight,
   deleteHighlight,
@@ -32,6 +32,8 @@ import {
 } from "../controller/userContact.controller.js";
 import { addAbout, updateAbout } from "../controller/about.controller.js";
 import { addContact, updateContact } from "../controller/contact.controller.js";
+import { getAllSearchKeywords } from "../controller/search.controller.js";
+import { getAllUser } from "../controller/user.controller.js";
 
 const Admin = Router();
 // < **  Banner routes -- start ** >
@@ -113,4 +115,11 @@ Admin.route("/about")
 // < **   routes -- Start web -contact-del** >
 Admin.route("/web-contact").post(addContact).put(updateContact);
 // < **   routes -- Start web -contact-del** >
+
+// < **   routes -- Start web -search-del** >
+Admin.route("/search").get(getAllSearchKeywords);
+// < **   routes -- Start web -search-del** >
+// < **   routes -- Start web -search-del** >
+Admin.route("/users").get(getAllUser);
+// < **   routes -- Start web -search-del** >
 export default Admin;

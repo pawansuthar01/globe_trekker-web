@@ -374,6 +374,8 @@ export const getAllDestination = async (req, res, next) => {
 };
 /*<=  user save the  destination =>*/
 
+// await grantAchievement(userId, "DESTINATION_LIKED");
+// await grantAchievement(userId, "FEEDBACK_GIVEN");
 export const saveDestination = async (req, res, next) => {
   try {
     const { destinationId, userId } = req.params;

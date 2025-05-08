@@ -18,7 +18,6 @@ const storySchema = new mongoose.Schema(
       avatar: String,
       bio: String,
     },
-
     coverImage: {
       url: String,
       alt: String,

@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { User, Mail, Lock, UserPlus } from "lucide-react";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const SignupPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -13,8 +16,35 @@ const SignupPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Implement signup logic here
-    console.log("Signup attempt:", formData);
+
+    const { name, email, password, confirmPassword, acceptTerms } = formData;
+
+    if (!acceptTerms) {
+      toast.error("You must accept the terms and conditions.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/signup", {
+        name,
+        email,
+        password,
+      });
+
+      toast.success("Account created successfully!");
+      navigate("/login");
+    } catch (error) {
+      console.error("Signup Error:", error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "Signup failed");
+    }
+  };
+  const handleGoogleLogin = () => {
+    window.location.href = `http://localhost:5000/auth/google`;
   };
 
   return (
@@ -25,8 +55,28 @@ const SignupPage = () => {
             <h1 className="text-2xl font-bold text-center mb-8">
               Create an Account
             </h1>
+            <div>
+              <div className="mt-6">
+                <button
+                  type="button"
+                  onClick={handleGoogleLogin}
+                  className="w-full bg-white border border-neutral-300 hover:border-neutral-400 text-neutral-700 py-3 rounded-lg font-medium flex items-center justify-center gap-3 shadow-sm hover:shadow transition"
+                >
+                  <img
+                    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                    alt="Google"
+                    className="h-5 w-5"
+                  />
+                  Continue with Google
+                </button>
+              </div>
+              <div className="my-4 flex items-center justify-center">
+                <span className="text-neutral-500 text-sm">OR</span>
+              </div>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Full Name */}
               <div>
                 <label
                   htmlFor="name"
@@ -49,6 +99,7 @@ const SignupPage = () => {
                 </div>
               </div>
 
+              {/* Email */}
               <div>
                 <label
                   htmlFor="email"
@@ -71,6 +122,7 @@ const SignupPage = () => {
                 </div>
               </div>
 
+              {/* Password */}
               <div>
                 <label
                   htmlFor="password"
@@ -93,6 +145,7 @@ const SignupPage = () => {
                 </div>
               </div>
 
+              {/* Confirm Password */}
               <div>
                 <label
                   htmlFor="confirmPassword"
@@ -118,6 +171,7 @@ const SignupPage = () => {
                 </div>
               </div>
 
+              {/* Terms & Conditions */}
               <div className="flex items-start">
                 <input
                   type="checkbox"
@@ -149,6 +203,7 @@ const SignupPage = () => {
                 </label>
               </div>
 
+              {/* Submit Button */}
               <button
                 type="submit"
                 className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
@@ -158,6 +213,7 @@ const SignupPage = () => {
               </button>
             </form>
 
+            {/* Already have an account */}
             <div className="mt-6 text-center">
               <p className="text-neutral-600">
                 Already have an account?{" "}

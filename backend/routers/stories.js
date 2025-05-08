@@ -3,7 +3,7 @@ import {
   GetFeaturedStory,
   getStoriesById,
   GetStory,
-} from "../controller/storiesController.js";
+} from "../controller/stories.Controller.js";
 
 const story = Router();
 story.route("/").get(GetStory);

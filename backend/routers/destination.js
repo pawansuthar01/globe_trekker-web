@@ -8,7 +8,7 @@ import {
   RemoveToSaveDestination,
   saveDestination,
   updateReview,
-} from "../controller/destinationController.js";
+} from "../controller/destination.Controller.js";
 
 const destination = Router();
 destination.route("/add-review/:id").post(addReview);

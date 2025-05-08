@@ -1,5 +1,5 @@
 import { config } from "dotenv";
-config(".env");
+config({ path: ".env" });
 
 import express from "express";
 import morgan from "morgan";
@@ -15,10 +15,24 @@ import highlight from "./routers/highlight.route.js";
 import userContact from "./routers/Usercontact.route.js";
 import about from "./routers/about.route.js";
 import contact from "./routers/contact.route.js";
+import search from "./routers/search.route.js";
+import session from "express-session";
+import passport from "passport";
+import "./config/passport.js";
+import { cookieOptions } from "./utils/cookieOption.js";
+import user from "./routers/user.route.js";
 // call connect to DB//
-DataBaseConnection();
-
 const App = express();
+DataBaseConnection();
+App.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+App.use(passport.initialize());
+App.use(passport.session());
 
 App.use(express.json());
 App.use(cookieParser());
@@ -45,6 +59,7 @@ App.use((req, res, next) => {
 });
 
 //routes
+
 App.use("/banner", banner);
 App.use("/stories", story);
 App.use("/highlight", highlight);
@@ -52,7 +67,9 @@ App.use("/admin", Admin);
 App.use("/contact", userContact);
 App.use("/about", about);
 App.use("/web-contact-del", contact);
+App.use("/search", search);
 App.use("/destination", destination);
+App.use("/auth", user);
 App.use("/", (req, res, next) => {
   res.status(404).send("Oops ! page not found..");
 });

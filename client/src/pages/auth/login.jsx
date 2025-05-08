@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail, Lock, LogIn } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,10 @@ const LoginPage = () => {
     e.preventDefault();
     // Implement login logic here
     console.log("Login attempt:", formData);
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = `http://localhost:5000/auth/google`;
   };
 
   return (
@@ -99,6 +104,18 @@ const LoginPage = () => {
                 Sign In
               </button>
             </form>
+
+            <div className="my-4 flex items-center justify-center">
+              <span className="text-neutral-500 text-sm">OR</span>
+            </div>
+
+            <button
+              onClick={handleGoogleLogin}
+              className="w-full border border-neutral-300 bg-white text-neutral-700 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 hover:bg-neutral-100"
+            >
+              <FcGoogle className="h-5 w-5" />
+              Continue with Google
+            </button>
 
             <div className="mt-6 text-center">
               <p className="text-neutral-600">
