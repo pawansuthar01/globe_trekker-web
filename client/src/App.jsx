@@ -14,7 +14,21 @@ import ResetPasswordPage from "./pages/PasswordPages/ResetPasswordPage";
 import HighlightsPage from "./pages/HighlightsPage";
 import Profile from "./pages/auth/profile";
 import Layout from "./components/Layout/layout";
-
+import ProtectedRoute from "./components/AdminComponent/auth/ProtectedRoute";
+import Dashboard from "./pages/Admin/Dashboard";
+import DestinationList from "./pages/Admin/destinations/DestinationList";
+import DestinationForm from "./pages/Admin/destinations/DestinationForm";
+import HighlightList from "./pages/Admin/highlights/HighlightList";
+import HighlightForm from "./pages/Admin/highlights/HighlightForm";
+import StoryList from "./pages/Admin/stories/StoryList";
+import StoryForm from "./pages/Admin/stories/StoryForm";
+import UserList from "./pages/Admin/users/UserList";
+import UserDetail from "./pages/Admin/users/UserDetail";
+import ContactList from "./pages/Admin/contacts/ContactList";
+import AboutUpdatePage from "./pages/Admin/about/aboutPage";
+import AdminLayout from "./components/AdminComponent/layouts/AdminLayout";
+import BannerPage from "./pages/Admin/banner/BannerPage";
+import TeamMembers from "./pages/Admin/about/TeamMembers";
 function App() {
   return (
     <Routes>
@@ -32,6 +46,31 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/search" element={<SearchPage />} />
+      </Route>
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Dashboard />} />
+        <Route path="destinations" element={<DestinationList />} />
+        <Route path="about" element={<AboutUpdatePage />} />
+        <Route path="about/team" element={<TeamMembers />} />
+        <Route path="banners" element={<BannerPage />} />
+        <Route path="destinations/create" element={<DestinationForm />} />
+        <Route path="destinations/edit/:id" element={<DestinationForm />} />
+        <Route path="highlights" element={<HighlightList />} />
+        <Route path="highlights/create" element={<HighlightForm />} />
+        <Route path="highlights/edit/:id" element={<HighlightForm />} />
+        <Route path="stories" element={<StoryList />} />
+        <Route path="stories/create" element={<StoryForm />} />
+        <Route path="stories/edit/:id" element={<StoryForm />} />
+        <Route path="users" element={<UserList />} />
+        <Route path="users/:id" element={<UserDetail />} />
+        <Route path="contacts" element={<ContactList />} />
       </Route>
     </Routes>
   );

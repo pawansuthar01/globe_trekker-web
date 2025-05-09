@@ -1,0 +1,234 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+body {
+  font-family: "Inter", sans-serif;
+  @apply bg-gray-50 text-gray-900;
+}
+
+.page-transition {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.form-input {
+  @apply w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20;
+}
+
+.form-select {
+  @apply w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20;
+}
+
+.form-textarea {
+  @apply w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-lg px-4 py-2 font-medium transition-colors duration-200;
+}
+
+.btn-primary {
+  @apply bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+}
+
+.btn-danger {
+  @apply bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2;
+}
+
+.btn-success {
+  @apply bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
+}
+
+.card {
+  @apply rounded-xl bg-white p-6 shadow-sm transition-all duration-200 hover:shadow-md;
+}
+
+.mobile-nav {
+  @apply fixed bottom-0 left-0 z-50 w-full border-t border-gray-200 bg-white;
+}
+
+.active-nav-item {
+  @apply text-blue-600;
+}
+
+.inactive-nav-item {
+  @apply text-gray-500;
+}
+
+.page-header {
+  @apply mb-6 flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0;
+}
+
+.card-grid {
+  @apply grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3;
+}
+
+.search-input {
+  @apply w-full rounded-lg border border-gray-300 bg-white pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20;
+}
+
+.tag {
+  @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+}
+
+.tag-blue {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.tag-green {
+  @apply bg-green-100 text-green-800;
+}
+
+.tag-red {
+  @apply bg-red-100 text-red-800;
+}
+
+.tag-yellow {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.tag-purple {
+  @apply bg-purple-100 text-purple-800;
+}
+
+.tag-gray {
+  @apply bg-gray-100 text-gray-800;
+}
+
+.placeholder-image {
+  @apply flex h-full w-full items-center justify-center rounded-lg bg-gray-100 text-gray-400;
+}
+
+.image-preview {
+  @apply relative h-48 w-full overflow-hidden rounded-lg bg-gray-100;
+}
+
+.image-preview img {
+  @apply h-full w-full object-cover;
+}
+
+.image-actions {
+  @apply absolute bottom-2 right-2 flex space-x-2;
+}
+
+.form-group {
+  @apply mb-4;
+}
+
+.form-label {
+  @apply mb-2 block text-sm font-medium text-gray-700;
+}
+
+.form-error {
+  @apply mt-1 text-sm text-red-600;
+}
+
+.loading-spinner {
+  @apply h-5 w-5 animate-spin text-gray-500;
+}
+
+.modal-overlay {
+  @apply fixed inset-0 z-50 bg-black/50 backdrop-blur-sm transition-opacity;
+}
+
+.modal {
+  @apply fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-6 shadow-xl transition-all sm:p-8;
+}
+
+.drawer {
+  @apply fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white p-6 shadow-xl transition-all sm:p-8;
+}
+
+.fab {
+  @apply fixed bottom-20 right-6 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition-all hover:bg-blue-700 sm:bottom-6;
+}
+
+.tab-active {
+  @apply border-b-2 border-blue-600 text-blue-600;
+}
+
+.tab-inactive {
+  @apply border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700;
+}
+
+.status-badge {
+  @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+}
+
+.status-active {
+  @apply bg-green-100 text-green-800;
+}
+
+.status-inactive {
+  @apply bg-gray-100 text-gray-800;
+}
+
+.status-read {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.status-unread {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.table-container {
+  @apply overflow-x-auto rounded-lg border border-gray-200 bg-white;
+}
+
+.table {
+  @apply min-w-full divide-y divide-gray-200;
+}
+
+.table-header {
+  @apply bg-gray-50;
+}
+
+.table-header-cell {
+  @apply px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500;
+}
+
+.table-body {
+  @apply divide-y divide-gray-200 bg-white;
+}
+
+.table-row {
+  @apply hover:bg-gray-50;
+}
+
+.table-cell {
+  @apply whitespace-nowrap px-6 py-4 text-sm text-gray-500;
+}
+
+.pagination {
+  @apply mt-4 flex items-center justify-between;
+}
+
+.pagination-info {
+  @apply text-sm text-gray-700;
+}
+
+.pagination-buttons {
+  @apply flex space-x-2;
+}
+
+.pagination-button {
+  @apply inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50;
+}
+
+.pagination-button-active {
+  @apply bg-blue-50 text-blue-600 hover:bg-blue-100;
+}
+
+.pagination-button-disabled {
+  @apply cursor-not-allowed opacity-50;
+}
+
+.error-container {
+  @apply rounded-lg bg-red-50 p-4 text-red-800;
+}
+
+.success-container {
+  @apply rounded-lg bg-green-50 p-4 text-green-800;
+}
