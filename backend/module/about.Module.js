@@ -12,6 +12,7 @@ const AboutSchema = new mongoose.Schema(
     key: { type: String, default: "About_key", unique: true },
     title: String,
     intro: String,
+    introImage: String,
     mission: [String],
     values: [
       {

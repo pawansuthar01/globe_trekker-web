@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from "../../helper/axiosInstance";
 
 const initialState = {
   aboutData: null,
@@ -8,44 +8,39 @@ const initialState = {
 };
 
 // ✅ 1. Get About data (Public)
-export const fetchAbout = createAsyncThunk(
-  "about/fetch",
-  async (_, thunkAPI) => {
-    try {
-      const res = await axios.get("/about");
-      return res.data;
-    } catch (err) {
-      return thunkAPI.rejectWithValue(err.response?.data || err.message);
-    }
+
+export const fetchAbout = createAsyncThunk("about/fetch", async () => {
+  try {
+    const res = await axiosInstance.get("/about");
+    return res.data;
+  } catch (err) {
+    return err.response?.data || err.message;
   }
-);
+});
 
 // ✅ 2. Add About data (Admin)
-export const addAbout = createAsyncThunk(
-  "about/add",
-  async (formData, thunkAPI) => {
-    try {
-      const res = await axios.post("/api/v5/admin/about", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      return res.data;
-    } catch (err) {
-      return thunkAPI.rejectWithValue(err.response?.data || err.message);
-    }
+export const addAbout = createAsyncThunk("about/add", async (formData) => {
+  try {
+    const res = await axiosInstance.post("/api/v5/admin/about", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+  } catch (err) {
+    return err.response?.data || err.message;
   }
-);
+});
 
 // ✅ 3. Update About data (Admin)
 export const updateAbout = createAsyncThunk(
   "about/update",
-  async ({ id, formData }, thunkAPI) => {
+  async ({ id, formData }) => {
     try {
-      const res = await axios.put(`/api/v5/admin/about`, formData, {
+      const res = await axiosInstance.put(`/api/v5/admin/about`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       return res.data;
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.response?.data || err.message);
+      return err.response?.data || err.message;
     }
   }
 );
@@ -62,7 +57,7 @@ const aboutSlice = createSlice({
       })
       .addCase(fetchAbout.fulfilled, (state, action) => {
         state.loading = false;
-        state.aboutData = action.payload;
+        state.aboutData = action.payload?.data;
       })
       .addCase(fetchAbout.rejected, (state, action) => {
         state.loading = false;

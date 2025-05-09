@@ -108,7 +108,13 @@ Admin.put("/contact/:id", markAsReadContact);
 // < **   routes --  End-Contact** >
 // < **   routes --  Start-About** >
 Admin.route("/about")
-  .put(upload.fields([{ name: "teamImages", maxCount: 10 }]), updateAbout)
+  .put(
+    upload.fields([
+      { name: "teamImages", maxCount: 10 },
+      { name: "introImage", maxCount: 1 },
+    ]),
+    updateAbout
+  )
   .post(upload.fields([{ name: "teamImages", maxCount: 10 }]), addAbout);
 // < **  routes --  End-About** >
 
@@ -118,8 +124,8 @@ Admin.route("/web-contact").post(addContact).put(updateContact);
 
 // < **   routes -- Start web -search-del** >
 Admin.route("/search").get(getAllSearchKeywords);
-// < **   routes -- Start web -search-del** >
-// < **   routes -- Start web -search-del** >
+// < **   routes -- End web -search-del** >
+// < **   routes -- Start web -user** >
 Admin.route("/users").get(getAllUser);
-// < **   routes -- Start web -search-del** >
+// < **   routes -- Start web -User** >
 export default Admin;

@@ -86,7 +86,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stats */}
-      <div className="flex flex-wrap gap-5 justify-evenly">
+      <div className="grid grid-cols-2  gap-5 justify-evenly">
         {stats.map((stat) => (
           <Link
             key={stat.id}
@@ -94,7 +94,7 @@ const Dashboard = () => {
             className="group transition-all duration-200 hover:scale-[1.02]"
           >
             <div className="card overflow-hidden">
-              <div className="flex items-center">
+              <div className="flex  items-center">
                 <div
                   className={`flex h-12 w-12 items-center justify-center rounded-lg ${stat.color} text-white`}
                 >

@@ -17,7 +17,7 @@ const NewsletterSection = () => {
   };
 
   return (
-    <section className="py-16 relative overflow-hidden">
+    <section className="py-16 relative overflow-hidden lg:ml-2">
       <div
         className="absolute inset-0 z-0 "
         style={{

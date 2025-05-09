@@ -2,6 +2,7 @@ import { Router } from "express";
 import "../config/passport.js";
 import passport from "passport";
 import { Subscribe } from "../controller/user.controller.js";
+import { cookieOptions } from "../utils/cookieOption.js";
 // Initiate Google Login
 const user = Router();
 user.get(

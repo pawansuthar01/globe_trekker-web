@@ -99,6 +99,7 @@ export const updateAbout = async (req, res, next) => {
     }
 
     let team = existing.team;
+    let introImage = existing.introImage;
 
     // If new team images are uploaded, rebuild team array
     if (req.files?.teamImages) {
@@ -115,6 +116,15 @@ export const updateAbout = async (req, res, next) => {
         });
       }
     }
+    if (req.files?.introImage) {
+      const image = req.files.introImage[0];
+
+      introImage = "";
+
+      const uploaded = await uploadToCloudinary(image, "About/introImage");
+
+      introImage = uploaded.secure_url;
+    }
 
     existing.title = title || existing.title;
     existing.intro = intro || existing.intro;
@@ -122,6 +132,7 @@ export const updateAbout = async (req, res, next) => {
     existing.values = values ? JSON.parse(values) : existing.values;
     existing.join = join ? JSON.parse(join) : existing.join;
     existing.team = team;
+    existing.introImage = introImage;
 
     await existing.save();
 

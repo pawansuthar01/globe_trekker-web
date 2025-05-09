@@ -34,7 +34,7 @@ const TopDestinations = () => {
     }
   }, [shouldAnimate, activeCategory]);
   return (
-    <section ref={containerRef} className="py-16 bg-neutral-50  px-1">
+    <section ref={containerRef} className="py-16 bg-neutral-50  px-1 lg:ml-3">
       <div className="container mx-auto">
         <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 mb-6">
           Top Destinations

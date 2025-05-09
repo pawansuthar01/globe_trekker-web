@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import ImageWithLoaderPercentage from "../Skeleton/imageLoder";
 const HeroSection = () => {
   return (
-    <section className="relative pt-20 pb-16 md:pt-32 md:pb-24">
+    <section className="relative pt-20 pb-16 md:pt-32 md:pb-24 lg:ml-2">
       <div className="container mx-auto px-4 relative z-10">
         <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
           <div className="md:w-1/2 lg:pr-8 animate-slide-up">
@@ -34,7 +34,7 @@ const HeroSection = () => {
             </div>
           </div>
 
-          <div className="md:w-1/2 mt-8 md:mt-0 flex justify-center md:justify-end animate-fade-in">
+          <div className="md:w-1/2 lg:w-1/3 mt-8 md:mt-0 flex justify-center md:justify-end animate-fade-in">
             <div className="relative">
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex justify-center items-center h-full w-full">

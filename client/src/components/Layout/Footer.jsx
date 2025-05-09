@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 const Footer = () => {
   return (
-    <footer className="bg-neutral-800 text-white pt-16 pb-8">
+    <footer className="bg-neutral-800 text-white pt-16 pb-8 lg:ml-2">
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap     gap-8 mb-12">
           {/* <div className=  gap-8 mb-12"> */}

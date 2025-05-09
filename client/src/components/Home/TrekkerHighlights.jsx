@@ -1,13 +1,16 @@
 import React from "react";
-import { ChevronRight, Star } from "lucide-react";
+import { ChevronRight, MapPin, Star } from "lucide-react";
 import video from "../../assets/Video by ojaswini.kapoor.mp4";
 import { Link } from "react-router-dom";
 import ImageWithLoaderPercentage from "../Skeleton/imageLoder";
+import ShortVideoCard, { VideoPlayIcon } from "../Highlights/videoCard";
+import { useState } from "react";
 // Mock data - would come from backend in real implementation
 const highlights = [
   {
     id: 1,
     name: "Maria Campbell",
+    video: video,
     avatar:
       "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=600",
     location: "Cappadocia, Turkey",
@@ -19,6 +22,7 @@ const highlights = [
 ];
 
 const TrekkersHighlights = () => {
+  const [showVideo, setShowVideo] = useState("");
   return (
     <section className="py-16  text-black ">
       <div className="container mx-auto px-4">
@@ -62,20 +66,39 @@ const TrekkersHighlights = () => {
                 </div>
                 <div className="flex gap-5 max-sm:flex-col">
                   <div className="w-full sm:w-60 h-40 sm:h-72 overflow-hidden rounded-lg ">
-                    <ImageWithLoaderPercentage
-                      src={highlight.image}
-                      alt={highlight.location}
-                      className="w-full h-full rounded-lg object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="sm:w-52 flex flex-col h-62  overflow-hidden rounded-lg">
-                    <video
-                      src={video}
-                      autoPlay
-                      muted
-                      loop
-                      className="w-full h-52 object-cover rounded-sm transition-transform duration-500 group-hover:scale-105"
-                    />
+                    <div className="relative h-48 overflow-hidden">
+                      <ImageWithLoaderPercentage
+                        src={highlight.image}
+                        alt={highlight.location}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                        <div className="flex items-center text-white">
+                          <MapPin className="h-4 w-4 mr-1" />
+                          <span className="text-sm font-medium">
+                            {highlight.location}
+                          </span>
+                        </div>
+                      </div>
+                      {highlight.video && (
+                        <div className="absolute top-0 right-0 p-4">
+                          <div
+                            onClick={() => setShowVideo(highlight.id)}
+                            className="flex items-center text-white"
+                          >
+                            <VideoPlayIcon />
+                          </div>
+
+                          {showVideo == highlight.id && (
+                            <ShortVideoCard
+                              isClose={() => setShowVideo(null)}
+                              videoUrl={highlight.video}
+                              title={highlight.name}
+                            />
+                          )}
+                        </div>
+                      )}
+                    </div>
                     <div className="mt-8 text-center ">
                       <Link
                         to="/highlight"
