@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from "../../helper/axiosInstance";
 
 const initialState = {
   stories: [],
@@ -10,26 +10,34 @@ const initialState = {
 };
 
 // Public APIs
-export const fetchStories = createAsyncThunk(
-  "stories/fetchAll",
+export const fetchStories = createAsyncThunk("stories/fetchAll", async () => {
+  try {
+    const res = await axiosInstance.get("/story");
+    return res.data;
+  } catch (err) {
+    return err.response?.data || err.message;
+  }
+});
+
+export const fetchFeaturedStories = createAsyncThunk(
+  "stories/fetchFeatured",
   async (_, thunkAPI) => {
     try {
-      const res = await axios.get("/story");
+      const res = await axiosInstance.get("/story/featured");
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
     }
   }
 );
-
-export const fetchFeaturedStories = createAsyncThunk(
+export const fetchHomeStories = createAsyncThunk(
   "stories/fetchFeatured",
-  async (_, thunkAPI) => {
+  async () => {
     try {
-      const res = await axios.get("/story/featured");
+      const res = await axiosInstance.get("/story/home");
       return res.data;
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.response?.data || err.message);
+      return err.response?.data || err.message;
     }
   }
 );
@@ -38,7 +46,7 @@ export const fetchStoryById = createAsyncThunk(
   "stories/fetchById",
   async (id, thunkAPI) => {
     try {
-      const res = await axios.get(`/story/${id}`);
+      const res = await axiosInstance.get(`/story/${id}`);
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -51,7 +59,7 @@ export const addStory = createAsyncThunk(
   "stories/add",
   async (formData, thunkAPI) => {
     try {
-      const res = await axios.post("/api/v5/admin/stories", formData, {
+      const res = await axiosInstance.post("/api/v5/admin/stories", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       return res.data;
@@ -65,9 +73,13 @@ export const updateStory = createAsyncThunk(
   "stories/update",
   async ({ id, formData }, thunkAPI) => {
     try {
-      const res = await axios.put(`/api/v5/admin/stories/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await axiosInstance.put(
+        `/api/v5/admin/stories/${id}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -79,7 +91,7 @@ export const deleteStory = createAsyncThunk(
   "stories/delete",
   async (id, thunkAPI) => {
     try {
-      await axios.delete(`/api/v5/admin/stories/${id}`);
+      await axiosInstance.delete(`/api/v5/admin/stories/${id}`);
       return { id };
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -91,7 +103,9 @@ export const markAsFeatured = createAsyncThunk(
   "stories/markAsFeatured",
   async (id, thunkAPI) => {
     try {
-      const res = await axios.put(`/api/v5/admin/stories/featured-true/${id}`);
+      const res = await axiosInstance.put(
+        `/api/v5/admin/stories/featured-true/${id}`
+      );
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -103,7 +117,9 @@ export const unmarkAsFeatured = createAsyncThunk(
   "stories/unmarkAsFeatured",
   async (id, thunkAPI) => {
     try {
-      const res = await axios.put(`/api/v5/admin/stories/featured-false/${id}`);
+      const res = await axiosInstance.put(
+        `/api/v5/admin/stories/featured-false/${id}`
+      );
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);

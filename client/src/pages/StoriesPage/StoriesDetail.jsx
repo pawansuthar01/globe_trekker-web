@@ -2,20 +2,25 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { Calendar, Clock, User, Heart, Share2 } from "lucide-react";
 import ImageWithLoaderPercentage from "../../components/Skeleton/imageLoder";
+import formatDate from "../../utils/DataFormat";
+import { useDispatch } from "react-redux";
+import { fetchStoryById } from "../../Redux/Slice/storiesSlice";
 
 const StoryDetailPage = () => {
   const { id } = useParams();
   const DataStory = useLocation().state?.story;
-  const [story, setStory] = useState(DataStory);
+  const [story, setStory] = useState([]);
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    if (DataStory) {
-      // Simulated API call - replace with actual API integration
+    if (!DataStory) {
       const fetchStory = async () => {
         try {
-          //   const response = await fetch(`/api/stories/${id}`);
-          //   const data = await response.json();
-          //   setStory(data);
+          setLoading(true);
+          const res = await dispatch(fetchStoryById(id));
+          if (res?.payload?.success) {
+            setStory(res?.payload.data);
+          }
           setLoading(false);
         } catch (error) {
           console.error("Error fetching story:", error);
@@ -56,13 +61,7 @@ const StoryDetailPage = () => {
             </span>
             <div className="flex items-center">
               <Calendar className="h-4 w-4 mr-2" />
-              <span>
-                {new Date(story?.publishedAt).toLocaleDateString("en-US", {
-                  month: "long",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              </span>
+              <span>{formatDate(story?.publishedAt)}</span>
             </div>
             <div className="flex items-center">
               <Clock className="h-4 w-4 mr-2" />

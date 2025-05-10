@@ -26,7 +26,9 @@ const destinationSchema = new mongoose.Schema(
 
     tags: [String],
     popularFor: [String],
-
+    SuggestedDuration: {
+      type: String,
+    },
     location: {
       country: String,
       region: String,

@@ -3,7 +3,7 @@ import { MapPin } from "lucide-react";
 
 const HighlightHeader = () => {
   return (
-    <div className="relative mt-20">
+    <div className="relative ">
       <div className="h-[40vh] w-full bg-gradient-to-r from-primary-600 to-neutral-500 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay"

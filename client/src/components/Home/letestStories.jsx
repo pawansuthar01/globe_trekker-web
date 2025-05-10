@@ -1,15 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ChevronRight, Calendar, Clock } from "lucide-react";
 import ImageWithLoaderPercentage from "../Skeleton/imageLoder";
-import { storiesData } from "../../pages/StoriesPage/Stories";
+import { useDispatch } from "react-redux";
+import { fetchHomeStories } from "../../Redux/Slice/storiesSlice";
+import formatDate from "../../utils/DataFormat";
 // Mock data - would come from backend in real implementation
 
 const LatestStories = () => {
   const navigate = useNavigate();
-  const featuredStories = storiesData.filter((story) => story.featured);
-  const regularStories = storiesData.filter((story) => !story.featured);
-
+  const dispatch = useDispatch();
+  const [stories, setStories] = useState([]);
+  const featuredStories = stories?.filter((story) => story.featured);
+  const regularStories = stories?.filter((story) => !story.featured);
+  const fetchStories = async () => {
+    const res = await dispatch(fetchHomeStories());
+    if (res?.payload?.success) {
+      setStories(res?.payload?.data);
+    }
+  };
+  useEffect(() => {
+    fetchStories();
+  }, []);
   return (
     <section className="py-16">
       <div className="container mx-auto px-4">
@@ -27,17 +39,17 @@ const LatestStories = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-8">
-          {featuredStories.map((story) => (
+          {featuredStories?.map((story) => (
             <div
-              key={story.id}
+              key={story._id}
               onClick={() =>
-                navigate(`/stories/${story.id}`, { state: { story: story } })
+                navigate(`/stories/${story._id}`, { state: { story: story } })
               }
               className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow"
             >
               <div className="relative h-48 overflow-hidden">
                 <ImageWithLoaderPercentage
-                  src={story.image}
+                  src={story.coverImage.url}
                   alt={story.title}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
@@ -49,13 +61,7 @@ const LatestStories = () => {
                 <div className="flex items-center text-xs text-neutral-500 mb-3 space-x-4">
                   <div className="flex items-center">
                     <Calendar className="h-3 w-3 mr-1" />
-                    <span>
-                      {new Date(story.date).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </span>
+                    <span>{formatDate(story?.publishedAt)}</span>
                   </div>
                   <div className="flex items-center">
                     <Clock className="h-3 w-3 mr-1" />
@@ -75,15 +81,15 @@ const LatestStories = () => {
           <div className="flex flex-col gap-4    ">
             {regularStories.map((story) => (
               <div
-                key={story.id}
+                key={story._id}
                 onClick={() =>
-                  navigate(`/stories/${story.id}`, { state: { story: story } })
+                  navigate(`/stories/${story._id}`, { state: { story: story } })
                 }
                 className=" flex rounded-lg items-center overflow-hidden  group  cursor-pointer "
               >
                 <div className="relative flex justify-center  max-w-20 max-h-20 overflow-hidden">
                   <ImageWithLoaderPercentage
-                    src={story.image}
+                    src={story.coverImage.url}
                     alt={story.title}
                     className=" object-cover rounded-xl transition-transform duration-500 "
                   />
@@ -92,10 +98,7 @@ const LatestStories = () => {
                   <div className="flex items-center text-xs text-neutral-500 mb-2">
                     <Calendar className="h-3 w-3 mr-1" />
                     <span className="mr-3">
-                      {new Date(story.date).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      })}
+                      {formatDate(story?.publishedAt)}
                     </span>
                     <Clock className="h-3 w-3 mr-1 " />
                     <span>{story.readTime}</span>

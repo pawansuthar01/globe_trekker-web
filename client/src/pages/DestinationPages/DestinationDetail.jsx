@@ -2,23 +2,27 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { Calendar, MapPin, Star, Clock, Heart } from "lucide-react";
 import ImageWithLoaderPercentage from "../../components/Skeleton/imageLoder";
+import { useDispatch } from "react-redux";
+import { fetchDestinationById } from "../../Redux/Slice/detinationSlice";
+import formatDate from "../../utils/DataFormat";
 
 const DestinationDetailPage = () => {
   const { id } = useParams();
-  const DataDestination = useLocation().state.destination;
-
-  const [destination, setDestination] = useState(DataDestination);
+  const DataDestination = useLocation().state?.destination;
+  const dispatch = useDispatch();
+  const [destination, setDestination] = useState();
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     // Simulated API call - replace with actual API integration
     if (!DataDestination) {
       const fetchDestination = async () => {
         try {
-          //   const response = await fetch(`/api/destinations/${id}`);
-          //   const data = await response.json();
-          setLoading(false);
-          //   setDestination(data);
+          const res = await dispatch(fetchDestinationById(id));
+
+          if (res?.payload?.success) {
+            setDestination(res?.payload.data);
+            setLoading(false);
+          }
         } catch (error) {
           console.error("Error fetching destination:", error);
         } finally {
@@ -33,7 +37,7 @@ const DestinationDetailPage = () => {
     }
   }, [id]);
 
-  if (loading) {
+  if (loading || !destination) {
     return (
       <div className="min-h-screen pt-24 pb-16">
         <div className="container mx-auto px-4">
@@ -49,105 +53,166 @@ const DestinationDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-16">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <header className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-4">
-            {destination.name}
-          </h1>
-          <div className="flex flex-wrap items-center gap-4 text-neutral-600">
-            <div className="flex items-center">
-              <MapPin className="h-5 w-5 mr-2 text-primary-600" />
-              <span>
-                {destination.location.country}, {destination.location.region}
+    destination && (
+      <div className="min-h-screen pt-24 pb-16">
+        <div className="container mx-auto px-4">
+          {/* Header */}
+          <header className="mb-8">
+            <p className="text-sm  fond-bold">
+              Post On:{" "}
+              <span className="text-blue-300">
+                {" "}
+                {formatDate(destination.createdAt)}
               </span>
-            </div>
-            <div className="flex items-center">
-              <Star className="h-5 w-5 mr-2 text-accent-500" />
-              <span>
-                {destination.rating.value} ({destination.rating.count} reviews)
-              </span>
-            </div>
-          </div>
-        </header>
-        {/* Main image gallery */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          {destination.images.map((image, index) => (
-            <div
-              key={index}
-              className="relative aspect-video rounded-lg overflow-hidden"
-            >
-              <ImageWithLoaderPercentage
-                src={image.url}
-                alt={image.caption}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-3 text-sm">
-                {image.caption}
+            </p>
+            <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-4">
+              {destination.name}
+            </h1>
+            <div className="flex flex-wrap items-center gap-4 text-neutral-600">
+              <div className="flex items-center">
+                <MapPin className="h-5 w-5 mr-2 text-primary-600" />
+                <span>
+                  {destination.location.country}, {destination.location.region}
+                </span>
+              </div>
+              <div className="flex items-center">
+                <Star className="h-5 w-5 mr-2 text-accent-500" />
+                <span>
+                  {destination.rating.value} ({destination.rating.count}{" "}
+                  reviews)
+                </span>
               </div>
             </div>
-          ))}
-        </div>
-        {/* Content grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main content */}
-          <div className="lg:col-span-2">
-            <section className="bg-white rounded-lg shadow-md p-6 mb-8">
-              <h2 className="text-2xl font-semibold mb-4">About</h2>
-              <p className="text-neutral-600 mb-6">{destination.description}</p>
-              <p className="text-neutral-600">{destination.longDescription}</p>
-            </section>
-
-            <section className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-2xl font-semibold mb-4">Travel Tips</h2>
-              <ul className="space-y-3">
-                {destination.travelTips.map((tip, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="inline-block w-6 h-6 bg-primary-100 text-primary-600 rounded-full flex-shrink-0  items-center justify-center mr-3">
-                      {index + 1}
-                    </span>
-                    <span className="text-neutral-600">{tip}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
+          </header>
+          {/* Main image gallery */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            {destination?.images.map((image, index) => (
+              <div
+                key={index}
+                className="relative aspect-video rounded-lg overflow-hidden"
+              >
+                <ImageWithLoaderPercentage
+                  src={image.secure_url}
+                  alt={image.caption}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-3 text-sm">
+                  {image.caption}
+                </div>
+              </div>
+            ))}
           </div>
+          {/* Content grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main content */}
+            <div className="lg:col-span-2">
+              <section className="bg-white rounded-lg shadow-md p-2 mb-8">
+                <div className="flex flex-wrap gap-2">
+                  {destination.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="p-6">
+                  <h2 className="text-2xl font-semibold mb-4">About</h2>
+                  <p className="text-neutral-600 mb-6">
+                    {destination.description}
+                  </p>
+                  <p className="text-neutral-600">
+                    {destination.longDescription}
+                  </p>
+                </div>
+              </section>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold mb-4">Quick Info</h3>
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <Calendar className="h-5 w-5 text-primary-600 mr-3" />
-                  <div>
-                    <div className="font-medium">Best Time to Visit</div>
-                    <div className="text-neutral-600">
-                      {destination.bestTimeToVisit}
+              <section className="bg-white rounded-lg shadow-md p-6">
+                <h2 className="text-2xl font-semibold mb-4">Travel Tips</h2>
+                <ul className="space-y-3">
+                  {destination.travelTips.map((tip, index) => (
+                    <li key={index} className="flex items-start">
+                      <span className="inline-block w-6 h-6 bg-primary-100 text-primary-600 rounded-full flex-shrink-0  items-center justify-center mr-3">
+                        {index + 1}
+                      </span>
+                      <span className="text-neutral-600">{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h3 className="text-lg font-semibold mb-4">Quick Info</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <Calendar className="h-5 w-5 text-primary-600 mr-3" />
+                    <div>
+                      <div className="font-medium">Best Time to Visit</div>
+                      <div className="text-neutral-600">
+                        {destination.bestTimeToVisit}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <Clock className="h-5 w-5 text-primary-600 mr-3" />
+                    <div>
+                      <div className="font-medium">Suggested Duration</div>
+                      <div className="text-neutral-600">
+                        {destination?.SuggestedDuration}
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center">
-                  <Clock className="h-5 w-5 text-primary-600 mr-3" />
-                  <div>
-                    <div className="font-medium">Suggested Duration</div>
-                    <div className="text-neutral-600">4-7 days</div>
-                  </div>
-                </div>
               </div>
-            </div>
+              {/* Itinerary Section */}
+              <section className="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 className="text-2xl font-semibold mb-4">Itinerary</h2>
+                {destination.itinerary.map((dayPlan) => (
+                  <div key={dayPlan._id} className="mb-4">
+                    <h3 className="text-lg font-bold text-primary-700 mb-1">
+                      Day {dayPlan.day}: {dayPlan.title}
+                    </h3>
+                    <ul className="list-disc list-inside text-neutral-600">
+                      {dayPlan.activities.map((activity, idx) => (
+                        <li key={idx}>{activity}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </section>
 
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <button className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 px-6 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-                <Heart className="h-5 w-5" />
-                Save to Favorites
-              </button>
+              {/* Tags Section */}
+
+              {/* Popular For Section */}
+              <section className="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 className="text-2xl font-semibold mb-4">Popular For</h2>
+                <div className="flex flex-wrap gap-2">
+                  {destination.popularFor.map((item, index) => (
+                    <span
+                      key={index}
+                      className="bg-accent-100 text-accent-700 px-3 py-1 rounded-full text-sm"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </section>
+
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <button className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 px-6 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+                  <Heart className="h-5 w-5" />
+                  Save to Favorites
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    )
   );
 };
 

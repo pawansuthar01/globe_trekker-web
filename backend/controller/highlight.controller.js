@@ -205,6 +205,71 @@ export const getPublishedHighlight = async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 };
+/*<=  add  Featured  destination by id  `true => false and false => true`   =>*/
+export const FeaturedHighlight = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return next(
+        new AppError("Id is required to featured   highlight...", 400)
+      );
+    }
+    const highlight = await Highlight.findById(id);
+    if (!highlight) {
+      return next(
+        new AppError("highlight does not found, try next time...", 400)
+      );
+    }
+    if (highlight.featured) {
+      highlight.featured = false;
+    } else {
+      highlight.featured = true;
+    }
+    await highlight.save();
+
+    res.status(200).json({
+      success: true,
+      message: "SuccessFully featured highlight ...",
+      data: highlight,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
+/*<=  get only   Featured highlight by true =>*/
+export const getFeaturedHighlight = async (req, res, next) => {
+  try {
+    // Get the page and limit from query parameters, with default values
+    const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
+    const limit = parseInt(req.query.limit) || 30; // Default to 30 items per page if not provided
+
+    // Calculate the skip value for pagination
+    const skip = (page - 1) * limit;
+
+    // Fetch the featured highlights with pagination
+    const featuredHighlight = await Highlight.find({ featured: true })
+      .skip(skip)
+      .limit(limit);
+
+    // Get the total count of featured highlights (no pagination)
+    const featuredHighlightCount = await Highlight.countDocuments({
+      featured: true,
+    });
+
+    // Send the response with the data, count, and pagination info
+    res.status(200).json({
+      success: true,
+      message: "Successfully fetched featured highlights",
+      data: featuredHighlight,
+      count: featuredHighlightCount,
+      totalPages: Math.ceil(featuredHighlightCount / limit),
+      currentPage: page,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
+
 export const getHighlightById = async (req, res, next) => {
   try {
     const { id } = req.params;

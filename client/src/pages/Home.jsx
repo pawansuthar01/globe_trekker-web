@@ -1,3 +1,4 @@
+import { useDispatch } from "react-redux";
 import HeroSection from "../components/Home/HeroSection";
 import LatestStories from "../components/Home/letestStories";
 import NewsletterSection from "../components/Home/NewsSeletterSection";
@@ -6,7 +7,7 @@ import TrekkersHighlights from "../components/Home/TrekkerHighlights";
 
 export const Home = () => {
   return (
-    <div className="  select-none">
+    <div className=" select-none">
       <HeroSection />
       <TopDestinations />
       <LatestStories />

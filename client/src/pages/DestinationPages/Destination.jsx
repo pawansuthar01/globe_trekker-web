@@ -1,355 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MapPin, Filter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { caption } from "framer-motion/client";
 import ImageWithLoaderPercentage from "../../components/Skeleton/imageLoder";
-
-// Mock data - would come from backend in real implementation
-export const destinationsData = [
-  {
-    id: 15555,
-    type: "Destinations",
-    longDescription:
-      "Santorini is one of the Cyclades islands in the Aegean Sea. It was devastated by a volcanic eruption in the 16th century BC, forever shaping its rugged landscape. The whitewashed, cubiform houses of its 2 principal towns, Fira and Oia, cling to cliffs above an underwater caldera (crater). They overlook the sea, small islands to the west and beaches made up of black, red and white lava pebbles.",
-    name: "Santorini, Greece",
-    image:
-      "https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg?auto=compress&cs=tinysrgb&w=600",
-    images: [
-      {
-        url: "https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg?auto=compress&cs=tinysrgb&w=600",
-        caption: "Sunset view from Oia",
-      },
-      {
-        url: "https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg?auto=compress&cs=tinysrgb&w=600",
-        caption: "Sunset view from Oia",
-      },
-    ],
-    description:
-      "Famous for its stunning sunsets, white-washed buildings, and blue domes.",
-    category: "europe",
-    bestTimeToVisit: "April to October",
-    tags: ["island", "romantic", "beaches"],
-
-    location: {
-      country: "Greece",
-      region: "Cyclades",
-      coordinates: {
-        latitude: 36.3932,
-        longitude: 25.4615,
-      },
-    },
-    rating: {
-      value: 4.8,
-      count: 1250,
-    },
-    travelTips: [
-      "Book accommodations well in advance, especially during peak season",
-      "Visit Oia early in the morning to avoid crowds",
-      "Take a sunset cruise around the caldera",
-      "Try local wines at a traditional vineyard",
-    ],
-  },
-  {
-    id: 2654,
-    type: "Destinations",
-    name: "Kyoto, Japan",
-    bestTimeToVisit: "April to October",
-    longDescription:
-      "Santorini is one of the Cyclades islands in the Aegean Sea. It was devastated by a volcanic eruption in the 16th century BC, forever shaping its rugged landscape. The whitewashed, cubiform houses of its 2 principal towns, Fira and Oia, cling to cliffs above an underwater caldera (crater). They overlook the sea, small islands to the west and beaches made up of black, red and white lava pebbles.",
-    image:
-      "https://images.pexels.com/photos/1440476/pexels-photo-1440476.jpeg?auto=compress&cs=tinysrgb&w=600",
-    images: [
-      {
-        url: "https://images.pexels.com/photos/1440476/pexels-photo-1440476.jpeg?auto=compress&cs=tinysrgb&w=600",
-        caption: "Iconic blue domes of Santorini",
-      },
-      {
-        url: "https://images.pexels.com/photos/3225531/pexels-photo-3225531.jpeg?auto=compress&cs=tinysrgb&w=1280",
-        caption: "Sunset view from Oia",
-      },
-    ],
-
-    location: {
-      country: "Greece",
-      region: "Cyclades",
-      coordinates: {
-        latitude: 36.3932,
-        longitude: 25.4615,
-      },
-    },
-    rating: {
-      value: 4.8,
-      count: 1250,
-    },
-    description: "Historic temples, traditional gardens, and geisha districts.",
-    category: "asia",
-    tags: ["culture", "temples", "history"],
-    travelTips: [
-      "Book accommodations well in advance, especially during peak season",
-      "Visit Oia early in the morning to avoid crowds",
-      "Take a sunset cruise around the caldera",
-      "Try local wines at a traditional vineyard",
-    ],
-  },
-
-  {
-    id: 36546489,
-    type: "Destinations",
-    longDescription:
-      "Santorini is one of the Cyclades islands in the Aegean Sea. It was devastated by a volcanic eruption in the 16th century BC, forever shaping its rugged landscape. The whitewashed, cubiform houses of its 2 principal towns, Fira and Oia, cling to cliffs above an underwater caldera (crater). They overlook the sea, small islands to the west and beaches made up of black, red and white lava pebbles.",
-    name: "Amalfi Coast, Italy",
-    bestTimeToVisit: "April to October",
-    image:
-      "https://images.pexels.com/photos/4502965/pexels-photo-4502965.jpeg?auto=compress&cs=tinysrgb&w=600",
-    images: [
-      {
-        url: "https://images.pexels.com/photos/4502965/pexels-photo-4502965.jpeg?auto=compress&cs=tinysrgb&w=600",
-        caption: "Iconic blue domes of Santorini",
-      },
-      {
-        url: "https://images.pexels.com/photos/3225531/pexels-photo-3225531.jpeg?auto=compress&cs=tinysrgb&w=1280",
-        caption: "Sunset view from Oia",
-      },
-    ],
-
-    location: {
-      country: "Greece",
-      region: "Cyclades",
-      coordinates: {
-        latitude: 36.3932,
-        longitude: 25.4615,
-      },
-    },
-    rating: {
-      value: 4.8,
-      count: 1250,
-    },
-    description:
-      "Stunning cliffside villages with colorful houses overlooking the Mediterranean Sea.",
-    category: "europe",
-    tags: ["coastal", "scenic", "food"],
-    travelTips: [
-      "Book accommodations well in advance, especially during peak season",
-      "Visit Oia early in the morning to avoid crowds",
-      "Take a sunset cruise around the caldera",
-      "Try local wines at a traditional vineyard",
-    ],
-  },
-  {
-    id: 4656546,
-    type: "Destinations",
-    name: "Bali, Indonesia",
-    bestTimeToVisit: "April to October",
-    longDescription:
-      "Santorini is one of the Cyclades islands in the Aegean Sea. It was devastated by a volcanic eruption in the 16th century BC, forever shaping its rugged landscape. The whitewashed, cubiform houses of its 2 principal towns, Fira and Oia, cling to cliffs above an underwater caldera (crater). They overlook the sea, small islands to the west and beaches made up of black, red and white lava pebbles.",
-    image:
-      "https://images.pexels.com/photos/3225531/pexels-photo-3225531.jpeg?auto=compress&cs=tinysrgb&w=1280",
-    images: [
-      {
-        url: "https://images.pexels.com/photos/4502965/pexels-photo-4502965.jpeg?auto=compress&cs=tinysrgb&w=600",
-        caption: "Iconic blue domes of Santorini",
-      },
-      {
-        url: "https://images.pexels.com/photos/3225531/pexels-photo-3225531.jpeg?auto=compress&cs=tinysrgb&w=1280",
-        caption: "Sunset view from Oia",
-      },
-    ],
-
-    location: {
-      country: "Greece",
-      region: "Cyclades",
-      coordinates: {
-        latitude: 36.3932,
-        longitude: 25.4615,
-      },
-    },
-    rating: {
-      value: 4.8,
-      count: 1250,
-    },
-    description:
-      "Tropical paradise with beautiful beaches, rice terraces, and spiritual temples.",
-    category: "asia",
-    tags: ["beaches", "nature", "culture"],
-    travelTips: [
-      "Book accommodations well in advance, especially during peak season",
-      "Visit Oia early in the morning to avoid crowds",
-      "Take a sunset cruise around the caldera",
-      "Try local wines at a traditional vineyard",
-    ],
-  },
-  {
-    id: 56464988,
-    type: "Destinations",
-    name: "Marrakech, Morocco",
-    bestTimeToVisit: "April to October",
-    longDescription:
-      "Santorini is one of the Cyclades islands in the Aegean Sea. It was devastated by a volcanic eruption in the 16th century BC, forever shaping its rugged landscape. The whitewashed, cubiform houses of its 2 principal towns, Fira and Oia, cling to cliffs above an underwater caldera (crater). They overlook the sea, small islands to the west and beaches made up of black, red and white lava pebbles.",
-    image:
-      "https://images.pexels.com/photos/4502965/pexels-photo-4502965.jpeg?auto=compress&cs=tinysrgb&w=600",
-    images: [
-      {
-        url: "https://images.pexels.com/photos/4502965/pexels-photo-4502965.jpeg?auto=compress&cs=tinysrgb&w=600",
-        caption: "Iconic blue domes of Santorini",
-      },
-      {
-        url: "https://images.pexels.com/photos/3225531/pexels-photo-3225531.jpeg?auto=compress&cs=tinysrgb&w=1280",
-        caption: "Sunset view from Oia",
-      },
-    ],
-
-    location: {
-      country: "Greece",
-      region: "Cyclades",
-      coordinates: {
-        latitude: 36.3932,
-        longitude: 25.4615,
-      },
-    },
-    rating: {
-      value: 4.8,
-      count: 1250,
-    },
-    description:
-      "Vibrant markets, intricate architecture, and rich Moroccan culture.",
-    category: "africa",
-    tags: ["markets", "culture", "architecture"],
-    travelTips: [
-      "Book accommodations well in advance, especially during peak season",
-      "Visit Oia early in the morning to avoid crowds",
-      "Take a sunset cruise around the caldera",
-      "Try local wines at a traditional vineyard",
-    ],
-  },
-  {
-    id: 66638698,
-    type: "Destinations",
-    name: "Grand Canyon, USA",
-    bestTimeToVisit: "April to October",
-    longDescription:
-      "Santorini is one of the Cyclades islands in the Aegean Sea. It was devastated by a volcanic eruption in the 16th century BC, forever shaping its rugged landscape. The whitewashed, cubiform houses of its 2 principal towns, Fira and Oia, cling to cliffs above an underwater caldera (crater). They overlook the sea, small islands to the west and beaches made up of black, red and white lava pebbles.",
-    images: [
-      {
-        url: "https://images.pexels.com/photos/4502965/pexels-photo-4502965.jpeg?auto=compress&cs=tinysrgb&w=600",
-        caption: "Iconic blue domes of Santorini",
-      },
-      {
-        url: "https://images.pexels.com/photos/3225531/pexels-photo-3225531.jpeg?auto=compress&cs=tinysrgb&w=1280",
-        caption: "Sunset view from Oia",
-      },
-    ],
-
-    location: {
-      country: "Greece",
-      region: "Cyclades",
-      coordinates: {
-        latitude: 36.3932,
-        longitude: 25.4615,
-      },
-    },
-    rating: {
-      value: 4.8,
-      count: 1250,
-    },
-    image:
-      "https://images.pexels.com/photos/33041/antelope-canyon-lower-canyon-arizona.jpg?auto=compress&cs=tinysrgb&w=600",
-    description:
-      "Vast and majestic natural wonder carved by the Colorado River.",
-    category: "americas",
-    tags: ["nature", "hiking", "scenic"],
-    travelTips: [
-      "Book accommodations well in advance, especially during peak season",
-      "Visit Oia early in the morning to avoid crowds",
-      "Take a sunset cruise around the caldera",
-      "Try local wines at a traditional vineyard",
-    ],
-  },
-  {
-    id: 7753662,
-    type: "Destinations",
-    name: "Machu Picchu, Peru",
-    bestTimeToVisit: "April to October",
-    longDescription:
-      "Santorini is one of the Cyclades islands in the Aegean Sea. It was devastated by a volcanic eruption in the 16th century BC, forever shaping its rugged landscape. The whitewashed, cubiform houses of its 2 principal towns, Fira and Oia, cling to cliffs above an underwater caldera (crater). They overlook the sea, small islands to the west and beaches made up of black, red and white lava pebbles.",
-    images: [
-      {
-        url: "https://images.pexels.com/photos/4502965/pexels-photo-4502965.jpeg?auto=compress&cs=tinysrgb&w=600",
-        caption: "Iconic blue domes of Santorini",
-      },
-      {
-        url: "https://images.pexels.com/photos/3225531/pexels-photo-3225531.jpeg?auto=compress&cs=tinysrgb&w=1280",
-        caption: "Sunset view from Oia",
-      },
-    ],
-
-    location: {
-      country: "Greece",
-      region: "Cyclades",
-      coordinates: {
-        latitude: 36.3932,
-        longitude: 25.4615,
-      },
-    },
-    rating: {
-      value: 4.8,
-      count: 1250,
-    },
-    image:
-      "https://images.pexels.com/photos/33041/antelope-canyon-lower-canyon-arizona.jpg?auto=compress&cs=tinysrgb&w=600",
-    description: "Ancient Incan citadel set high in the Andes Mountains.",
-    category: "americas",
-    tags: ["history", "hiking", "ancient"],
-    travelTips: [
-      "Book accommodations well in advance, especially during peak season",
-      "Visit Oia early in the morning to avoid crowds",
-      "Take a sunset cruise around the caldera",
-      "Try local wines at a traditional vineyard",
-    ],
-  },
-  {
-    id: 8897654321,
-    type: "Destinations",
-    name: "Sydney, Australia",
-    longDescription:
-      "Santorini is one of the Cyclades islands in the Aegean Sea. It was devastated by a volcanic eruption in the 16th century BC, forever shaping its rugged landscape. The whitewashed, cubiform houses of its 2 principal towns, Fira and Oia, cling to cliffs above an underwater caldera (crater). They overlook the sea, small islands to the west and beaches made up of black, red and white lava pebbles.",
-    bestTimeToVisit: "April to October",
-    images: [
-      {
-        url: "https://images.pexels.com/photos/4502965/pexels-photo-4502965.jpeg?auto=compress&cs=tinysrgb&w=600",
-        caption: "Iconic blue domes of Santorini",
-      },
-      {
-        url: "https://images.pexels.com/photos/3225531/pexels-photo-3225531.jpeg?auto=compress&cs=tinysrgb&w=1280",
-        caption: "Sunset view from Oia",
-      },
-    ],
-
-    location: {
-      country: "Greece",
-      region: "Cyclades",
-      coordinates: {
-        latitude: 36.3932,
-        longitude: 25.4615,
-      },
-    },
-    rating: {
-      value: 4.8,
-      count: 1250,
-    },
-    image:
-      "https://images.pexels.com/photos/1878293/pexels-photo-1878293.jpeg?auto=compress&cs=tinysrgb&w=600",
-    description:
-      "Iconic harbor city known for the Opera House and beautiful beaches.",
-    category: "oceania",
-    tags: ["city", "beaches", "architecture"],
-    travelTips: [
-      "Book accommodations well in advance, especially during peak season",
-      "Visit Oia early in the morning to avoid crowds",
-      "Take a sunset cruise around the caldera",
-      "Try local wines at a traditional vineyard",
-    ],
-  },
-];
+import { useDispatch } from "react-redux";
+import { fetchAllDestinations } from "../../Redux/Slice/detinationSlice";
+import DestinationSkeleton from "../../components/Skeleton/destinationPageSkeleton";
 
 const categories = [
   { id: "all", name: "All" },
@@ -374,6 +29,9 @@ const tags = [
 ];
 
 const DestinationsPage = () => {
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const [destination, setDestination] = useState([]);
   const [activeCategory, setActiveCategory] = useState("all");
   const [activeTags, setActiveTags] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -386,8 +44,16 @@ const DestinationsPage = () => {
       setActiveTags([...activeTags, tag]);
     }
   };
+  const fetchDestinationsData = async () => {
+    setLoading(true);
+    const res = await dispatch(fetchAllDestinations());
+    if (res?.payload?.success) {
+      setDestination(res?.payload?.data);
+    }
+    setLoading(false);
+  };
 
-  const filteredDestinations = destinationsData.filter((destination) => {
+  const filteredDestinations = destination?.filter((destination) => {
     // Filter by category
     if (activeCategory !== "all" && destination.category !== activeCategory) {
       return false;
@@ -411,7 +77,10 @@ const DestinationsPage = () => {
 
     return true;
   });
-
+  useEffect(() => {
+    fetchDestinationsData();
+    console.log(destination);
+  }, []);
   return (
     <div className="min-h-screen pt-24 pb-16">
       <div className="container mx-auto px-4">
@@ -533,21 +202,27 @@ const DestinationsPage = () => {
         </div>
 
         {/* Destinations grid */}
-        {filteredDestinations.length > 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <DestinationSkeleton key={index} />
+            ))}
+          </div>
+        ) : filteredDestinations.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredDestinations.map((destination) => (
               <div
                 onClick={() =>
-                  navigate(`/destinations/${destination.id}`, {
+                  navigate(`/destinations/${destination._id}`, {
                     state: { destination },
                   })
                 }
-                key={destination.id}
+                key={destination._id}
                 className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all hover:-translate-y-1"
               >
                 <div className="relative h-48 overflow-hidden">
                   <ImageWithLoaderPercentage
-                    src={destination.image}
+                    src={destination?.thumbnail.url}
                     alt={destination.name}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />

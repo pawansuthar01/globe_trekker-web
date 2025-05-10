@@ -1,21 +1,42 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import ImageWithLoaderPercentage from "../Skeleton/imageLoder";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchActiveBanners } from "../../Redux/Slice/bannerSlice";
+import SkeletonBannerPage from "../Skeleton/bannerSkeletonpage";
 const HeroSection = () => {
+  const [banner, setBanner] = useState();
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const FetchActiveBanners = async () => {
+    setLoading(true);
+    const res = await dispatch(fetchActiveBanners());
+    if (res?.payload?.success) {
+      setBanner(res?.payload?.data[0]);
+    }
+    setLoading(false);
+  };
+  useEffect(() => {
+    FetchActiveBanners();
+  }, []);
+
+  if (loading || !banner) return <SkeletonBannerPage />;
   return (
     <section className="relative pt-20 pb-16 md:pt-32 md:pb-24 lg:ml-2">
       <div className="container mx-auto px-4 relative z-10">
-        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12">
           <div className="md:w-1/2 lg:pr-8 animate-slide-up">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-neutral-900 mb-4 leading-tight">
-              Discover the World's{" "}
-              <span className="text-accent-500">Hidden</span> Wonders
+              {banner.title ||
+                ` Discover the World's{" "}
+              <span className="text-accent-500">Hidden</span> Wonders`}
             </h1>
             <p className="text-neutral-600 text-lg mb-8 max-w-lg">
-              Find the most marvelous and hidden gems that aren't on typical
+              {banner.description ||
+                `Find the most marvelous and hidden gems that aren't on typical
               tourist maps. Join our global community of adventurers who seek
-              authentic travel experiences off the beaten path.
+              authentic travel experiences off the beaten path.`}
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
@@ -40,18 +61,18 @@ const HeroSection = () => {
                 <div className="flex justify-center items-center h-full w-full">
                   <ImageWithLoaderPercentage
                     alt="Machu Picchu"
+                    src={banner.images[0].secure_url}
                     className="rounded-lg w-full  h-[80%] md:h-[80%] md:w-[80%] object-cover shadow-lg transform hover:scale-102 transition-transform hover:shadow-xl"
-                    src="https://images.pexels.com/photos/3155666/pexels-photo-3155666.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                   />
                 </div>
                 <div className="flex flex-col gap-3 w-full md:w-[90%]">
                   <ImageWithLoaderPercentage
-                    src="https://images.pexels.com/photos/4275885/pexels-photo-4275885.jpeg?auto=compress&cs=tinysrgb&w=600"
+                    src={banner.images[1].secure_url}
                     alt="Santorini"
                     className=" relative  rounded-lg h-48 md:h-54 w-full  object-cover shadow-lg transform hover:scale-102 transition-transform hover:shadow-xl"
                   />
                   <ImageWithLoaderPercentage
-                    src="https://images.pexels.com/photos/4388167/pexels-photo-4388167.jpeg?auto=compress&cs=tinysrgb&w=600"
+                    src={banner.images[2].secure_url}
                     alt="Mountain landscape"
                     className="rounded-lg  h-48 md:h-60 w-full object-cover shadow-lg transform hover:scale-102 transition-transform hover:shadow-xl"
                   />
@@ -62,7 +83,8 @@ const HeroSection = () => {
                   ✈️ Ready for adventure
                 </div>
                 <div className="text-sm text-neutral-600">
-                  Join 50,000+ travelers exploring the world
+                  {banner.smallDescription ||
+                    `  Join 50,000+ travelers exploring the world`}
                 </div>
               </div>
             </div>

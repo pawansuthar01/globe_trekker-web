@@ -19,8 +19,8 @@ import search from "./routers/search.route.js";
 import session from "express-session";
 import passport from "passport";
 import "./config/passport.js";
-import { cookieOptions } from "./utils/cookieOption.js";
 import user from "./routers/user.route.js";
+import axios from "axios";
 // call connect to DB//
 const App = express();
 DataBaseConnection();
@@ -60,16 +60,29 @@ App.use((req, res, next) => {
 
 //routes
 
+setInterval(() => {
+  const handelUpSever = async () => {
+    try {
+      await axios.get(`${process.env.BACKEND_URL}/ping`);
+    } catch (error) {
+      console.log(error.massage);
+    }
+  };
+  handelUpSever();
+}, 15000);
+App.use("/ping", (req, res) => {
+  res.status(200).send("pong...");
+});
 App.use("/banner", banner);
-App.use("/stories", story);
+App.use("/story", story);
 App.use("/highlight", highlight);
-App.use("/admin", Admin);
+App.use("/api/v5/admin", Admin);
 App.use("/contact", userContact);
 App.use("/about", about);
 App.use("/web-contact-del", contact);
 App.use("/search", search);
-App.use("/destination", destination);
-App.use("/auth", user);
+App.use("/api/v3/destination", destination);
+App.use("/api/v3/auth", user);
 App.use("/", (req, res, next) => {
   res.status(404).send("Oops ! page not found..");
 });

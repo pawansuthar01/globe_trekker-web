@@ -1,9 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from "../../helper/axiosInstance";
 
 const initialState = {
   banners: [],
-  activeBanners: [],
   loading: false,
   error: null,
 };
@@ -13,7 +12,7 @@ export const fetchBanners = createAsyncThunk(
   "banner/fetchAll",
   async (_, thunkAPI) => {
     try {
-      const res = await axios.get("/api/v5/admin/banner");
+      const res = await axiosInstance.get("/api/v5/admin/banner");
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -24,12 +23,12 @@ export const fetchBanners = createAsyncThunk(
 // ✅ Get Active Banners (Public)
 export const fetchActiveBanners = createAsyncThunk(
   "banner/fetchActive",
-  async (_, thunkAPI) => {
+  async () => {
     try {
-      const res = await axios.get("/banner");
+      const res = await axiosInstance.get("/banner");
       return res.data;
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.response?.data || err.message);
+      return err.response?.data || err.message;
     }
   }
 );
@@ -39,9 +38,13 @@ export const updateBanner = createAsyncThunk(
   "banner/update",
   async ({ id, formData }, thunkAPI) => {
     try {
-      const res = await axios.put(`/api/v5/admin/banner/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await axiosInstance.put(
+        `/api/v5/admin/banner/${id}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -54,7 +57,7 @@ export const deleteBanner = createAsyncThunk(
   "banner/delete",
   async (id, thunkAPI) => {
     try {
-      await axios.delete(`/api/v5/admin/banner/${id}`);
+      await axiosInstance.delete(`/api/v5/admin/banner/${id}`);
       return { id };
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -67,7 +70,7 @@ export const activateBanner = createAsyncThunk(
   "banner/activate",
   async (id, thunkAPI) => {
     try {
-      const res = await axios.put(`/api/v5/admin/banner-active/${id}`);
+      const res = await axiosInstance.put(`/api/v5/admin/banner-active/${id}`);
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -92,11 +95,6 @@ const bannerSlice = createSlice({
       .addCase(fetchBanners.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      })
-
-      // Fetch active banners
-      .addCase(fetchActiveBanners.fulfilled, (state, action) => {
-        state.activeBanners = action.payload;
       })
 
       // Update banner

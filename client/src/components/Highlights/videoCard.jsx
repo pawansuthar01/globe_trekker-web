@@ -1,5 +1,4 @@
 import { X } from "lucide-react";
-import { useState } from "react";
 
 export const VideoPlayIcon = () => {
   return (
@@ -20,13 +19,13 @@ const ShortVideoCard = ({ videoUrl, isClose }) => {
   return (
     <div
       onClick={isClose}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
     >
       <div
         onContextMenu={(e) => e.preventDefault()}
         draggable="false"
         style={{ userSelect: "none" }}
-        className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden shadow-2xl"
+        className="relative w-full h-full"
       >
         <video
           src={videoUrl}
@@ -37,9 +36,8 @@ const ShortVideoCard = ({ videoUrl, isClose }) => {
           className="w-full h-full object-contain"
         />
         <button
-          onClick={isClose}
+          onClick={() => isClose}
           className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
-          aria-label="Close video"
         >
           <X className="w-6 h-6" />
         </button>
@@ -47,4 +45,5 @@ const ShortVideoCard = ({ videoUrl, isClose }) => {
     </div>
   );
 };
+
 export default ShortVideoCard;

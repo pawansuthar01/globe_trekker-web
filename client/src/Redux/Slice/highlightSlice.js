@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from "../../helper/axiosInstance";
 
 const initialState = {
   highlights: [],
@@ -14,7 +14,7 @@ export const fetchHighlights = createAsyncThunk(
   "highlight/fetchAll",
   async (_, thunkAPI) => {
     try {
-      const res = await axios.get("/highlight");
+      const res = await axiosInstance.get("/highlight");
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -27,10 +27,24 @@ export const fetchPublishedHighlights = createAsyncThunk(
   "highlight/fetchPublished",
   async (_, thunkAPI) => {
     try {
-      const res = await axios.get("/highlight/published");
+      const res = await axiosInstance.get("/highlight/published");
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+// Get featured Highlights
+export const fetchFeaturedHighlights = createAsyncThunk(
+  "highlight/fetchFeaturedHighlights",
+  async () => {
+    try {
+      const res = await axiosInstance.get("/highlight/featured");
+
+      return res.data;
+    } catch (err) {
+      return err.response?.data?.message;
     }
   }
 );
@@ -40,7 +54,7 @@ export const fetchHighlightById = createAsyncThunk(
   "highlight/fetchById",
   async (id, thunkAPI) => {
     try {
-      const res = await axios.get(`/highlight/${id}`);
+      const res = await axiosInstance.get(`/highlight/${id}`);
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -53,9 +67,13 @@ export const addHighlight = createAsyncThunk(
   "highlight/add",
   async (formData, thunkAPI) => {
     try {
-      const res = await axios.post("/api/v5/admin/highlight", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await axiosInstance.post(
+        "/api/v5/admin/highlight",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -68,9 +86,13 @@ export const updateHighlight = createAsyncThunk(
   "highlight/update",
   async ({ id, formData }, thunkAPI) => {
     try {
-      const res = await axios.put(`/api/v5/admin/highlight/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await axiosInstance.put(
+        `/api/v5/admin/highlight/${id}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -83,7 +105,7 @@ export const deleteHighlight = createAsyncThunk(
   "highlight/delete",
   async (id, thunkAPI) => {
     try {
-      const res = await axios.delete(`/api/v5/admin/highlight/${id}`);
+      const res = await axiosInstance.delete(`/api/v5/admin/highlight/${id}`);
       return { id };
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -96,7 +118,9 @@ export const togglePublishHighlight = createAsyncThunk(
   "highlight/publish",
   async (id, thunkAPI) => {
     try {
-      const res = await axios.put(`/api/v5/admin/highlight/published/${id}`);
+      const res = await axiosInstance.put(
+        `/api/v5/admin/highlight/published/${id}`
+      );
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);

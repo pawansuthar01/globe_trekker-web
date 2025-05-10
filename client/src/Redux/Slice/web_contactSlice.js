@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from "../../helper/axiosInstance";
 
 const initialState = {
   contacts: [],
@@ -12,7 +12,7 @@ export const getWebContacts = createAsyncThunk(
   "webContact/getAll",
   async (_, thunkAPI) => {
     try {
-      const res = await axios.get("/contact");
+      const res = await axiosInstance.get("/web-contact-del");
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -25,7 +25,7 @@ export const addWebContact = createAsyncThunk(
   "webContact/add",
   async (data, thunkAPI) => {
     try {
-      const res = await axios.post("/api/v5/admin/web-contact", data);
+      const res = await axiosInstance.post("/api/v5/admin/web-contact", data);
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -38,7 +38,7 @@ export const updateWebContact = createAsyncThunk(
   "webContact/update",
   async (data, thunkAPI) => {
     try {
-      const res = await axios.put("/api/v5/admin/web-contact", data);
+      const res = await axiosInstance.put("/api/v5/admin/web-contact", data);
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);

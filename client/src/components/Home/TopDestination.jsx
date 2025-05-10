@@ -3,7 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 import ImageWithLoaderPercentage from "../Skeleton/imageLoder";
-import { destinationsData } from "../../pages/DestinationPages/Destination";
+import TopDestinationsSkeleton from "../Skeleton/destinationSkeletonPage";
+import { useDispatch } from "react-redux";
+import { fetchFeaturedDestinations } from "../../Redux/Slice/detinationSlice";
 
 const categories = [
   { id: "popular", name: "Popular" },
@@ -15,6 +17,9 @@ const categories = [
 ];
 
 const TopDestinations = () => {
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const [destination, setDestination] = useState();
   const navigate = useNavigate();
   const [hasAnimated, setHasAnimated] = useState(true);
   const containerRef = useRef(null);
@@ -23,8 +28,8 @@ const TopDestinations = () => {
   const [activeCategory, setActiveCategory] = useState("popular");
   const filteredDestinations =
     activeCategory === "popular"
-      ? destinationsData
-      : destinationsData.filter((dest) => dest.category === activeCategory);
+      ? destination
+      : destination.filter((dest) => dest.category === activeCategory);
   const shouldAnimate = isInView && hasAnimated;
 
   // Lock animation after first animation trigger
@@ -33,6 +38,24 @@ const TopDestinations = () => {
       setHasAnimated(false);
     }
   }, [shouldAnimate, activeCategory]);
+  const fetchDestination = async () => {
+    setLoading(true);
+    const res = await dispatch(fetchFeaturedDestinations());
+
+    if (res?.payload?.success) {
+      setDestination(res?.payload?.data);
+      setLoading(false);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchDestination();
+  }, []);
+  if (loading || !destination) {
+    return <TopDestinationsSkeleton />;
+  }
+
   return (
     <section ref={containerRef} className="py-16 bg-neutral-50  px-1 lg:ml-3">
       <div className="container mx-auto">
@@ -62,11 +85,11 @@ const TopDestinations = () => {
           {filteredDestinations.map((destination) => (
             <div
               onClick={() =>
-                navigate(`/destinations/${destination.id}`, {
+                navigate(`/destinations/${destination._id}`, {
                   state: { destination },
                 })
               }
-              key={destination.id}
+              key={destination._id}
               className="group"
             >
               <motion.div
@@ -80,7 +103,7 @@ const TopDestinations = () => {
                 className="relative  w-52 overflow-hidden rounded-lg shadow-md transition-transform group-hover:shadow-xl group-hover:-translate-y-1"
               >
                 <ImageWithLoaderPercentage
-                  src={destination.image}
+                  src={destination.thumbnail.url}
                   alt={destination.name}
                   className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
                 />

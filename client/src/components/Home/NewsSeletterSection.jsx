@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Send } from "lucide-react";
-import bg_image from "../../assets/subscribe_bg_image.jpg";
+import bg_image from "../../assets/about_page_image.jpg";
+
 const NewsletterSection = () => {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -19,7 +20,7 @@ const NewsletterSection = () => {
   return (
     <section className="py-16 relative overflow-hidden lg:ml-2">
       <div
-        className="absolute inset-0 z-0 "
+        className="absolute inset-0 z-0 bg-black opacity-70"
         style={{
           backgroundImage: `url(${bg_image})`,
           backgroundSize: "cover",

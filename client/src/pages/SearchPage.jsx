@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { Search, MapPin, Calendar } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import ImageWithLoaderPercentage from "../components/Skeleton/imageLoder";
-import { destinationsData } from "./DestinationPages/Destination";
-import { storiesData } from "./StoriesPage/Stories";
+// import { storiesData } from "./StoriesPage/Stories";
 const SearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");

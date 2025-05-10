@@ -18,7 +18,7 @@ destination
   .route("/remove/:destinationId/:userId")
   .put(RemoveToSaveDestination);
 destination.get("/", getAllDestination);
+destination.get("/featured", getFeaturedDestination);
 destination.get("/:id", getDestinationById);
 destination.get("/published", getPublishedDestination);
-destination.get("/featured", getFeaturedDestination);
 export default destination;

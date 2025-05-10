@@ -23,6 +23,7 @@ import {
 import {
   addHighlight,
   deleteHighlight,
+  FeaturedHighlight,
   PublishedHighlight,
   updateHighlight,
 } from "../controller/highlight.controller.js";
@@ -100,6 +101,7 @@ Admin.route("/highlight/:id")
     updateHighlight
   )
   .delete(deleteHighlight);
+Admin.route("/highlight/featured/:id").put(FeaturedHighlight);
 Admin.route("/highlight/published/:id").put(PublishedHighlight);
 // < **   routes -- End highlight** >
 // < **   routes --  UserContact** >

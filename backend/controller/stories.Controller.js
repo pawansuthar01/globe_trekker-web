@@ -310,3 +310,25 @@ export const getStoriesById = async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 };
+export const getHomeStories = async (req, res) => {
+  try {
+    const featuredStories = await Story.find({ featured: true })
+      .sort({ createdAt: -1 }) // latest first
+      .limit(2);
+
+    const normalStories = await Story.find({ featured: false })
+      .sort({ createdAt: -1 }) // latest first
+      .limit(6);
+    const data = [...featuredStories, ...normalStories];
+
+    res.status(200).json({
+      success: true,
+      message: "successfully get home stories...",
+      data: data,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch stories" });
+  }
+};

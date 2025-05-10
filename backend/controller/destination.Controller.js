@@ -18,6 +18,7 @@ export const newDestination = async (req, res, next) => {
       longitude,
       travelTips,
       avgTemp,
+      SuggestedDuration,
       climateType,
       bestMonth,
       featured,
@@ -28,6 +29,7 @@ export const newDestination = async (req, res, next) => {
     if (
       !description ||
       !name ||
+      !SuggestedDuration ||
       !bestTimeToVisit ||
       !category ||
       !avgTemp ||
@@ -83,6 +85,7 @@ export const newDestination = async (req, res, next) => {
       description,
       longDescription,
       category,
+      SuggestedDuration,
       bestTimeToVisit,
       tags: typeof tags === "string" ? JSON.parse(tags) : tags,
       popularFor:
@@ -136,6 +139,7 @@ export const updateDestination = async (req, res, next) => {
       description,
       longDescription,
       category,
+      SuggestedDuration,
       bestTimeToVisit,
       tags,
       popularFor,
@@ -190,6 +194,8 @@ export const updateDestination = async (req, res, next) => {
     }
 
     // Update fields
+    existing.SuggestedDuration =
+      SuggestedDuration || existing.SuggestedDuration;
     existing.name = name || existing.name;
     existing.description = description || existing.description;
     existing.longDescription = longDescription || existing.longDescription;
@@ -211,7 +217,7 @@ export const updateDestination = async (req, res, next) => {
       climateType: climateType || existing.weatherInfo.climateType,
       bestMonth: bestMonth || existing.weatherInfo.bestMonth,
     };
-    existing.featured = featured || existing.featured;
+    existing.featured = featured == "true" || existing.featured;
     existing.isPublished = isPublished || existing.isPublished;
     existing.thumbnail = thumbnail;
     existing.images = images;
