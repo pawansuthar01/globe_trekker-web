@@ -20,7 +20,7 @@ import passport from "passport";
 import "./config/passport.js";
 import user from "./routers/user.route.js";
 import axios from "axios";
-import DataBaseConnection from "./config/DB.js";
+import DataBaseConnection from "./config/DataBase.js";
 // call connect to DB//
 const App = express();
 DataBaseConnection();
