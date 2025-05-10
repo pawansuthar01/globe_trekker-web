@@ -1,3 +1,5 @@
+import { config } from "dotenv";
+config({ path: ".env" });
 import passport from "passport";
 import GoogleStrategy from "passport-google-oauth20";
 import User from "../module/user.Module.js";

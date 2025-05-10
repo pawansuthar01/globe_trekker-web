@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { config } from "dotenv";
 config();
-export const DataBaseConnection = async () => {
+const DataBaseConnection = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URL);
     console.log("DatabaseConnect Successfully...");
@@ -11,3 +11,4 @@ export const DataBaseConnection = async () => {
     process.exit(1);
   }
 };
+export default DataBaseConnection;

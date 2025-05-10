@@ -5,7 +5,6 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { DataBaseConnection } from "./config/DB.js";
 import ErrorMiddleware from "./middleware/ErrorMiddleware.js";
 import banner from "./routers/banner.js";
 import Admin from "./routers/admin.js";
@@ -21,6 +20,7 @@ import passport from "passport";
 import "./config/passport.js";
 import user from "./routers/user.route.js";
 import axios from "axios";
+import DataBaseConnection from "./config/DB.js";
 // call connect to DB//
 const App = express();
 DataBaseConnection();
