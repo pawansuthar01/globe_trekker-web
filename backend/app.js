@@ -25,24 +25,6 @@ import { cookieOptions } from "./utils/cookieOption.js";
 // call connect to DB//
 const App = express();
 DataBaseConnection();
-
-App.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: cookieOptions,
-  })
-);
-App.use(passport.initialize());
-App.use(passport.session());
-
-App.use(express.json());
-App.use(cookieParser());
-App.use(morgan("dev"));
-
-// setup cors //
-
 App.use(
   cors({
     origin: process.env.FRONTEND_URL,
@@ -60,6 +42,23 @@ App.use((req, res, next) => {
   );
   next();
 });
+App.use(cookieParser());
+App.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: cookieOptions,
+  })
+);
+App.use(passport.initialize());
+App.use(passport.session());
+
+App.use(express.json());
+App.use(cookieParser());
+App.use(morgan("dev"));
+
+// setup cors //
 
 //routes
 
