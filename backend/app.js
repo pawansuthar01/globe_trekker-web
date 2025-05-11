@@ -39,10 +39,11 @@ App.use((req, res, next) => {
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header(
     "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, X-Requested-With, Set-Cookie"
+    "Content-Type, Authorization, X-Requested-With"
   );
   next();
 });
+App.set("trust proxy", 1);
 
 App.use(cookieParser());
 App.use(
