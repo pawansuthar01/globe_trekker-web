@@ -1,9 +1,16 @@
 import { Router } from "express";
 import "../config/passport.js";
 import passport from "passport";
-import { getCurrentUser, Subscribe } from "../controller/user.controller.js";
+import {
+  getCurrentUser,
+  loginUser,
+  registerUser,
+  Subscribe,
+  UpdateUser,
+} from "../controller/user.controller.js";
 import { cookieOptions } from "../utils/cookieOption.js";
 import { isLoggedIn } from "../middleware/authMiddlware.js";
+import upload from "../middleware/multerMiddleware.js";
 // Initiate Google Login
 const user = Router();
 user.get(
@@ -43,4 +50,7 @@ user.get("/me", (req, res) => {
 });
 user.put("/subscribe/:id", Subscribe);
 user.get("/getProfile", isLoggedIn, getCurrentUser);
+user.post("/login", loginUser);
+user.post("/register", registerUser);
+user.put("/UpdateProfile", isLoggedIn, upload.single("avatar"), UpdateUser);
 export default user;

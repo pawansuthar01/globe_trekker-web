@@ -1,10 +1,41 @@
 import User from "../module/user.Module.js";
 import AppError from "../utils/AppError.js";
+import { uploadToCloudinary } from "../utils/cloudnary.js";
 import { cookieOptions } from "../utils/cookieOption.js";
 
-export const registerController = async (req, res, next) => {
-  const { fullName, email, password } = req.body;
+export const UpdateUser = async (req, res, next) => {
+  const { id } = req.user;
+  const { name, email, isSubscribed, phoneNumber } = req.body;
+  if (!id) {
+    return next(new AppError("id is required to update user", 404));
+  }
+  const existingUser = await User.findById(id);
+  if (!existingUser) return next(new AppError("user does not found...", 404));
+  if (req.file) {
+    let avatar = existingUser.avatar;
+    const uploadAvatar = await uploadToCloudinary(req.file, "user/avatar");
+    if (uploadAvatar) {
+      avatar = uploadAvatar.secure_url;
+    }
+    existingUser.avatar.secure_url = avatar;
+  }
+  existingUser.fullName = name || existingUser.fullName;
+  existingUser.email = email || existingUser.email;
+  existingUser.phoneNumber = phoneNumber || existingUser.phoneNumber;
+  existingUser.isSubscribed = isSubscribed || existingUser.isSubscribed;
+  await existingUser.save();
+  res.status(200).json({
+    success: true,
+    message: "User update successfully",
 
+    user: existingUser,
+  });
+};
+export const registerUser = async (req, res, next) => {
+  const { name: fullName, email, password } = req.body;
+  if (!fullName || !email || !password) {
+    return next(new AppError("give All data to register...", 400));
+  }
   const existingUser = await User.findOne({ email });
   if (existingUser)
     return res.status(400).json({ message: "Email already registered" });
@@ -21,10 +52,10 @@ export const registerController = async (req, res, next) => {
     success: true,
     message: "User registered successfully",
 
-    data: newUser,
+    user: newUser,
   });
 };
-export const loginController = async (req, res, next) => {
+export const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email }).select("+password");
@@ -36,9 +67,10 @@ export const loginController = async (req, res, next) => {
   const token = user.generate_JWT_TOKEN();
   res.cookie("token", token, cookieOptions);
   res.status(200).json({
+    success: true,
     message: "Login successful",
-    token,
-    data: user,
+
+    user: user,
   });
 };
 

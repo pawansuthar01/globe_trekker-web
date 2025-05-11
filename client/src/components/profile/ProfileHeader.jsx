@@ -53,12 +53,12 @@ const ProfileHeader = ({ user }) => {
                   ? "Travel Guide"
                   : "Explorer"}
               </span>
-              {(user.role != "ADMIN" || user.role === "AUTHOR") && (
+              {(user.role === "ADMIN" || user.role === "AUTHOR") && (
                 <div
                   onClick={() => window.open("/admin", "_blank")}
-                  className={`px-4 group    cursor-pointer py-1 hover:scale-105 rounded-full text-sm font-medium border ${getRoleBadgeColor(
+                  className={`px-5 group    cursor-pointer py-1 hover:scale-105 rounded-full text-sm font-medium border ${getRoleBadgeColor(
                     user.role
-                  )} flex items-center gap-1`}
+                  )} flex items-center gap-2`}
                 >
                   <ArrowUpRight className="h-4 w-4 text-gray-400 transition-transform duration-200 group-hover:translate-x-1 group-hover:translate-y-[-2px] group-hover:text-blue-500" />{" "}
                   <span> GO Dashboard </span>

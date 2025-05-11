@@ -1,18 +1,16 @@
-import React from "react";
-import {
-  Clock,
-  Shield,
-  Globe,
-  MapPin,
-  Compass,
-  Award,
-  Sailboat,
-  UserCircle,
-} from "lucide-react";
+import { Clock, Shield, Globe, Award, UserCircle, LogOut } from "lucide-react";
 import formatDate from "../../utils/DataFormat";
-import { data } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logout } from "../../Redux/Slice/authSlice";
 
 const AccountInfo = ({ user }) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const Logout = async () => {
+    await dispatch(logout());
+    navigate("/login");
+  };
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 mt-6 border border-emerald-100">
       <h3 className="text-xl font-semibold mb-6 text-emerald-900 flex items-center">
@@ -126,6 +124,15 @@ const AccountInfo = ({ user }) => {
               <Compass className="w-4 h-4 mr-1" />
               View Travel History
             </button> */}
+          </div>
+        </div>
+        <div className="mt-6 pt-6 border-t border-emerald-100">
+          <div
+            onClick={() => Logout()}
+            className="flex  hover:translate-x-1 items-center gap-2 cursor-pointer hover:bg-red-50 p-2 rounded-md transition"
+          >
+            <LogOut className="w-5 h-5 text-red-600" />
+            <button className="text-red-500 font-medium">Logout</button>
           </div>
         </div>
       </div>

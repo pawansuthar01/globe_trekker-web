@@ -40,15 +40,6 @@ export const LoginAccount = createAsyncThunk("/auth/login", async (data) => {
     return error?.response?.data || error?.message || "Something went wrong";
   }
 });
-export const LogoutAccount = createAsyncThunk("/auth/logout", async () => {
-  try {
-    const res = await axiosInstance.get(`${User_basic_url}/logout`);
-
-    return res.data;
-  } catch (error) {
-    return error?.response?.data || error?.message || "Something went wrong";
-  }
-});
 
 export const UpdateAccount = createAsyncThunk("/auth/update", async (data) => {
   try {
@@ -178,7 +169,22 @@ export const HandelPromotion = createAsyncThunk(
 const authSliceRedux = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    logout: (state) => {
+      localStorage.setItem("data", null);
+      localStorage.setItem("isLoggedIn", false);
+      localStorage.setItem("exp", 0);
+      localStorage.setItem("role", "");
+      localStorage.setItem("userName", "");
+
+      state.userName = "";
+
+      state.exp = 0;
+      state.isLoggedIn = false;
+      state.data = "";
+      state.role = "";
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(CreateAccount.fulfilled, (state, action) => {
@@ -198,6 +204,18 @@ const authSliceRedux = createSlice({
           state.exp = Number(action?.payload?.exp);
           state.isLoggedIn = true;
           state.data = action?.payload?.user;
+          state.role = action?.payload?.user.role;
+        }
+      })
+      .addCase(UpdateAccount.fulfilled, (state, action) => {
+        if (action.payload.success) {
+          localStorage.setItem("data", JSON.stringify(action?.payload?.user));
+          localStorage.setItem("role", action?.payload?.user.role);
+          localStorage.setItem("userName", action?.payload?.user.userName);
+
+          state.userName = action?.payload?.user.userName;
+          null;
+          state.role = state.data = action?.payload?.user;
           state.role = action?.payload?.user.role;
         }
       })
@@ -258,18 +276,8 @@ const authSliceRedux = createSlice({
           state.data = user;
           state.role = user.role;
         }
-      })
-
-      .addCase(LogoutAccount.fulfilled, (state) => {
-        localStorage.clear();
-        state.userName = "";
-        state.exp = 0;
-        state.Authenticator = null;
-        state.isLoggedIn = false;
-        state.data = {};
-        state.role = "";
       });
   },
 });
-export const {} = authSliceRedux.actions;
+export const { logout } = authSliceRedux.actions;
 export default authSliceRedux.reducer;

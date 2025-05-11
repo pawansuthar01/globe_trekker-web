@@ -13,7 +13,7 @@ const ImageWithLoaderPercentage = ({
 
   useEffect(() => {
     // If the image is from Google (profile image)
-    if (src.startsWith("https://lh3.googleusercontent.com/")) {
+    if (src && src.startsWith("https://lh3.googleusercontent.com/")) {
       setImageDataUrl(src); // Directly set the Google image URL
       setLoaded(true); // Mark the image as loaded immediately
       return;

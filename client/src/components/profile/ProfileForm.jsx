@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Camera, Loader2, Globe, Phone, Mail, Bell } from "lucide-react";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { UpdateAccount } from "../../Redux/Slice/authSlice";
 
 const ProfileForm = ({ user }) => {
+  const dispatch = useDispatch();
   const [isLoading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: user.fullName | "",
@@ -16,10 +19,10 @@ const ProfileForm = ({ user }) => {
 
   useEffect(() => {
     setFormData({
-      fullName: user.fullName,
-      email: user.email,
+      fullName: user.fullName || "",
+      email: user.email || "",
       phoneNumber: user.phoneNumber || "",
-      isSubscribed: user.isSubscribed,
+      isSubscribed: user.isSubscribed || false,
     });
   }, [user]);
 
@@ -98,25 +101,23 @@ const ProfileForm = ({ user }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
       return;
     }
-
+    const formDataUpdate = new FormData();
+    formDataUpdate.append("name", formData.fullName);
+    formDataUpdate.append("email", formData.email);
+    formDataUpdate.append("isSubscribed", formData.isSubscribed);
+    formDataUpdate.append("phoneNumber", formData.phoneNumber);
     if (avatarFile) {
-      updateUser({
-        ...formData,
-        avatar: {
-          secure_url: avatarPreview || user?.avatar?.secure_url,
-        },
-      });
-    } else {
-      updateUser(formData);
+      formDataUpdate.append("avatar", avatarFile);
     }
-
-    toast.success("Travel profile updated successfully!");
+    setLoading(true);
+    await dispatch(UpdateAccount(formDataUpdate));
+    setLoading(false);
   };
 
   return (

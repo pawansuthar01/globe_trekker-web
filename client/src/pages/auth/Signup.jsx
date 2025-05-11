@@ -4,9 +4,13 @@ import { User, Mail, Lock, UserPlus } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { basic_url } from "../../helper/axiosInstance";
+import { useDispatch } from "react-redux";
+import { CreateAccount } from "../../Redux/Slice/authSlice";
 
 const SignupPage = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -17,31 +21,28 @@ const SignupPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const { name, email, password, confirmPassword, acceptTerms } = formData;
+    setError(null);
+    const { password, confirmPassword, acceptTerms } = formData;
 
     if (!acceptTerms) {
-      toast.error("You must accept the terms and conditions.");
+      setError("Please accept terms and conditions.");
       return;
     }
 
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match.");
+      setError("Passwords do not match.");
       return;
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/signup", {
-        name,
-        email,
-        password,
-      });
-
-      toast.success("Account created successfully!");
-      navigate("/login");
+      const res = await dispatch(CreateAccount(formData));
+      if (res?.payload?.success) {
+        navigate("/");
+      } else {
+        setError(res?.payload?.message);
+      }
     } catch (error) {
-      console.error("Signup Error:", error.response?.data || error.message);
-      toast.error(error.response?.data?.message || "Signup failed");
+      setError(error.response?.data?.message || "Signup failed");
     }
   };
   const handleGoogleLogin = () => {
@@ -203,6 +204,9 @@ const SignupPage = () => {
                   </Link>
                 </label>
               </div>
+              {error && (
+                <span className="text-sm text-red-500 mt-1 block">{error}</span>
+              )}
 
               {/* Submit Button */}
               <button

@@ -1,23 +1,31 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { useDispatch } from "react-redux";
-import { ContinueWithGoogle } from "../../Redux/Slice/authSlice";
+import { ContinueWithGoogle, LoginAccount } from "../../Redux/Slice/authSlice";
 import { basic_url } from "../../helper/axiosInstance";
 
 const LoginPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    rememberMe: false,
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Implement login logic here
-    console.log("Login attempt:", formData);
+    setError(null);
+    if (formData) {
+      const res = await dispatch(LoginAccount(formData));
+      if (res?.payload?.success) {
+        navigate("/");
+      } else {
+        setError(res?.payload?.message);
+      }
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -46,9 +54,10 @@ const LoginPage = () => {
                     type="email"
                     id="email"
                     value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
+                    onChange={(e) => (
+                      setFormData({ ...formData, email: e.target.value }),
+                      setError(null)
+                    )}
                     className="w-full px-4 py-3 pl-11 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-300"
                     required
                   />
@@ -69,7 +78,10 @@ const LoginPage = () => {
                     id="password"
                     value={formData.password}
                     onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
+                      setFormData(
+                        { ...formData, password: e.target.value },
+                        setError(null)
+                      )
                     }
                     className="w-full px-4 py-3 pl-11 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-300"
                     required
@@ -78,23 +90,15 @@ const LoginPage = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.rememberMe}
-                    onChange={(e) =>
-                      setFormData({ ...formData, rememberMe: e.target.checked })
-                    }
-                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded"
-                  />
-                  <span className="ml-2 text-sm text-neutral-600">
-                    Remember me
-                  </span>
-                </label>
+              {error && (
+                <span className="text-sm    capitalize text-red-500 mt-1 block">
+                  {error}
+                </span>
+              )}
+              <div className="flex relative  items-center justify-between">
                 <Link
                   to="/reset-password"
-                  className="text-sm text-primary-600 hover:text-primary-700"
+                  className="text-sm absolute right-0  text-primary-600 hover:text-primary-700"
                 >
                   Forgot password?
                 </Link>

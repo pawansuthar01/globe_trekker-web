@@ -6,9 +6,11 @@ import AccountInfo from "../../components/profile/AcountInfo";
 import { mockUser } from "../../utils/mokData";
 import { useDispatch, useSelector } from "react-redux";
 import { LoadAccount } from "../../Redux/Slice/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const [user, setUser] = useState(mockUser);
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isLoading, setLoading] = useState(false);
   const { isLoggedIn, role, data } = useSelector((state) => state?.auth);
@@ -19,9 +21,13 @@ const Profile = () => {
     setLoading(false);
   };
   useEffect(() => {
-    fetchProfile();
-  }, []);
-  if (isLoading) {
+    if (isLoggedIn) {
+      fetchProfile();
+    } else {
+      navigate("/login");
+    }
+  }, [isLoggedIn]);
+  if (isLoading || !isLoggedIn) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center">

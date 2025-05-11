@@ -30,10 +30,12 @@ import AdminLayout from "./components/AdminComponent/layouts/AdminLayout";
 import BannerPage from "./pages/Admin/banner/BannerPage";
 import TeamMembers from "./pages/Admin/about/TeamMembers";
 import CheckLogin from "./pages/checkLoginValid";
+import PageNotFound from "./pages/NotFound";
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
+        <Route path="*" element={<PageNotFound />} />
         <Route index element={<Home />} />
         <Route path="/destinations" element={<DestinationsPage />} />
         <Route path="/highlight" element={<HighlightsPage />} />
