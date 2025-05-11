@@ -12,7 +12,7 @@ const CheckLogin = () => {
     const verifyGoogleLogin = async () => {
       try {
         const res = await dispatch(ContinueWithGoogle());
-        if (res.success) {
+        if (res.payload.success) {
           toast.success("Welcome back, traveler!");
           navigate("/");
         } else {

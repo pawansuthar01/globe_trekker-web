@@ -42,20 +42,26 @@ App.use((req, res, next) => {
   );
   next();
 });
+
 App.use(cookieParser());
 App.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
-    cookie: cookieOptions,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
+    cookie: {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    },
   })
 );
 App.use(passport.initialize());
 App.use(passport.session());
 
 App.use(express.json());
-App.use(cookieParser());
 App.use(morgan("dev"));
 
 // setup cors //
