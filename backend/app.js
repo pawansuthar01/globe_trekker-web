@@ -37,6 +37,7 @@ App.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
+    cookie: cookieOptions,
   })
 );
 App.use(passport.initialize());

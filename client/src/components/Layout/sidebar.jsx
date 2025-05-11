@@ -27,7 +27,7 @@ const SidebarNav = ({ expanded, onMouseEnter, onMouseLeave }) => {
     isLoggedIn
       ? { icon: <User size={20} />, label: "Profile", path: "/profile" }
       : { icon: <LogIn size={20} />, label: "Login", path: "/login" },
-    (role != "ADMIN" || !role != "AUTHOR") && {
+    (role == "ADMIN" || !role == "AUTHOR") && {
       icon: <PenLine size={20} />,
       label: "Admin Dashboard",
       path: "/admin",
