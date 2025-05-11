@@ -21,7 +21,7 @@ import "./config/passport.js";
 import user from "./routers/user.route.js";
 import axios from "axios";
 import DataBaseConnection from "./config/DataBase.js";
-import { cookieOptions } from "./utils/cookieOption.js";
+import { sessionCookieOptions } from "./utils/cookieOption.js";
 import MongoStore from "connect-mongo";
 // call connect to DB//
 const App = express();
@@ -52,10 +52,9 @@ App.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
-    cookie: cookieOptions,
+    cookie: sessionCookieOptions,
   })
 );
-console.log(process.env.NODE_ENV === "production");
 console.log(process.env.NODE_ENV === "production" ? "None" : "Lax");
 App.use(passport.initialize());
 App.use(passport.session());
