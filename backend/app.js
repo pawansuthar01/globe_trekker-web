@@ -21,9 +21,17 @@ import "./config/passport.js";
 import user from "./routers/user.route.js";
 import axios from "axios";
 import DataBaseConnection from "./config/DataBase.js";
+import { cookieOptions } from "./utils/cookieOption.js";
 // call connect to DB//
 const App = express();
 DataBaseConnection();
+App.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 App.use(
   session({
     secret: process.env.SESSION_SECRET,

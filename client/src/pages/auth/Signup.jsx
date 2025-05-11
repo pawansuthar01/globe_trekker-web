@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { User, Mail, Lock, UserPlus } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { basic_url } from "../../helper/axiosInstance";
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ const SignupPage = () => {
     }
   };
   const handleGoogleLogin = () => {
-    window.location.href = `http://localhost:5000/auth/google`;
+    window.location.href = `${basic_url}/api/v3/auth/google`;
   };
 
   return (

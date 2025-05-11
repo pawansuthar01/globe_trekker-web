@@ -1,17 +1,22 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, Map, BookOpen, Compass, User } from "lucide-react";
+import { Home, Map, BookOpen, Compass, User, LogIn } from "lucide-react";
+import { useSelector } from "react-redux";
+import ButtonUI from "../button";
 
 const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isLoggedIn } = useSelector((state) => state?.auth);
 
   const navItems = [
     { icon: <Home size={20} />, label: "Home", path: "/" },
     { icon: <Map size={20} />, label: "Explore", path: "/destinations" },
     { icon: <BookOpen size={20} />, label: "Stories", path: "/stories" },
     { icon: <Compass size={20} />, label: "About", path: "/about" },
-    { icon: <User size={20} />, label: "Profile", path: "/profile" },
+    isLoggedIn
+      ? { icon: <User size={20} />, label: "Profile", path: "/profile" }
+      : { icon: <LogIn size={20} />, label: "Login", path: "/login" },
   ];
 
   return (

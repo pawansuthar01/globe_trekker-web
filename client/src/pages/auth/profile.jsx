@@ -1,31 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Loader2, Compass } from "lucide-react";
 import ProfileHeader from "../../components/profile/ProfileHeader";
 import ProfileForm from "../../components/profile/ProfileForm";
 import AccountInfo from "../../components/profile/AcountInfo";
 import { mockUser } from "../../utils/mokData";
+import { useDispatch, useSelector } from "react-redux";
+import { LoadAccount } from "../../Redux/Slice/authSlice";
 
 const Profile = () => {
   const [user, setUser] = useState(mockUser);
+  const dispatch = useDispatch();
   const [isLoading, setLoading] = useState(false);
-  if (!user) {
+  const { isLoggedIn, role, data } = useSelector((state) => state?.auth);
+
+  const fetchProfile = async () => {
+    setLoading(true);
+    await dispatch(LoadAccount());
+    setLoading(false);
+  };
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        {isLoading ? (
-          <div className="flex flex-col items-center">
-            <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
-            <p className="mt-4 text-gray-600">
-              Loading your journey details...
-            </p>
-          </div>
-        ) : (
-          <div className="text-center">
-            <Compass className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
-            <p className="text-gray-600">
-              Please log in to view your travel profile.
-            </p>
-          </div>
-        )}
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center">
+          <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
+          <p className="mt-4 text-gray-600">Loading your journey details...</p>
+        </div>
       </div>
     );
   }
@@ -43,9 +45,9 @@ const Profile = () => {
           </p>
         </div>
       </div>
-      <ProfileHeader user={user} />
-      <ProfileForm user={user} />
-      <AccountInfo user={user} />
+      <ProfileHeader user={data} />
+      <ProfileForm user={data} />
+      <AccountInfo user={data} />
     </div>
   );
 };

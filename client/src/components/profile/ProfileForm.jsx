@@ -5,10 +5,10 @@ import toast from "react-hot-toast";
 const ProfileForm = ({ user }) => {
   const [isLoading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    fullName: user.fullName,
-    email: user.email,
+    fullName: user.fullName | "",
+    email: user.email | "",
     phoneNumber: user.phoneNumber || "",
-    isSubscribed: user.isSubscribed,
+    isSubscribed: user.isSubscribed | "",
   });
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
@@ -109,7 +109,7 @@ const ProfileForm = ({ user }) => {
       updateUser({
         ...formData,
         avatar: {
-          secure_url: avatarPreview || user.avatar.secure_url,
+          secure_url: avatarPreview || user?.avatar?.secure_url,
         },
       });
     } else {
@@ -135,8 +135,8 @@ const ProfileForm = ({ user }) => {
               <img
                 src={
                   avatarPreview ||
-                  user.avatar.secure_url ||
-                  "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                  user?.avatar?.secure_url ||
+                  "https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff"
                 }
                 alt="Avatar preview"
                 className="w-full h-full object-cover"

@@ -12,6 +12,14 @@ const initialState = {
       : {},
 };
 const User_basic_url = `/api/v3/auth`;
+export const ContinueWithGoogle = createAsyncThunk("/auth/google", async () => {
+  try {
+    const res = await axiosInstance.get(`${User_basic_url}/me`);
+    return res.data;
+  } catch (error) {
+    return error?.response?.data || error?.message || "Something went wrong";
+  }
+});
 export const CreateAccount = createAsyncThunk(
   "/auth/register",
   async (data) => {
@@ -57,16 +65,7 @@ export const UpdateAccount = createAsyncThunk("/auth/update", async (data) => {
 
 export const LoadAccount = createAsyncThunk("/auth/getProfile", async () => {
   try {
-    const token = localStorage.getItem("Authenticator");
-    const res = await axiosInstance.get(
-      "/api/v3/user/getProfile",
-
-      {
-        headers: {
-          Authorization: `${token}`,
-        },
-      }
-    );
+    const res = await axiosInstance.get("/api/v3/auth/getProfile");
 
     return res.data;
   } catch (error) {
@@ -184,61 +183,81 @@ const authSliceRedux = createSlice({
     builder
       .addCase(CreateAccount.fulfilled, (state, action) => {
         if (action.payload.success) {
-          localStorage.setItem("data", JSON.stringify(action?.payload?.data));
+          localStorage.setItem("data", JSON.stringify(action?.payload?.user));
           localStorage.setItem("isLoggedIn", true);
           localStorage.setItem("exp", Number(action?.payload?.exp));
-          localStorage.setItem("role", action?.payload?.data.role);
-          localStorage.setItem("userName", action?.payload?.data.userName);
+          localStorage.setItem("role", action?.payload?.user.role);
+          localStorage.setItem("userName", action?.payload?.user.userName);
           localStorage.setItem(
             "Authenticator",
             action?.payload?.AuthenticatorToken
           );
           state.Authenticator = action?.payload?.AuthenticatorToken;
-          state.userName = action?.payload?.data.userName;
-          state.walletProduct = [...action?.payload?.data.walletAddProducts];
+          state.userName = action?.payload?.user.userName;
+
           state.exp = Number(action?.payload?.exp);
           state.isLoggedIn = true;
-          state.data = action?.payload?.data;
-          state.role = action?.payload?.data.role;
+          state.data = action?.payload?.user;
+          state.role = action?.payload?.user.role;
+        }
+      })
+      .addCase(ContinueWithGoogle.fulfilled, (state, action) => {
+        if (action.payload.success) {
+          localStorage.setItem("data", JSON.stringify(action?.payload?.user));
+          localStorage.setItem("isLoggedIn", true);
+          localStorage.setItem("exp", Number(action?.payload?.exp));
+          localStorage.setItem("role", action?.payload?.user.role);
+          localStorage.setItem("userName", action?.payload?.user.userName);
+          localStorage.setItem(
+            "Authenticator",
+            action?.payload?.AuthenticatorToken
+          );
+          state.Authenticator = action?.payload?.AuthenticatorToken;
+          state.userName = action?.payload?.user.userName;
+
+          state.exp = Number(action?.payload?.exp);
+          state.isLoggedIn = true;
+          state.data = action?.payload?.user;
+          state.role = action?.payload?.user.role;
         }
       })
       .addCase(LoginAccount.fulfilled, (state, action) => {
         if (action?.payload?.success) {
-          const { data, exp } = action.payload;
-          localStorage.setItem("data", JSON.stringify(data));
+          const { user, exp } = action.payload;
+          localStorage.setItem("data", JSON.stringify(user));
           localStorage.setItem("isLoggedIn", true);
           localStorage.setItem("exp", Number(exp));
-          localStorage.setItem("role", data.role);
-          localStorage.setItem("userName", data.userName);
+          localStorage.setItem("role", user.role);
+          localStorage.setItem("userName", user.userName);
           localStorage.setItem(
             "Authenticator",
             action?.payload?.AuthenticatorToken
           );
           state.Authenticator = action?.payload?.AuthenticatorToken;
-          state.userName = data.userName;
-          state.walletProduct = [...data.walletAddProducts];
+          state.userName = user.userName;
+
           state.exp = Number(exp);
           state.isLoggedIn = true;
-          state.data = data;
-          state.role = data.role;
+          state.data = user;
+          state.role = user.role;
         }
       })
       .addCase(LoadAccount.fulfilled, (state, action) => {
+        console.log(action?.payload.success);
         if (action.payload.success) {
-          const { data, exp } = action.payload;
-
-          localStorage.setItem("data", JSON.stringify(data));
+          const { user, exp } = action.payload;
+          localStorage.setItem("data", JSON.stringify(user));
           localStorage.setItem("isLoggedIn", true);
           localStorage.setItem("exp", Number(exp));
-          localStorage.setItem("role", data.role);
-          localStorage.setItem("userName", data.userName);
+          localStorage.setItem("role", user.role);
+          localStorage.setItem("userName", user.userName);
 
-          state.userName = data.userName;
-          state.walletProduct = [...data.walletAddProducts];
+          state.userName = user.userName;
+
           state.exp = Number(exp);
           state.isLoggedIn = true;
-          state.data = data;
-          state.role = data.role;
+          state.data = user;
+          state.role = user.role;
         }
       })
 

@@ -51,7 +51,11 @@ export const getCurrentUser = async (req, res, next) => {
     if (!user) {
       return next(new AppError("user does not found...", 404));
     }
-    res.status(200).json({ user });
+    res.status(200).json({
+      success: true,
+      message: "successFully get profile",
+      user,
+    });
   } catch (error) {
     return next(new AppError(error.message, 500));
   }
@@ -70,7 +74,11 @@ export const forgotPassword = async (req, res) => {
 
   // Send reset link via email here (not included)
 
-  res.status(200).json({ message: "Reset token sent", token });
+  res.status(200).json({
+    success: true,
+    message: "Reset token sent",
+    token,
+  });
 };
 export const resetPassword = async (req, res) => {
   const { token } = req.params;
@@ -94,7 +102,11 @@ export const resetPassword = async (req, res) => {
   const jwtToken = user.generate_JWT_TOKEN();
   res
     .status(200)
-    .json({ message: "Password reset successful", token: jwtToken });
+    .json({
+      success: true,
+      message: "Password reset successful",
+      token: jwtToken,
+    });
 };
 export const updatePassword = async (req, res) => {
   const user = await User.findById(req.user.id).select("+password");
@@ -106,7 +118,9 @@ export const updatePassword = async (req, res) => {
   user.password = req.body.newPassword;
   await user.save();
 
-  res.status(200).json({ message: "Password updated successfully" });
+  res
+    .status(200)
+    .json({ success: true, message: "Password updated successfully" });
 };
 
 export const Subscribe = async (req, res, next) => {

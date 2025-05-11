@@ -8,19 +8,30 @@ import {
   MessageSquare,
   User,
   Search,
+  LogIn,
+  FanIcon,
+  PenLine,
 } from "lucide-react";
+import { useSelector } from "react-redux";
 
 const SidebarNav = ({ expanded, onMouseEnter, onMouseLeave }) => {
   const location = useLocation();
   const navigate = useNavigate();
-
+  const { isLoggedIn, role } = useSelector((state) => state?.auth);
   const navItems = [
     { icon: <Home size={24} />, label: "Home", path: "/" },
     { icon: <Map size={24} />, label: "Destinations", path: "/destinations" },
     { icon: <BookOpen size={24} />, label: "Stories", path: "/stories" },
     { icon: <Compass size={24} />, label: "About", path: "/about" },
     { icon: <MessageSquare size={24} />, label: "Contact", path: "/contact" },
-    { icon: <User size={24} />, label: "Profile", path: "/profile" },
+    isLoggedIn
+      ? { icon: <User size={20} />, label: "Profile", path: "/profile" }
+      : { icon: <LogIn size={20} />, label: "Login", path: "/login" },
+    (role != "ADMIN" || !role != "AUTHOR") && {
+      icon: <PenLine size={20} />,
+      label: "Admin Dashboard",
+      path: "/admin",
+    },
   ];
 
   return (

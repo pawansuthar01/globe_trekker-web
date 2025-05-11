@@ -1,18 +1,18 @@
 import React from "react";
-import { Clock, Shield, Globe, MapPin, Compass, Award } from "lucide-react";
+import {
+  Clock,
+  Shield,
+  Globe,
+  MapPin,
+  Compass,
+  Award,
+  Sailboat,
+  UserCircle,
+} from "lucide-react";
+import formatDate from "../../utils/DataFormat";
+import { data } from "react-router-dom";
 
 const AccountInfo = ({ user }) => {
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date);
-  };
-
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 mt-6 border border-emerald-100">
       <h3 className="text-xl font-semibold mb-6 text-emerald-900 flex items-center">
@@ -77,32 +77,40 @@ const AccountInfo = ({ user }) => {
             <h4 className="font-medium text-emerald-900">
               Travel Achievements
             </h4>
-            <div className="mt-2 grid grid-cols-2 md:grid-cols-3 gap-4">
-              <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-100">
-                <div className="flex items-center justify-center w-10 h-10 bg-emerald-100 rounded-full mb-2 mx-auto">
-                  <MapPin className="w-5 h-5 text-emerald-600" />
-                </div>
-                <p className="text-center text-sm font-medium text-emerald-900">
-                  New Explorer
-                </p>
+            {data.travelAchievements && data.travelAchievements.length > 0 ? (
+              <div className="mt-2 grid grid-cols-2 md:grid-cols-3 gap-4">
+                {data.travelAchievements.map((t) => (
+                  <div
+                    key={t._id}
+                    className="bg-emerald-50 p-3 rounded-lg border border-emerald-100"
+                  >
+                    <div className="flex items-center justify-center w-10 h-10 bg-emerald-100 rounded-full mb-2 mx-auto">
+                      {t.title}
+                    </div>
+                    <div className="flex items-center justify-center w-10 h-10 bg-emerald-100 rounded-full mb-2 mx-auto">
+                      {t.icon}
+                    </div>
+                    <p className="text-center text-sm font-medium text-emerald-900">
+                      {t.description}
+                    </p>
+                    <p className="text-center text-sm font-medium text-emerald-900">
+                      {formatDate(t.achievedAt)}
+                    </p>
+                  </div>
+                ))}
               </div>
-              <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-100">
-                <div className="flex items-center justify-center w-10 h-10 bg-emerald-100 rounded-full mb-2 mx-auto">
-                  <Compass className="w-5 h-5 text-emerald-600" />
+            ) : (
+              <div className="mt-2 flex justify-center items-center  w-full">
+                <div className=" p-3  rounded-lg border ">
+                  <div className="flex items-center justify-center w-10 h-10 bg-emerald-100 rounded-full mb-2 mx-auto">
+                    <UserCircle className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <p className="text-center text-sm font-medium text-emerald-900">
+                    No travelAchievements
+                  </p>
                 </div>
-                <p className="text-center text-sm font-medium text-emerald-900">
-                  Adventure Seeker
-                </p>
               </div>
-              <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-100">
-                <div className="flex items-center justify-center w-10 h-10 bg-emerald-100 rounded-full mb-2 mx-auto">
-                  <Globe className="w-5 h-5 text-emerald-600" />
-                </div>
-                <p className="text-center text-sm font-medium text-emerald-900">
-                  World Traveler
-                </p>
-              </div>
-            </div>
+            )}
           </div>
         </div>
 

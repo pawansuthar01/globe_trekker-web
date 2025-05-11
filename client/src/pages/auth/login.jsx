@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
+import { useDispatch } from "react-redux";
+import { ContinueWithGoogle } from "../../Redux/Slice/authSlice";
+import { basic_url } from "../../helper/axiosInstance";
 
 const LoginPage = () => {
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -17,7 +21,7 @@ const LoginPage = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `http://localhost:5000/auth/google`;
+    window.location.href = `${basic_url}/api/v3/auth/google`;
   };
 
   return (

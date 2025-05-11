@@ -1,16 +1,15 @@
 import React from "react";
-import { Calendar, Mail, Phone, MapPin, Compass } from "lucide-react";
+import {
+  Calendar,
+  Mail,
+  Phone,
+  MapPin,
+  Compass,
+  ArrowUpRight,
+} from "lucide-react";
+import formatDate from "../../utils/DataFormat";
 
 const ProfileHeader = ({ user }) => {
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }).format(date);
-  };
-
   const getRoleBadgeColor = (role) => {
     switch (role) {
       case "ADMIN":
@@ -30,8 +29,8 @@ const ProfileHeader = ({ user }) => {
           <div className="mx-auto md:mx-0 w-32 h-32 rounded-xl border-4 border-white overflow-hidden bg-white shadow-lg">
             <img
               src={
-                user.avatar?.secure_url ||
-                "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                user?.avatar?.secure_url ||
+                "https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff"
               }
               alt={`${user.fullName}'s avatar`}
               className="w-full h-full object-cover"
@@ -54,6 +53,17 @@ const ProfileHeader = ({ user }) => {
                   ? "Travel Guide"
                   : "Explorer"}
               </span>
+              {(user.role != "ADMIN" || user.role === "AUTHOR") && (
+                <div
+                  onClick={() => window.open("/admin", "_blank")}
+                  className={`px-4 group    cursor-pointer py-1 hover:scale-105 rounded-full text-sm font-medium border ${getRoleBadgeColor(
+                    user.role
+                  )} flex items-center gap-1`}
+                >
+                  <ArrowUpRight className="h-4 w-4 text-gray-400 transition-transform duration-200 group-hover:translate-x-1 group-hover:translate-y-[-2px] group-hover:text-blue-500" />{" "}
+                  <span> GO Dashboard </span>
+                </div>
+              )}
               <span
                 className={`px-4 py-1 rounded-full text-sm font-medium border ${
                   user.isSubscribed
