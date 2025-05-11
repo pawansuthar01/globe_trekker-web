@@ -1,8 +1,8 @@
 export const cookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production", // true in production, false in dev
-  sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // iOS + cross-site compatible
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  secure: true, // must be true for SameSite=None to work
+  sameSite: "None", // iOS needs SameSite=None
+  maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 export const sessionCookieOptions = {
   httpOnly: true,

@@ -52,7 +52,12 @@ App.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
-    cookie: sessionCookieOptions,
+    cookie: {
+      httpOnly: true,
+      secure: true, // must be true for SameSite=None to work
+      sameSite: "None", // iOS needs SameSite=None
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    },
   })
 );
 console.log(process.env.NODE_ENV === "production" ? "None" : "Lax");
