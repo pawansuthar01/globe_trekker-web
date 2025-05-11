@@ -25,13 +25,7 @@ import { cookieOptions } from "./utils/cookieOption.js";
 // call connect to DB//
 const App = express();
 DataBaseConnection();
-App.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-  })
-);
+
 App.use(
   session({
     secret: process.env.SESSION_SECRET,

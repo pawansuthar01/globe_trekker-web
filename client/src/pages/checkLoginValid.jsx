@@ -11,7 +11,7 @@ const CheckLogin = () => {
   useEffect(() => {
     const verifyGoogleLogin = async () => {
       try {
-        const res = await dispatch(ContinueWithGoogle()).unwrap();
+        const res = await dispatch(ContinueWithGoogle());
         if (res.success) {
           toast.success("Welcome back, traveler!");
           navigate("/");

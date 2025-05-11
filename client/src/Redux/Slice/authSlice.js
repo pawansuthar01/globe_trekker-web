@@ -243,7 +243,6 @@ const authSliceRedux = createSlice({
         }
       })
       .addCase(LoadAccount.fulfilled, (state, action) => {
-        console.log(action?.payload.success);
         if (action.payload.success) {
           const { user, exp } = action.payload;
           localStorage.setItem("data", JSON.stringify(user));
