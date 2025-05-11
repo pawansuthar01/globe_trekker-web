@@ -52,14 +52,11 @@ App.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
-    cookie: {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    },
+    cookie: cookieOptions,
   })
 );
+console.log(process.env.NODE_ENV === "production");
+console.log(process.env.NODE_ENV === "production" ? "None" : "Lax");
 App.use(passport.initialize());
 App.use(passport.session());
 
