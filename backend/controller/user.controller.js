@@ -60,6 +60,25 @@ export const getCurrentUser = async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 };
+
+export const checkUserValid = async (req, res, next) => {
+  try {
+    if (!req.params.id) {
+      return next(new AppError("id user does not found...", 404));
+    }
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return next(new AppError("user does not found...", 401));
+    }
+    res.status(200).json({
+      success: true,
+      message: "successFully get profile",
+      user,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
 // if (profile.fullName && profile.email && profile.avatar && profile.phoneNumber) {
 //   await grantAchievement(user._id, "PROFILE_COMPLETE");
 // }
@@ -100,13 +119,11 @@ export const resetPassword = async (req, res) => {
   await user.save();
 
   const jwtToken = user.generate_JWT_TOKEN();
-  res
-    .status(200)
-    .json({
-      success: true,
-      message: "Password reset successful",
-      token: jwtToken,
-    });
+  res.status(200).json({
+    success: true,
+    message: "Password reset successful",
+    token: jwtToken,
+  });
 };
 export const updatePassword = async (req, res) => {
   const user = await User.findById(req.user.id).select("+password");

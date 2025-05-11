@@ -24,7 +24,7 @@ user.get(
 
     const token = user.generate_JWT_TOKEN();
     res.cookie("token", token, cookieOptions);
-    res.redirect(`${process.env.FRONTEND_URL}`);
+    res.redirect(`${process.env.FRONTEND_URL}/auth/check-login`);
   }
 );
 // ✅ NEW: Authenticated user info route

@@ -29,6 +29,7 @@ import AboutUpdatePage from "./pages/Admin/about/aboutPage";
 import AdminLayout from "./components/AdminComponent/layouts/AdminLayout";
 import BannerPage from "./pages/Admin/banner/BannerPage";
 import TeamMembers from "./pages/Admin/about/TeamMembers";
+import CheckLogin from "./pages/checkLoginValid";
 function App() {
   return (
     <Routes>
@@ -42,6 +43,7 @@ function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/auth/check-login" element={<CheckLogin />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
