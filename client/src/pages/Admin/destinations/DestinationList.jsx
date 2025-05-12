@@ -42,7 +42,6 @@ const DestinationList = () => {
   const handlePublishToggle = async (id) => {
     // API call to toggle publish status
     const res = await dispatch(markAsPublished(id));
-    console.log(res);
     if (res?.payload?.success) {
       toast.success(res?.payload?.message);
       setDestination(

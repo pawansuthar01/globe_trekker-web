@@ -1,84 +1,57 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Plus, Edit, Trash2, Eye, EyeOff, Search } from "lucide-react";
 import StatusBadge from "../../../components/AdminComponent/common/StatusBadge";
 import DeleteModal from "../../../components/AdminComponent/common/DeleteModal";
 import SearchBar from "../../../components/AdminComponent/common/SearchBar";
+import { useDispatch } from "react-redux";
+import {
+  deleteHighlight,
+  fetchHighlights,
+  togglePublishHighlight,
+} from "../../../Redux/Slice/highlightSlice";
+import toast from "react-hot-toast";
 
 const HighlightList = () => {
+  const navigate = useNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const dispatch = useDispatch();
+  const [Highlights, setHighlights] = useState([]);
 
-  // Mock data - would come from API in real app
-  const mockHighlights = [
-    {
-      _id: "1",
-      name: "Beautiful Beaches of Bali",
-      slug: "beautiful-beaches-of-bali",
-      image:
-        "https://images.pexels.com/photos/1450353/pexels-photo-1450353.jpeg",
-      description:
-        "Explore the pristine beaches with crystal clear waters and white sand.",
-      location: "Bali",
-      region: "Asia",
-      rating: 4.8,
-      isPublished: true,
-      date: "2023-06-15",
-    },
-    {
-      _id: "2",
-      name: "Ancient Temples of Kyoto",
-      slug: "ancient-temples-of-kyoto",
-      image: "https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg",
-      description:
-        "Discover the spiritual heart of Japan in these serene ancient temples.",
-      location: "Kyoto",
-      region: "Asia",
-      rating: 4.9,
-      isPublished: true,
-      date: "2023-05-20",
-    },
-    {
-      _id: "3",
-      name: "Safari in Serengeti",
-      slug: "safari-in-serengeti",
-      image: "https://images.pexels.com/photos/259397/pexels-photo-259397.jpeg",
-      description:
-        "Witness the incredible wildlife in one of Africa's most famous national parks.",
-      location: "Tanzania",
-      region: "Africa",
-      rating: 4.7,
-      isPublished: false,
-      date: "2023-07-10",
-    },
-    {
-      _id: "4",
-      name: "Northern Lights in Norway",
-      slug: "northern-lights-norway",
-      image:
-        "https://images.pexels.com/photos/1933316/pexels-photo-1933316.jpeg",
-      description:
-        "Experience the magical aurora borealis dancing across the Arctic sky.",
-      location: "Norway",
-      region: "Europe",
-      rating: 4.9,
-      isPublished: true,
-      date: "2023-01-12",
-    },
-  ];
+  async function FetchHighlight() {
+    setLoading(true);
+    const res = await dispatch(fetchHighlights());
+    if (res?.payload?.success) {
+      setHighlights(res?.payload?.data);
+    }
+    setLoading(false);
+  }
 
+  useEffect(() => {
+    FetchHighlight();
+  }, []);
   // Filter highlights based on search term
-  const filteredHighlights = mockHighlights.filter(
+  const filteredHighlights = Highlights.filter(
     (highlight) =>
       highlight.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       highlight.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
       highlight.region.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handlePublishToggle = (id) => {
+  const handlePublishToggle = async (id) => {
     // API call to toggle publish status
-    console.log(`Toggle publish for highlight with id: ${id}`);
+    const res = await dispatch(togglePublishHighlight(id));
+    if (res?.payload?.success) {
+      toast.success(res?.payload?.message);
+      setHighlights(
+        Highlights.map((hig) => (hig._id === id ? res?.payload?.data : hig))
+      );
+    } else {
+      toast.error(res?.payload?.message);
+    }
   };
 
   const handleDeleteClick = (id) => {
@@ -86,17 +59,27 @@ const HighlightList = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleDelete = () => {
-    // API call to delete highlight
-    console.log(`Delete highlight with id: ${deleteId}`);
+  const handleDelete = async () => {
+    // API call to delete destination
+    const res = await dispatch(deleteHighlight(deleteId));
+    if (res?.payload?.success) {
+      toast.success(res?.payload?.message);
+      setHighlights(Highlights.filter((hig) => hig._id !== deleteId));
+    } else {
+      toast.error(res?.payload?.message);
+    }
+
     setIsDeleteModalOpen(false);
     setDeleteId(null);
   };
 
+  if (loading) return;
   return (
     <div className="space-y-6 overflow-x-hidden  p-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-gray-900">Highlights</h1>
+        <h1 className="text-2xl font-semibold max-sm:text-xl text-gray-900">
+          Highlights
+        </h1>
         <Link
           to="/admin/highlights/create"
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -193,12 +176,16 @@ const HighlightList = () => {
                             <Eye size={18} />
                           )}
                         </button>
-                        <Link
-                          to={`/admin/highlights/edit/${highlight._id}`}
+                        <button
+                          onClick={() =>
+                            navigate(`edit/${highlight?._id}`, {
+                              state: { highlight },
+                            })
+                          }
                           className="text-indigo-600 hover:text-indigo-900"
                         >
                           <Edit size={18} />
-                        </Link>
+                        </button>
                         <button
                           onClick={() => handleDeleteClick(highlight._id)}
                           className="text-red-600 hover:text-red-900"

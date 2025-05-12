@@ -12,12 +12,12 @@ const initialState = {
 // Get all highlights (public)
 export const fetchHighlights = createAsyncThunk(
   "highlight/fetchAll",
-  async (_, thunkAPI) => {
+  async () => {
     try {
       const res = await axiosInstance.get("/highlight");
       return res.data;
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.response?.data || err.message);
+      return err.response?.data || err.message;
     }
   }
 );
@@ -84,18 +84,15 @@ export const addHighlight = createAsyncThunk(
 // Admin - Update highlight
 export const updateHighlight = createAsyncThunk(
   "highlight/update",
-  async ({ id, formData }, thunkAPI) => {
+  async ({ id, formData }) => {
     try {
       const res = await axiosInstance.put(
         `/api/v5/admin/highlight/${id}`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
+        formData
       );
       return res.data;
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.response?.data || err.message);
+      return err.response?.data || err.message;
     }
   }
 );
@@ -106,7 +103,7 @@ export const deleteHighlight = createAsyncThunk(
   async (id, thunkAPI) => {
     try {
       const res = await axiosInstance.delete(`/api/v5/admin/highlight/${id}`);
-      return { id };
+      return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
     }
@@ -145,44 +142,6 @@ const highlightSlice = createSlice({
       .addCase(fetchHighlights.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      })
-
-      // Fetch Published
-      .addCase(fetchPublishedHighlights.fulfilled, (state, action) => {
-        state.publishedHighlights = action.payload;
-      })
-
-      // Get By ID
-      .addCase(fetchHighlightById.fulfilled, (state, action) => {
-        state.currentHighlight = action.payload;
-      })
-
-      // Add
-      .addCase(addHighlight.fulfilled, (state, action) => {
-        state.highlights.push(action.payload);
-      })
-
-      // Update
-      .addCase(updateHighlight.fulfilled, (state, action) => {
-        const index = state.highlights.findIndex(
-          (h) => h._id === action.payload._id
-        );
-        if (index !== -1) state.highlights[index] = action.payload;
-      })
-
-      // Delete
-      .addCase(deleteHighlight.fulfilled, (state, action) => {
-        state.highlights = state.highlights.filter(
-          (h) => h._id !== action.payload.id
-        );
-      })
-
-      // Publish/Unpublish
-      .addCase(togglePublishHighlight.fulfilled, (state, action) => {
-        const index = state.highlights.findIndex(
-          (h) => h._id === action.payload._id
-        );
-        if (index !== -1) state.highlights[index] = action.payload;
       });
   },
 });

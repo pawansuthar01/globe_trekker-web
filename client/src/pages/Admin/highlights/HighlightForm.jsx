@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Save } from "lucide-react";
 import FormField from "../../../components/AdminComponent/form/FormField";
+import FileUpload from "../../../components/AdminComponent/common/FileUpload";
+import {
+  addHighlight,
+  updateHighlight,
+} from "../../../Redux/Slice/highlightSlice";
+import { useDispatch } from "react-redux";
 
 const initialFormData = {
   name: "",
@@ -17,33 +23,24 @@ const initialFormData = {
 };
 
 const HighlightForm = () => {
+  const dispatch = useDispatch();
   const { id } = useParams();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState(initialFormData);
+  const { highlight } = useLocation()?.state || [];
+  const [formData, setFormData] = useState();
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
 
   const isEditMode = !!id;
 
   useEffect(() => {
     if (isEditMode) {
-      // In a real app, you would fetch the highlight data from an API
-      // For now, we'll use mock data
-      const mockHighlight = {
-        _id: "1",
-        name: "Beautiful Beaches of Bali",
-        image:
-          "https://images.pexels.com/photos/1450353/pexels-photo-1450353.jpeg",
-        description:
-          "Explore the pristine beaches with crystal clear waters and white sand.",
-        location: "Bali",
-        region: "Asia",
-        rating: 4.8,
-        isPublished: true,
-        date: "2023-06-15",
-      };
-
-      setFormData(mockHighlight);
+      setFormData(highlight);
+      setLoadingData(false);
+    } else {
+      setFormData(initialFormData);
+      setLoadingData(false);
     }
   }, [id, isEditMode]);
 
@@ -71,13 +68,9 @@ const HighlightForm = () => {
 
   const validateForm = () => {
     const newErrors = {};
-
+    console.log(formData.name);
     if (!formData.name.trim()) {
       newErrors.name = "Highlight name is required";
-    }
-
-    if (!formData.image.trim()) {
-      newErrors.image = "Image URL is required";
     }
 
     if (!formData.description.trim()) {
@@ -100,7 +93,7 @@ const HighlightForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -109,16 +102,63 @@ const HighlightForm = () => {
 
     setLoading(true);
 
-    // In a real app, you would send the data to an API
-    console.log("Submitting highlight data:", formData);
+    const form = new FormData();
+    if (formData.name) {
+      form.append("name", formData.name);
+    }
+    if (formData.description) {
+      form.append("description", formData.description);
+    }
+    if (formData.region) {
+      form.append("region", formData.region);
+    }
+    if (formData.rating) {
+      form.append("rating", formData.rating);
+    }
+    if (formData.location) {
+      form.append("location", formData.location);
+    }
 
+    if (formData.image && formData.image instanceof File) {
+      form.append("image", formData.image);
+    }
+
+    if (formData.video && formData.video instanceof File) {
+      form.append("video", formData.video);
+    }
+
+    const res = await dispatch(
+      isEditMode
+        ? updateHighlight({ id: id, formData: form })
+        : addHighlight(form)
+    );
+    setLoading(false);
+
+    console.log(res);
+    return;
     // Simulate API call
     setTimeout(() => {
-      setLoading(false);
       navigate("/admin/highlights");
     }, 1000);
   };
 
+  const handleImageChange = (file) => {
+    setFormData((prev) => ({
+      ...prev,
+      image: file,
+    }));
+  };
+
+  const handleVideoChange = (file) => {
+    if (file) {
+      setFormData((prev) => ({
+        ...prev,
+        video: file,
+      }));
+    }
+  };
+
+  if (loadingData) return;
   return (
     <div className="space-y-6 overflow-hidden p-6">
       <div className="flex items-center justify-between">
@@ -129,7 +169,7 @@ const HighlightForm = () => {
           >
             <ArrowLeft size={20} />
           </button>
-          <h1 className="text-2xl font-semibold text-gray-900">
+          <h1 className="text-2xl max-sm:text-xl font-semibold text-gray-900">
             {isEditMode ? "Edit Highlight" : "Create New Highlight"}
           </h1>
         </div>
@@ -164,34 +204,22 @@ const HighlightForm = () => {
             </FormField>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <FormField
-                label="Image URL"
-                id="image"
-                error={errors.image}
-                required
-              >
-                <input
-                  type="text"
-                  name="image"
-                  id="image"
+              <FormField label="image" id="image" error={errors.image} required>
+                <FileUpload
+                  accept="image/*"
+                  onChange={handleImageChange}
                   value={formData.image}
-                  onChange={handleChange}
-                  className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                 />
               </FormField>
-
               <FormField
                 label="Video URL (optional)"
                 id="video"
                 error={errors.video}
               >
-                <input
-                  type="text"
-                  name="video"
-                  id="video"
+                <FileUpload
+                  accept="video/*"
+                  onChange={handleVideoChange}
                   value={formData.video}
-                  onChange={handleChange}
-                  className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                 />
               </FormField>
             </div>

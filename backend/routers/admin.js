@@ -97,6 +97,7 @@ Admin.route("/destination/Published/:id").put(PublishedDestination);
 // < **   routes -- End Destination** >
 // < **   routes -- Start highlight** >
 Admin.route("/highlight").post(
+  isLoggedIn,
   upload.fields([
     { name: "video", maxCount: 1 },
     { name: "image", maxCount: 1 },

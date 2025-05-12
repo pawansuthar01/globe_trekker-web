@@ -15,25 +15,11 @@ const uploadToCloudinary = async (file, folder) => {
 };
 
 export const addHighlight = async (req, res, next) => {
-  const {
-    name,
-    avatar,
-    isPublished,
-    date,
-    location,
-    region,
-    description,
-    rating,
-  } = req.body;
-  if (
-    !name ||
-    !description ||
-    !avatar ||
-    !location ||
-    !region ||
-    !rating ||
-    !req.files
-  ) {
+  const { avatar } = req.user;
+  const { name, isPublished, date, location, region, description, rating } =
+    req.body;
+
+  if (!name || !description || !location || !region || !rating || !req.files) {
     return next(new AppError("highlight data is required to upload..."), 402);
   }
   if (Number(rating) > 5 || Number(rating) < 0) {
@@ -67,7 +53,7 @@ export const addHighlight = async (req, res, next) => {
       isPublished,
       date,
       image,
-      avatar,
+      avatar: avatar.secure_url,
       video,
       location,
       rating,
@@ -90,9 +76,11 @@ export const addHighlight = async (req, res, next) => {
 // Update Controller
 export const updateHighlight = async (req, res, next) => {
   const { id } = req.params;
+  const { avatar } = req.user;
+
   const {
     name,
-    avatar,
+
     isPublished,
     date,
     location,
@@ -136,7 +124,7 @@ export const updateHighlight = async (req, res, next) => {
     // Update other fields
     highlight.name = name || highlight.name;
     highlight.isPublished = isPublished || highlight.isPublished;
-    highlight.avatar = avatar || highlight.avatar;
+    highlight.avatar = avatar.secure_url || highlight.avatar;
     highlight.date = date || highlight.date;
     highlight.location = location || highlight.location;
     highlight.region = region || highlight.region;

@@ -78,16 +78,6 @@ const FileUpload = ({
                 className="max-h-48 mx-auto rounded"
               />
             ) : null}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                clearFile();
-              }}
-              className="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-            >
-              <X size={16} />
-            </button>
           </div>
         ) : (
           <>
