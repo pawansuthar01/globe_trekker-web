@@ -43,6 +43,7 @@ import {
 import { addContact, updateContact } from "../controller/contact.controller.js";
 import { getAllSearchKeywords } from "../controller/search.controller.js";
 import { getAllUser } from "../controller/user.controller.js";
+import { isLoggedIn } from "../middleware/authMiddlware.js";
 
 const Admin = Router();
 // < **  Banner routes -- start ** >
@@ -75,6 +76,7 @@ Admin.route("/stories/featured-true/:id").put(Featured_TrueStory);
 // < **  stories routes -- End ** >
 // < **   routes -- Start newDestination** >
 Admin.route("/destination").post(
+  isLoggedIn,
   upload.fields([
     { name: "thumbnail", maxCount: 1 },
     { name: "image", maxCount: 5 },

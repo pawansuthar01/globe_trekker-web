@@ -15,7 +15,7 @@ const Header = ({ setSidebarOpen }) => {
 
       <div className="flex flex-1 justify-between px-4">
         <div className="flex flex-1">
-          <h2 className="text-2xl font-semibold text-gray-800 self-center">
+          <h2 className="text-2xl max-sm:text-xl font-semibold text-gray-800 self-center">
             Admin Dashboard
           </h2>
         </div>

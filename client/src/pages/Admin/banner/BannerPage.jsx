@@ -13,12 +13,14 @@ import {
 import { useDispatch } from "react-redux";
 import {
   activateBanner,
+  deleteBanner,
   fetchBanners,
   newBanner,
   updateBanner,
 } from "../../../Redux/Slice/bannerSlice";
 import { useEffect } from "react";
 import FileUpload from "../../../components/AdminComponent/common/FileUpload";
+import toast from "react-hot-toast";
 
 const BannerPage = () => {
   // Sample data
@@ -141,36 +143,45 @@ const BannerPage = () => {
       }
     });
 
-    // Send to backend (example with axios)
     const res = await (editingBanner
       ? dispatch(updateBanner({ id: editingBanner._id, formData }))
       : dispatch(newBanner(formData)));
-    console.log(res);
     if (res.payload.success) {
-      FetchBanners(); // refresh list
+      FetchBanners();
       closeModal();
     }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this banner?")) {
-      setBanners(banners.filter((banner) => banner._id !== id));
+      const res = await dispatch(deleteBanner(id));
+      if (res?.payload?.success) {
+        setBanners(banners.filter((banner) => banner._id !== id));
+        toast.success(res?.payload?.message);
+      } else {
+        toast.error(res?.payload?.message);
+      }
     }
   };
 
   const toggleActive = async (id) => {
-    await dispatch(activateBanner(id));
-    setBanners(
-      banners.map((banner) =>
-        banner._id === id
-          ? { ...banner, active: true }
-          : { ...banner, active: false }
-      )
-    );
+    const res = await dispatch(activateBanner(id));
+    if (res?.payload?.success) {
+      setBanners(
+        banners.map((banner) =>
+          banner._id === id
+            ? { ...banner, active: true }
+            : { ...banner, active: false }
+        )
+      );
+      toast.success(res?.payload?.message);
+    } else {
+      toast.error(res?.payload?.message);
+    }
   };
 
   return (
-    <div className=" space-y-6 overflow-hidden w-screen p-6">
+    <div className=" space-y-6  p-6">
       <div className="page-header">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Banners</h1>
@@ -323,7 +334,7 @@ const BannerPage = () => {
                         <button
                           type="button"
                           className="text-red-600 hover:text-red-900"
-                          onClick={() => handleDelete(banner.id)}
+                          onClick={() => handleDelete(banner._id)}
                         >
                           <Trash2 className="h-5 w-5" />
                         </button>

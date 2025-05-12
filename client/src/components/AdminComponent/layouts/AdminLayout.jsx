@@ -60,7 +60,7 @@ const AdminLayout = () => {
       {/* Main content area */}
       <div className="flex flex-1 flex-col">
         <Header setSidebarOpen={setSidebarOpen} />
-        <main>
+        <main className="  overflow-x-hidden  w-screen md:pl-64">
           <Outlet />
         </main>
       </div>

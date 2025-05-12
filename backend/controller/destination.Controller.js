@@ -4,6 +4,7 @@ import cloudinary from "cloudinary";
 /*<=  add =>*/
 export const newDestination = async (req, res, next) => {
   try {
+    const { id } = req.user;
     const {
       name,
       description,
@@ -22,10 +23,11 @@ export const newDestination = async (req, res, next) => {
       climateType,
       bestMonth,
       featured,
-      createdBy,
+
       isPublished,
       itinerary, // Array of objects: [{ day, title, activities }]
     } = req.body;
+    console.log(req.body.travelTips);
     if (
       !description ||
       !name ||
@@ -43,7 +45,7 @@ export const newDestination = async (req, res, next) => {
       !latitude ||
       !longDescription ||
       !popularFor ||
-      !createdBy ||
+      !id ||
       !req.files
     ) {
       return next(
@@ -94,7 +96,7 @@ export const newDestination = async (req, res, next) => {
         typeof travelTips === "string" ? JSON.parse(travelTips) : travelTips,
       featured: featured === "true",
       isPublished: isPublished === "true",
-      createdBy,
+      createdBy: id,
       thumbnail,
       images,
       weatherInfo: {
@@ -180,6 +182,16 @@ export const updateDestination = async (req, res, next) => {
 
     // Handle gallery images
     let images = existing.images;
+    if (req.body.removedImages) {
+      const removedImages = Array.isArray(req.body.removedImages)
+        ? req.body.removedImages
+        : [req.body.removedImages]; // Handle single image URL or array
+
+      // Just filter the images array in the database to remove the ones with matching URLs
+      images = existing.images.filter(
+        (image) => !removedImages.includes(image.secure_url)
+      );
+    }
     if (req.files["image"]) {
       images = []; // Replace old gallery
       for (let file of req.files["image"]) {
@@ -218,7 +230,7 @@ export const updateDestination = async (req, res, next) => {
       bestMonth: bestMonth || existing.weatherInfo.bestMonth,
     };
     existing.featured = featured == "true" || existing.featured;
-    existing.isPublished = isPublished || existing.isPublished;
+    existing.isPublished = isPublished == "true" || existing.isPublished;
     existing.thumbnail = thumbnail;
     existing.images = images;
     existing.itinerary = parsedItinerary || existing.itinerary;

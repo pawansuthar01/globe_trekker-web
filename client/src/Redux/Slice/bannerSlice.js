@@ -53,17 +53,15 @@ export const updateBanner = createAsyncThunk(
 );
 
 // ✅ Delete Banner (Admin)
-export const deleteBanner = createAsyncThunk(
-  "banner/delete",
-  async (id, thunkAPI) => {
-    try {
-      await axiosInstance.delete(`/api/v5/admin/banner/${id}`);
-      return { id };
-    } catch (err) {
-      return thunkAPI.rejectWithValue(err.response?.data || err.message);
-    }
+export const deleteBanner = createAsyncThunk("banner/delete", async (id) => {
+  try {
+    console.log(id);
+    await axiosInstance.delete(`/api/v5/admin/banner/${id}`);
+    return { id };
+  } catch (err) {
+    return err.response?.data || err.message;
   }
-);
+});
 
 // ✅ Activate Banner (Admin)
 export const activateBanner = createAsyncThunk(
@@ -103,13 +101,6 @@ const bannerSlice = createSlice({
       .addCase(fetchBanners.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      })
-
-      // Delete banner
-      .addCase(deleteBanner.fulfilled, (state, action) => {
-        state.banners = state.banners.filter(
-          (b) => b._id !== action.payload.id
-        );
       });
   },
 });

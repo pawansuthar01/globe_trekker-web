@@ -79,7 +79,9 @@ const Dashboard = () => {
   return (
     <div className="space-y-6 overflow-hidden p-6">
       <div className="page-header">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900 max-sm:text-xl">
+          Dashboard
+        </h1>
         <p className="text-sm text-gray-500">
           Welcome back to your admin dashboard
         </p>

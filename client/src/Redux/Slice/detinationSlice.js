@@ -14,12 +14,12 @@ const initialState = {
 // Get all destinations
 export const fetchAllDestinations = createAsyncThunk(
   "destination/fetchAll",
-  async (_, { rejectWithValue }) => {
+  async () => {
     try {
       const { data } = await axiosInstance.get("/api/v3/destination");
       return data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message);
+      return err.response?.data?.message;
     }
   }
 );
@@ -130,16 +130,15 @@ export const removeSavedDestination = createAsyncThunk(
 // Create new destination
 export const createDestination = createAsyncThunk(
   "destination/create",
-  async (formData, { rejectWithValue }) => {
+  async (formData) => {
     try {
       const { data } = await axiosInstance.post(
         "/api/v5/admin/destination",
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        formData
       );
       return data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message);
+      return err.response?.data?.message;
     }
   }
 );
@@ -194,14 +193,14 @@ export const markAsFeatured = createAsyncThunk(
 // Mark as Published
 export const markAsPublished = createAsyncThunk(
   "destination/markPublished",
-  async (id, { rejectWithValue }) => {
+  async (id) => {
     try {
       const { data } = await axiosInstance.put(
         `/api/v5/admin/destination/published/${id}`
       );
       return data;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message);
+      return err.response?.data?.message;
     }
   }
 );

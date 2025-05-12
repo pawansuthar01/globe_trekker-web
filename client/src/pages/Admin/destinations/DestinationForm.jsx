@@ -1,88 +1,73 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Save, Plus, X } from "lucide-react";
 import FormField from "../../../components/AdminComponent/form/FormField";
 import FileUpload from "../../../components/AdminComponent/common/FileUpload";
+import {
+  createDestination,
+  updateDestination,
+} from "../../../Redux/Slice/detinationSlice";
+import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
 
-const initialFormData = {
+const emptyDestination = {
   name: "",
-  thumbnail: null,
-  thumbnailPreview: "",
-  images: [],
-  imagesPreviews: [],
-  description: "",
-  longDescription: "",
   category: "",
   bestTimeToVisit: "",
+  description: "",
+  longDescription: "",
+  featured: false,
+  isPublished: false,
+  SuggestedDuration: "",
   tags: [],
   popularFor: [],
+  travelTips: [],
+  itinerary: [
+    {
+      day: "",
+      title: "",
+      activities: [""],
+    },
+  ],
+  weatherInfo: {
+    avgTemp: "",
+    climateType: "",
+    bestMonth: "",
+  },
   location: {
     country: "",
     region: "",
     coordinates: {
-      latitude: 0,
-      longitude: 0,
+      latitude: "",
+      longitude: "",
     },
   },
-  featured: false,
-  isPublished: false,
-  travelTips: [],
+  images: [],
+  thumbnail: null,
 };
-
 const DestinationForm = () => {
+  const dispatch = useDispatch();
   const { id } = useParams();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState(initialFormData);
+  const { destination } = useLocation()?.state || [];
+  const [formData, setFormData] = useState();
+  const [loadingData, setLoadingData] = useState(true);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [newTag, setNewTag] = useState("");
   const [newTip, setNewTip] = useState("");
   const [newPopularFor, setNewPopularFor] = useState("");
-
-  const isEditMode = !!id;
-
+  const [removedImages, setRemovedImages] = useState([]);
+  const isEditMode = id != null;
   useEffect(() => {
     if (isEditMode) {
-      // In a real app, you would fetch the destination data from an API
-      // For now, we'll use mock data
-      const mockDestination = {
-        id: "1",
-        name: "Bali, Indonesia",
-        thumbnailPreview:
-          "https://images.pexels.com/photos/1586795/pexels-photo-1586795.jpeg",
-        description: "A beautiful island paradise in Indonesia",
-        longDescription:
-          "Bali is a beautiful island paradise known for its stunning beaches, lush rice terraces, and vibrant culture.",
-        category: "Beach",
-        bestTimeToVisit: "April to October",
-        tags: ["beach", "tropical", "culture"],
-        popularFor: ["Beaches", "Temples", "Rice terraces"],
-        location: {
-          country: "Indonesia",
-          region: "Asia",
-          coordinates: {
-            latitude: -8.3405,
-            longitude: 115.092,
-          },
-        },
-        featured: true,
-        isPublished: true,
-        travelTips: [
-          "Bring sunscreen",
-          "Respect local customs",
-          "Try the local food",
-        ],
-      };
-
-      setFormData({
-        ...initialFormData,
-        ...mockDestination,
-        thumbnail: null,
-        images: [],
-      });
+      setFormData(destination);
+      setLoadingData(false);
+    } else {
+      setFormData(emptyDestination);
+      setLoadingData(false);
     }
   }, [id, isEditMode]);
-
   const handleChange = (e) => {
     const { name, value, type } = e.target;
 
@@ -118,29 +103,12 @@ const DestinationForm = () => {
 
   const handleImagesChange = (file) => {
     if (file) {
+      const newFiles = Array.isArray(file) ? file : [file];
       setFormData((prev) => ({
         ...prev,
-        images: [...prev.images, file],
+        images: [...prev.images, ...newFiles],
       }));
-
-      // Create preview URL
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prev) => ({
-          ...prev,
-          imagesPreviews: [...prev.imagesPreviews, reader.result],
-        }));
-      };
-      reader.readAsDataURL(file);
     }
-  };
-
-  const removeImage = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-      imagesPreviews: prev.imagesPreviews.filter((_, i) => i !== index),
-    }));
   };
 
   const handleCoordinateChange = (e) => {
@@ -239,65 +207,125 @@ const DestinationForm = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setLoading(true);
+    const form = new FormData();
+
+    // Append basic fields
+    form.append("name", formData.name);
+    form.append("category", formData.category);
+    form.append("bestTimeToVisit", formData.bestTimeToVisit);
+    form.append("description", formData.description);
+    form.append("longDescription", formData.longDescription);
+    form.append("featured", formData.featured);
+    form.append("isPublished", formData.isPublished);
+
+    // Append location
+    form.append("country", formData.location.country);
+    form.append("region", formData.location.region);
+    form.append("latitude", formData.location.coordinates.latitude);
+    form.append("longitude", formData.location.coordinates.longitude);
+    form.append("SuggestedDuration", formData.SuggestedDuration);
+    form.append("avgTemp", formData.weatherInfo?.avgTemp);
+    form.append("climateType", formData.weatherInfo?.climateType);
+    form.append("bestMonth", formData.weatherInfo?.bestMonth);
+
+    // Append itinerary as JSON string (or break into multiple fields as needed)
+    form.append("itinerary", JSON.stringify(formData.itinerary || []));
+    // Append arrays
+    formData.tags.forEach((tag) => form.append("tags[]", tag));
+    formData.popularFor.forEach((item) => form.append("popularFor[]", item));
+    formData.travelTips.forEach((tip) => form.append("travelTips[]", tip));
+
+    // Thumbnail (check if it's a File or URL object)
+    if (formData.thumbnail && formData.thumbnail instanceof File) {
+      form.append("thumbnail", formData.thumbnail);
+    }
+
+    // Images (only newly added files)
+    formData.images.forEach((img) => {
+      if (img instanceof File) {
+        form.append("image", img);
+      }
+    });
+    removedImages.forEach((img) =>
+      form.append("removedImages", img.secure_url)
+    );
 
     try {
-      // Upload thumbnail if new file is selected
-      let thumbnailUrl = formData.thumbnailPreview;
-      if (formData.thumbnail) {
-        thumbnailUrl = await uploadFile(
-          formData.thumbnail,
-          "destinations",
-          `thumbnails/${formData.name}-${Date.now()}`
-        );
-      }
-
-      // Upload additional images
-      const uploadedImages = await Promise.all(
-        formData.images.map((file, index) =>
-          uploadFile(
-            file,
-            "destinations",
-            `images/${formData.name}-${Date.now()}-${index}`
-          )
-        )
+      // Now dispatch the action with ID and formData
+      const res = await dispatch(
+        isEditMode
+          ? updateDestination({ id, formData: form })
+          : createDestination(form)
       );
-
-      // Prepare data for API
-      const destinationData = {
-        ...formData,
-        thumbnail: {
-          url: thumbnailUrl,
-          alt: formData.name,
-        },
-        images: uploadedImages.map((url) => ({
-          secure_url: url,
-        })),
-      };
-
-      // In a real app, you would send the data to an API
-      console.log("Submitting destination data:", destinationData);
-
-      // Simulate API call
-      setTimeout(() => {
-        setLoading(false);
-        navigate("/admin/destinations");
-      }, 1000);
+      console.log(res);
+      if (res?.payload?.success) {
+        toast.success(res?.payload?.message);
+        setFormData(res?.payload?.data);
+      } else {
+        toast.error(res?.payload?.message);
+      }
+      // navigate("/admin/destinations");
     } catch (error) {
-      console.error("Error uploading files:", error);
+      console.error("Error updating destination:", error);
+    } finally {
       setLoading(false);
-      // Handle error appropriately
     }
   };
 
+  const removeImage = (index) => {
+    const imageToRemove = formData.images[index];
+
+    // Track removed URLs if they're not File instances (i.e., existing URLs)
+    if (!(imageToRemove instanceof File)) {
+      setRemovedImages((prev) => [...prev, imageToRemove]);
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+  };
+  // Handle change for day or title
+  const handleDayChange = (index, field, value) => {
+    const updatedItinerary = [...formData.itinerary];
+    updatedItinerary[index][field] = value;
+    setFormData({ ...formData, itinerary: updatedItinerary });
+  };
+
+  // Handle change for specific activity
+  const handleActivityChange = (dayIndex, activityIndex, value) => {
+    const updatedItinerary = [...formData.itinerary];
+    updatedItinerary[dayIndex].activities[activityIndex] = value;
+    setFormData({ ...formData, itinerary: updatedItinerary });
+  };
+
+  // Add a new activity to an existing day
+  const addActivityToDay = (dayIndex) => {
+    const updatedItinerary = [...formData.itinerary];
+    updatedItinerary[dayIndex].activities.push("");
+    setFormData({ ...formData, itinerary: updatedItinerary });
+  };
+
+  // Add a new day
+  const addNewDay = () => {
+    const newDay = {
+      day: "",
+      title: "",
+      activities: [""],
+    };
+    setFormData({
+      ...formData,
+      itinerary: [...formData.itinerary, newDay],
+    });
+  };
+
+  if (loadingData) return;
   return (
     <div className="space-y-6  overflow-hidden p-6">
       <div className="flex items-center justify-between">
@@ -308,7 +336,7 @@ const DestinationForm = () => {
           >
             <ArrowLeft size={20} />
           </button>
-          <h1 className="text-2xl font-semibold text-gray-900">
+          <h1 className="text-2xl max-sm:text-sm font-semibold text-gray-900">
             {isEditMode ? "Edit Destination" : "Create New Destination"}
           </h1>
         </div>
@@ -316,9 +344,9 @@ const DestinationForm = () => {
           type="button"
           onClick={handleSubmit}
           disabled={loading}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="inline-flex  items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
-          <Save className="mr-2 h-5 w-5" />
+          <Save className="mr-2 h-5 w-5 max-sm:w-4 max-sm:mr-0" />
           {loading ? "Saving..." : "Save Destination"}
         </button>
       </div>
@@ -338,10 +366,9 @@ const DestinationForm = () => {
                 id="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                className="shadow-sm focus:ring-indigo-500 p-1 border focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
               />
             </FormField>
-
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <FormField label="Category" id="category" error={errors.category}>
                 <select
@@ -349,7 +376,7 @@ const DestinationForm = () => {
                   id="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  className="shadow-sm focus:ring-indigo-500 border  p-1 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                 >
                   <option value="">Select a category</option>
                   <option value="Beach">Beach</option>
@@ -372,11 +399,10 @@ const DestinationForm = () => {
                   id="bestTimeToVisit"
                   value={formData.bestTimeToVisit}
                   onChange={handleChange}
-                  className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  className="shadow-sm focus:ring-indigo-500 border p-1 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                 />
               </FormField>
             </div>
-
             <FormField
               label="Thumbnail"
               id="thumbnail"
@@ -386,72 +412,63 @@ const DestinationForm = () => {
               <FileUpload
                 accept="image/*"
                 onChange={handleThumbnailChange}
-                value={formData.thumbnailPreview}
+                value={formData.thumbnail?.url}
               />
             </FormField>
-
             <FormField
               label="Additional Images"
               id="images"
               error={errors.images}
             >
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {formData.imagesPreviews.map((preview, index) => (
+                {formData?.images?.map((image, index) => (
                   <div key={index} className="relative">
-                    <img
-                      src={preview}
+                    <FileUpload
+                      onChange={handleImagesChange}
                       alt={`Preview ${index + 1}`}
-                      className="h-40 w-full object-cover rounded-lg"
+                      value={image.secure_url}
                     />
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      className="absolute -top-2 right-1 bg-red-500 text-white p-1 rounded-full"
                     >
-                      <X size={16} />
+                      <X size={12} />
                     </button>
                   </div>
                 ))}
-                <FileUpload
-                  accept="image/*"
-                  onChange={handleImagesChange}
-                  value={null}
-                  className="h-40"
-                />
               </div>
             </FormField>
-
+            <FileUpload onChange={handleImagesChange} />
             <FormField
               label="Short Description"
               id="description"
-              error={errors.description}
+              error={errors?.description}
               required
             >
               <textarea
                 name="description"
                 id="description"
                 rows={3}
-                value={formData.description}
+                value={formData?.description}
                 onChange={handleChange}
-                className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                className="shadow-sm focus:ring-indigo-500 border p-1 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
               />
             </FormField>
-
             <FormField
               label="Long Description"
               id="longDescription"
-              error={errors.longDescription}
+              error={errors?.longDescription}
             >
               <textarea
                 name="longDescription"
                 id="longDescription"
                 rows={5}
-                value={formData.longDescription}
+                value={formData?.longDescription}
                 onChange={handleChange}
-                className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                className="shadow-sm focus:ring-indigo-500 border p-1  focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
               />
             </FormField>
-
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <FormField
                 label="Country"
@@ -463,9 +480,9 @@ const DestinationForm = () => {
                   type="text"
                   name="location.country"
                   id="location.country"
-                  value={formData.location.country}
+                  value={formData?.location?.country}
                   onChange={handleChange}
-                  className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  className="shadow-sm focus:ring-indigo-500 border p-1  focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                 />
               </FormField>
 
@@ -479,13 +496,12 @@ const DestinationForm = () => {
                   type="text"
                   name="location.region"
                   id="location.region"
-                  value={formData.location.region}
+                  value={formData?.location?.region}
                   onChange={handleChange}
-                  className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  className="shadow-sm focus:ring-indigo-500 border p-1 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                 />
               </FormField>
             </div>
-
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <FormField
                 label="Latitude"
@@ -496,10 +512,10 @@ const DestinationForm = () => {
                   type="number"
                   name="location.coordinates.latitude"
                   id="location.coordinates.latitude"
-                  value={formData.location.coordinates.latitude}
+                  value={formData?.location?.coordinates?.latitude}
                   onChange={handleCoordinateChange}
                   step="0.0001"
-                  className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  className="shadow-sm focus:ring-indigo-500 border p-1 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                 />
               </FormField>
 
@@ -512,14 +528,13 @@ const DestinationForm = () => {
                   type="number"
                   name="location.coordinates.longitude"
                   id="location.coordinates.longitude"
-                  value={formData.location.coordinates.longitude}
+                  value={formData?.location?.coordinates?.longitude}
                   onChange={handleCoordinateChange}
                   step="0.0001"
-                  className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  className="shadow-sm focus:ring-indigo-500 border p-1 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                 />
               </FormField>
             </div>
-
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div>
                 <FormField label="Tags" id="tags" error={errors.tags}>
@@ -529,7 +544,7 @@ const DestinationForm = () => {
                       id="newTag"
                       value={newTag}
                       onChange={(e) => setNewTag(e.target.value)}
-                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
+                      className="shadow-sm focus:ring-indigo-500 border p-1 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
                       placeholder="Add a tag"
                       onKeyDown={(e) =>
                         e.key === "Enter" && (e.preventDefault(), addTag())
@@ -544,7 +559,7 @@ const DestinationForm = () => {
                     </button>
                   </div>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {formData.tags.map((tag) => (
+                    {formData?.tags?.map((tag) => (
                       <span
                         key={tag}
                         className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
@@ -576,7 +591,7 @@ const DestinationForm = () => {
                       id="newPopularFor"
                       value={newPopularFor}
                       onChange={(e) => setNewPopularFor(e.target.value)}
-                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
+                      className="shadow-sm focus:ring-indigo-500 border p-1 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
                       placeholder="Add a popular feature"
                       onKeyDown={(e) =>
                         e.key === "Enter" &&
@@ -592,7 +607,7 @@ const DestinationForm = () => {
                     </button>
                   </div>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {formData.popularFor.map((item) => (
+                    {formData?.popularFor?.map((item) => (
                       <span
                         key={item}
                         className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800"
@@ -601,7 +616,7 @@ const DestinationForm = () => {
                         <button
                           type="button"
                           onClick={() => removePopularFor(item)}
-                          className="ml-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full text-amber-400 hover:bg-amber-200 hover:text-amber-500 focus:outline-none"
+                          className="ml-1.5 inline-flex  items-center justify-center h-4 w-4 rounded-full text-amber-400 hover:bg-amber-200 hover:text-amber-500 focus:outline-none"
                         >
                           <span className="sr-only">Remove {item}</span>
                           &times;
@@ -612,12 +627,11 @@ const DestinationForm = () => {
                 </FormField>
               </div>
             </div>
-
             <div>
               <FormField
                 label="Travel Tips"
                 id="travelTips"
-                error={errors.travelTips}
+                error={errors?.travelTips}
               >
                 <div className="flex">
                   <input
@@ -625,7 +639,7 @@ const DestinationForm = () => {
                     id="newTip"
                     value={newTip}
                     onChange={(e) => setNewTip(e.target.value)}
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
+                    className="shadow-sm focus:ring-indigo-500 border p-1 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
                     placeholder="Add a travel tip"
                     onKeyDown={(e) =>
                       e.key === "Enter" && (e.preventDefault(), addTravelTip())
@@ -634,14 +648,15 @@ const DestinationForm = () => {
                   <button
                     type="button"
                     onClick={addTravelTip}
-                    className="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100"
+                    className="inline-flex  items-center px-3 py-2 border border-l-0 border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100"
                   >
                     Add
                   </button>
                 </div>
+
                 <div className="mt-2">
                   <ul className="divide-y divide-gray-200">
-                    {formData.travelTips.map((tip, index) => (
+                    {formData?.travelTips?.map((tip, index) => (
                       <li
                         key={index}
                         className="py-2 flex justify-between items-center"
@@ -659,22 +674,38 @@ const DestinationForm = () => {
                   </ul>
                 </div>
               </FormField>
+            </div>{" "}
+            <div>
+              <FormField
+                label="Suggested Duration"
+                id="SuggestedDuration"
+                error={errors["SuggestedDuration"]}
+                required
+              >
+                <input
+                  type="text"
+                  name="SuggestedDuration"
+                  id="SuggestedDuration"
+                  value={formData?.SuggestedDuration}
+                  onChange={handleChange}
+                  className="shadow-sm focus:ring-indigo-500 border p-1 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                />
+              </FormField>
             </div>
-
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div className="flex items-center">
                 <input
                   id="featured"
                   name="featured"
                   type="checkbox"
-                  checked={formData.featured}
+                  checked={formData?.featured}
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
                       featured: e.target.checked,
                     }))
                   }
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="h-4 w-4 border text-indigo-600 p-1 focus:ring-indigo-500 border-gray-300 rounded"
                 />
                 <label
                   htmlFor="featured"
@@ -684,12 +715,108 @@ const DestinationForm = () => {
                 </label>
               </div>
 
+              <FormField label="Average Temperature">
+                <input
+                  type="text"
+                  name="weatherInfo.avgTemp"
+                  value={formData.weatherInfo?.avgTemp || ""}
+                  onChange={handleChange}
+                  className="shadow-sm  focus:ring-indigo-500 border  focus:border-indigo-500 block w-full sm:text-sm p-1 border-indigo-300 rounded-md"
+                />
+              </FormField>
+              <FormField label="Climate Type">
+                {" "}
+                <input
+                  type="text"
+                  name="weatherInfo.climateType"
+                  className="shadow-sm  focus:ring-indigo-500 border focus:border-indigo-500 block w-full sm:text-sm p-1 border-indigo-300 rounded-md"
+                  value={formData.weatherInfo?.climateType || ""}
+                  onChange={handleChange}
+                />
+              </FormField>
+              <FormField label="Best Month">
+                <input
+                  type="text"
+                  name="weatherInfo.bestMonth"
+                  className="shadow-sm  focus:ring-indigo-500 border focus:border-indigo-500 block w-full sm:text-sm p-1 border-indigo-300 rounded-md"
+                  value={formData.weatherInfo?.bestMonth || ""}
+                  onChange={handleChange}
+                />
+              </FormField>
+              <div className="space-y-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Itinerary
+                </label>
+                {formData.itinerary.map((dayItem, dayIndex) => (
+                  <div
+                    key={dayIndex}
+                    className="mb-4 border p-4 rounded shadow-sm"
+                  >
+                    {/* Day Number Input */}
+                    <input
+                      type="text"
+                      value={dayItem.day}
+                      onChange={(e) =>
+                        handleDayChange(dayIndex, "day", e.target.value)
+                      }
+                      className="mb-2 w-full border p-2 rounded"
+                      placeholder={`Day ${dayIndex + 1} Number`}
+                    />
+
+                    {/* Title Input */}
+                    <input
+                      type="text"
+                      value={dayItem.title}
+                      onChange={(e) =>
+                        handleDayChange(dayIndex, "title", e.target.value)
+                      }
+                      className="mb-2 w-full border p-2 rounded"
+                      placeholder="Day Title"
+                    />
+
+                    {/* Activities */}
+                    {dayItem.activities.map((activity, activityIndex) => (
+                      <input
+                        key={activityIndex}
+                        type="text"
+                        value={activity}
+                        onChange={(e) =>
+                          handleActivityChange(
+                            dayIndex,
+                            activityIndex,
+                            e.target.value
+                          )
+                        }
+                        className="mb-2 w-full border p-2 rounded"
+                        placeholder={`Activity ${activityIndex + 1}`}
+                      />
+                    ))}
+
+                    <button
+                      type="button"
+                      onClick={() => addActivityToDay(dayIndex)}
+                      className="text-sm text-blue-500"
+                    >
+                      + Add Activity
+                    </button>
+                  </div>
+                ))}
+
+                {/* Button to Add New Day */}
+                <button
+                  type="button"
+                  onClick={addNewDay}
+                  className="mt-4 px-4 py-2 bg-green-500 text-white rounded"
+                >
+                  + Add New Day
+                </button>
+              </div>
               <div className="flex items-center">
                 <input
                   id="isPublished"
                   name="isPublished"
                   type="checkbox"
-                  checked={formData.isPublished}
+                  checked={formData?.isPublished}
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
