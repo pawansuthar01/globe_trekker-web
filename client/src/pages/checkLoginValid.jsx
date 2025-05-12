@@ -13,10 +13,11 @@ const CheckLogin = () => {
   useEffect(() => {
     async function setCookie() {
       const ContinueWithGoogleRes = await dispatch(ContinueWithGoogle());
-      console.log(ContinueWithGoogleRes);
+      toast(ContinueWithGoogle?.payload?.message);
       if (ContinueWithGoogleRes?.payload?.success) {
         const res = await dispatch(setCookieCall(token));
-        console.log(res);
+        toast(res?.payload?.message);
+
         if (res?.payload?.success) {
           navigate("/");
         }

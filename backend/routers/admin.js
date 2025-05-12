@@ -34,6 +34,7 @@ import {
 import {
   addAbout,
   DeleteTeamMember,
+  getTeam,
   newTeamMemberAdd,
   updateAbout,
   UpdateTeamMember,
@@ -131,9 +132,10 @@ Admin.route("/about")
     addAbout
   );
 Admin.put("/about/team/new", upload.single("image"), newTeamMemberAdd);
+Admin.get("/about/team", getTeam);
 Admin.put("/about/team/:id", upload.single("image"), UpdateTeamMember);
 
-Admin.put("/about/team/delete/:id", DeleteTeamMember);
+Admin.delete("/about/team/delete/:id", DeleteTeamMember);
 // < **  routes --  End-About** >
 
 // < **   routes -- Start web -contact-del** >

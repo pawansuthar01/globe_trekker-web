@@ -70,6 +70,14 @@ export const newAboutTeam = createAsyncThunk(
     }
   }
 );
+export const getTeamCall = createAsyncThunk("about/update", async () => {
+  try {
+    const res = await axiosInstance.get(`/api/v5/admin/about/team`);
+    return res.data;
+  } catch (err) {
+    return err.response?.data || err.message;
+  }
+});
 export const DeleteAboutTeam = createAsyncThunk(
   "about/team/delete",
   async (id) => {

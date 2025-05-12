@@ -148,6 +148,24 @@ export const getAbout = async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 };
+
+export const getTeam = async (req, res, next) => {
+  try {
+    const about = await aboutModule.findOne({ key: "About_key" });
+
+    if (!about) {
+      return next(new AppError("About content not found", 404));
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "About content fetched successfully",
+      data: about?.team,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
 export const newTeamMemberAdd = async (req, res, next) => {
   try {
     const { role, name, description } = req.body;
@@ -180,7 +198,7 @@ export const newTeamMemberAdd = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "successfully new member add...",
-      data: about,
+      data: aboutDoc.team,
     });
   } catch (error) {
     return next(new AppError(error.message, 500));
@@ -188,16 +206,17 @@ export const newTeamMemberAdd = async (req, res, next) => {
 };
 export const UpdateTeamMember = async (req, res, next) => {
   try {
-    const { id } = req.parse;
+    const { id } = req.params;
+
     if (!id) {
       return next(new AppError("id is required to update team member...", 404));
     }
 
-    const { role, name, descriptions } = req.body;
+    const { role, name, description } = req.body;
     const aboutDoc = await aboutModule.findOne({
       key: "About_key",
     });
-    if (aboutDoc) {
+    if (!aboutDoc) {
       return next(new AppError("About document not found", 404));
     }
     const teamMember = aboutDoc.team.find((member) => member.id === id);
@@ -220,13 +239,13 @@ export const UpdateTeamMember = async (req, res, next) => {
     }
     if (role) teamMember.role = role;
     if (name) teamMember.name = name;
-    if (descriptions) teamMember.descriptions = descriptions;
+    if (description) teamMember.description = description;
     await aboutDoc.save();
 
     res.status(200).json({
       success: true,
       message: "successfully update member ...",
-      data: aboutDoc,
+      data: aboutDoc.team,
     });
   } catch (error) {
     return next(new AppError(error.message, 500));
@@ -234,7 +253,7 @@ export const UpdateTeamMember = async (req, res, next) => {
 };
 export const DeleteTeamMember = async (req, res, next) => {
   try {
-    const { id } = req.parse;
+    const { id } = req.params;
     if (!id) {
       return next(new AppError("id is required to update team member...", 404));
     }
@@ -242,7 +261,7 @@ export const DeleteTeamMember = async (req, res, next) => {
     const aboutDoc = await aboutModule.findOne({
       key: "About_key",
     });
-    if (aboutDoc) {
+    if (!aboutDoc) {
       return next(new AppError("About document not found", 404));
     }
     aboutDoc.team = aboutDoc.team.filter((member) => member.id !== id);
@@ -252,7 +271,7 @@ export const DeleteTeamMember = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "successfully delete member ...",
-      data: aboutDoc,
+      data: aboutDoc.team,
     });
   } catch (error) {
     return next(new AppError(error.message, 500));

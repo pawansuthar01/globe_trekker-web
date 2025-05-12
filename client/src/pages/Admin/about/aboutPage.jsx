@@ -4,6 +4,7 @@ import { Save, Plus, ChevronRight } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { fetchAbout, updateAbout } from "../../../Redux/Slice/aboutSlice";
 import FileUpload from "../../../components/AdminComponent/common/FileUpload";
+import { AboutPageSkeleton } from "../../../components/Skeleton/admin/about/about";
 
 const AboutUpdatePage = () => {
   // Sample data
@@ -150,7 +151,9 @@ const AboutUpdatePage = () => {
       setOriginalAboutData(JSON.parse(JSON.stringify(res.payload.data))); // deep clone
     }
   };
-  if (loading) return;
+  if (loading) {
+    return <AboutPageSkeleton />;
+  }
   return (
     <div className=" overflow-hidden p-6">
       <div className="page-header">

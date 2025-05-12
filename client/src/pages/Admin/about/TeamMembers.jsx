@@ -10,54 +10,44 @@ import {
   Check,
   ImagePlus,
   Save,
+  Users,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import FileUpload from "../../../components/AdminComponent/common/FileUpload";
 import { useDispatch } from "react-redux";
-import { newAboutTeam, updateAboutTeam } from "../../../Redux/Slice/aboutSlice";
+import {
+  DeleteAboutTeam,
+  getTeamCall,
+  newAboutTeam,
+  updateAboutTeam,
+} from "../../../Redux/Slice/aboutSlice";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
+import { MemberSkeleton } from "../../../components/Skeleton/admin/about/teamMember";
 
 const TeamMembers = () => {
-  // Sample data
-  const [teamMembers, setTeamMembers] = useState([
-    {
-      id: "1",
-      name: "John Doe",
-      role: "CEO & Founder",
-      description: "John has over 15 years of experience in the industry.",
-      imageUrl:
-        "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    },
-    {
-      id: "2",
-      name: "Jane Smith",
-      role: "Marketing Director",
-      description:
-        "Jane leads our marketing efforts with creativity and vision.",
-      imageUrl:
-        "https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    },
-    {
-      id: "3",
-      name: "Mike Johnson",
-      role: "Lead Developer",
-      description:
-        "Mike is a skilled developer with expertise in multiple programming languages.",
-      imageUrl:
-        "https://images.pexels.com/photos/3777943/pexels-photo-3777943.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    },
-  ]);
   const dispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [editingMember, setEditingMember] = useState(null);
-
+  const [Team, setTeam] = useState([]);
   const [tempMember, setTempMember] = useState({
     name: "",
     role: "",
     description: "",
     imageUrl: "",
   });
-
+  useEffect(() => {
+    async function FetchTeam() {
+      const res = await dispatch(getTeamCall());
+      if (res?.payload?.success) {
+        setTeam(res?.payload?.data);
+      }
+      setLoading(false);
+    }
+    FetchTeam();
+  }, []);
   const handleThumbnailChange = (file) => {
     setTempMember((prev) => ({
       ...prev,
@@ -66,12 +56,11 @@ const TeamMembers = () => {
   };
 
   // Filtered team members
-  const filteredMembers = teamMembers.filter(
+  const filteredMembers = Team?.filter(
     (member) =>
-      member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      member.role.toLowerCase().includes(searchTerm.toLowerCase())
+      (member?.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (member?.role || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   const openAddModal = () => {
     setEditingMember(null);
     setTempMember({
@@ -85,6 +74,7 @@ const TeamMembers = () => {
 
   const openEditModal = (member) => {
     setEditingMember(member);
+
     setTempMember({ ...member });
     setIsModalOpen(true);
   };
@@ -103,7 +93,6 @@ const TeamMembers = () => {
       alert("Name and role are required!");
       return;
     }
-    console.log(tempMember);
     const formData = new FormData();
     if (tempMember.name) {
       formData.append("name", tempMember.name);
@@ -120,41 +109,42 @@ const TeamMembers = () => {
     if (editingMember) {
       // Update existing member
       const res = await dispatch(
-        updateAboutTeam({ id: editingMember.id, formData })
+        updateAboutTeam({ id: editingMember._id, formData })
       );
-      console.log(res);
-      return;
-      setTeamMembers(
-        teamMembers.map((member) =>
-          member.id === editingMember.id ? { ...member, ...tempMember } : member
-        )
-      );
+
+      if (res?.payload?.success) {
+        toast.success(res?.payload?.message);
+        setTeam(res?.payload?.data);
+      } else {
+        toast.error(res?.payload?.message);
+      }
     } else {
       // Add new member
       const res = await dispatch(newAboutTeam(formData));
-      console.log(res);
-      return;
-      const newMember = {
-        id: Date.now().toString(),
-        name: tempMember.name,
-        role: tempMember.role,
-        description: tempMember.description || "",
-        imageUrl:
-          tempMember.imageUrl ||
-          "https://images.pexels.com/photos/1851164/pexels-photo-1851164.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1", // Default image
-      };
-      setTeamMembers([...teamMembers, newMember]);
+      if (res?.payload?.success) {
+        toast.success(res?.payload?.message);
+        setTeam(res?.payload?.data);
+      } else {
+        toast.error(res?.payload?.message);
+      }
     }
 
     closeModal();
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this team member?")) {
-      setTeamMembers(teamMembers.filter((member) => member.id !== id));
+      const res = await dispatch(DeleteAboutTeam(id));
+      if (res?.payload?.success) {
+        toast.success(res?.payload?.message);
+        setTeam(Team.filter((member) => member._id !== id));
+      } else {
+      }
     }
   };
-
+  if (loading) {
+    return <MemberSkeleton />;
+  }
   return (
     <div className=" space-y-6 overflow-hidden  p-6">
       <div className="page-header ">
@@ -208,10 +198,12 @@ const TeamMembers = () => {
       </div>
 
       {/* Team members grid */}
-      {filteredMembers.length > 0 ? (
+      {loading ? (
+        <MemberSkeleton />
+      ) : filteredMembers.length > 0 ? (
         <div className="card-grid">
           {filteredMembers.map((member) => (
-            <div key={member.id} className="card overflow-hidden">
+            <div key={member._id} className="card overflow-hidden">
               <div className="relative mb-4 h-48 w-full overflow-hidden rounded-lg bg-gray-100">
                 {member.imageUrl ? (
                   <img
@@ -247,7 +239,7 @@ const TeamMembers = () => {
                 <button
                   type="button"
                   className="flex-1 rounded-md border border-red-300 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
-                  onClick={() => handleDelete(member.id)}
+                  onClick={() => handleDelete(member._id)}
                 >
                   <Trash2 className="mr-1 inline-block h-4 w-4" />
                   Delete
@@ -304,7 +296,7 @@ const TeamMembers = () => {
                 <FileUpload
                   accept="image/*"
                   onChange={handleThumbnailChange}
-                  value={teamMembers.imageUrl}
+                  value={tempMember.imageUrl || ""}
                 />
               </div>
 
