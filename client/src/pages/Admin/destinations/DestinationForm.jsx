@@ -263,7 +263,7 @@ const DestinationForm = () => {
           ? updateDestination({ id, formData: form })
           : createDestination(form)
       );
-      console.log(res);
+
       if (res?.payload?.success) {
         toast.success(res?.payload?.message);
         setFormData(res?.payload?.data);

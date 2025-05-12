@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Save, Plus, X } from "lucide-react";
 import FormField from "../../../components/AdminComponent/form/FormField";
 import FileUpload from "../../../components/AdminComponent/common/FileUpload";
@@ -25,6 +25,7 @@ const initialFormData = {
 const StoryForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { story } = useLocation()?.state || [];
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -34,36 +35,10 @@ const StoryForm = () => {
 
   useEffect(() => {
     if (isEditMode) {
-      // In a real app, you would fetch the story data from an API
-      // For now, we'll use mock data
-      const mockStory = {
-        _id: "1",
-        title: "My Journey Through the Himalayas",
-        excerpt:
-          "An incredible adventure through the world's highest mountains.",
-        content:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl nec ultricies lacinia, nisl nisl aliquet nisl, nec ultricies nisl nisl nec nisl.",
-        category: "Adventure",
-        tags: ["mountains", "trekking", "nature"],
-        featured: true,
-        author: {
-          name: "Jane Smith",
-          avatarPreview:
-            "https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg",
-          bio: "Travel writer and mountaineer",
-        },
-        coverImagePreview:
-          "https://images.pexels.com/photos/1909140/pexels-photo-1909140.jpeg",
-        readTime: "8 min",
-      };
-
       setFormData({
         ...initialFormData,
-        ...mockStory,
-        author: {
-          ...mockStory.author,
-          avatar: null,
-        },
+        ...story,
+
         coverImage: null,
         images: [],
       });
@@ -461,56 +436,6 @@ const StoryForm = () => {
                 ))}
               </div>
             </FormField>
-
-            <div className="border-t border-gray-200 pt-6">
-              <h3 className="text-lg font-medium text-gray-900">
-                Author Information
-              </h3>
-              <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
-                <FormField
-                  label="Author Name"
-                  id="author.name"
-                  error={errors["author.name"]}
-                  required
-                >
-                  <input
-                    type="text"
-                    name="author.name"
-                    id="author.name"
-                    value={formData.author.name}
-                    onChange={handleChange}
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                  />
-                </FormField>
-
-                <FormField
-                  label="Author Avatar"
-                  id="author.avatar"
-                  error={errors["author.avatar"]}
-                >
-                  <FileUpload
-                    accept="image/*"
-                    onChange={handleAuthorAvatarChange}
-                    value={formData.author.avatarPreview}
-                  />
-                </FormField>
-              </div>
-
-              <FormField
-                label="Author Bio"
-                id="author.bio"
-                error={errors["author.bio"]}
-              >
-                <textarea
-                  name="author.bio"
-                  id="author.bio"
-                  rows={2}
-                  value={formData.author.bio}
-                  onChange={handleChange}
-                  className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                />
-              </FormField>
-            </div>
 
             <div className="flex items-center">
               <input

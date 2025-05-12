@@ -184,33 +184,7 @@ export const updateStory = async (req, res, next) => {
   }
 };
 
-export const Featured_FalseStory = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    if (!id) {
-      return next(
-        new AppError("Id is required to set  Featured_False Story...", 400)
-      );
-    }
-    const featured_FalseStory = await Story.findByIdAndUpdate(
-      id,
-      { $set: { featured: false } },
-      { new: true, runValidators: true }
-    );
-
-    if (!featured_FalseStory) {
-      return next(new AppError("Story does not found, try next time...", 400));
-    }
-    res.status(200).json({
-      success: true,
-      message: "SuccessFully featured_False Story...",
-      data: featured_FalseStory,
-    });
-  } catch (error) {
-    return next(new AppError(error.message, 500));
-  }
-};
-export const Featured_TrueStory = async (req, res, next) => {
+export const FeaturedStory = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!id) {
@@ -218,19 +192,22 @@ export const Featured_TrueStory = async (req, res, next) => {
         new AppError("Id is required to set  Featured_True Story...", 400)
       );
     }
-    const featured_trueStory = await Story.findByIdAndUpdate(
-      id,
-      { $set: { featured: true } },
-      { new: true, runValidators: true }
-    );
 
-    if (!featured_trueStory) {
+    const story = await Story.findById(id);
+    if (!story) {
       return next(new AppError("Story does not found, try next time...", 400));
     }
+    if (story.featured) {
+      story.featured = false;
+    } else {
+      story.featured = true;
+    }
+
+    await story.save();
     res.status(200).json({
       success: true,
-      message: "SuccessFully featured_true Story...",
-      data: featured_trueStory,
+      message: "SuccessFully featured Story...",
+      data: story,
     });
   } catch (error) {
     return next(new AppError(error.message, 500));
@@ -242,11 +219,8 @@ export const deleteStory = async (req, res, next) => {
     if (!id) {
       return next(new AppError("Id is required to delete story...", 400));
     }
-    const DeleteStory = await Story.findByIdAndDelete(id);
+    await Story.findByIdAndDelete(id);
 
-    if (!DeleteStory) {
-      return next(new AppError("Story does not found, try next time...", 400));
-    }
     res.status(200).json({
       success: true,
       message: "SuccessFully Delete Story...",

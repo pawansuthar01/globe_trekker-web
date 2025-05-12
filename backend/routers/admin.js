@@ -9,8 +9,7 @@ import {
 import upload from "../middleware/multerMiddleware.js";
 import {
   deleteStory,
-  Featured_FalseStory,
-  Featured_TrueStory,
+  FeaturedStory,
   newStory,
   updateStory,
 } from "../controller/stories.Controller.js";
@@ -71,8 +70,7 @@ Admin.route("/stories/:id")
     updateStory
   )
   .delete(deleteStory);
-Admin.route("/stories/featured-false/:id").put(Featured_FalseStory);
-Admin.route("/stories/featured-true/:id").put(Featured_TrueStory);
+Admin.route("/stories/featured/:id").put(FeaturedStory);
 // < **  stories routes -- End ** >
 // < **   routes -- Start newDestination** >
 Admin.route("/destination").post(

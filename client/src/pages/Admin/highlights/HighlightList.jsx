@@ -60,7 +60,7 @@ const HighlightList = () => {
   };
 
   const handleDelete = async () => {
-    // API call to delete destination
+    // API call to delete Highlight
     const res = await dispatch(deleteHighlight(deleteId));
     if (res?.payload?.success) {
       toast.success(res?.payload?.message);

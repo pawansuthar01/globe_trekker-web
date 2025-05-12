@@ -132,14 +132,13 @@ const HighlightForm = () => {
         ? updateHighlight({ id: id, formData: form })
         : addHighlight(form)
     );
+    if (res?.payload?.success) {
+      toast.success(res?.payload?.message);
+      setFormData(res?.payload?.data);
+    } else {
+      toast.error(res?.payload?.message);
+    }
     setLoading(false);
-
-    console.log(res);
-    return;
-    // Simulate API call
-    setTimeout(() => {
-      navigate("/admin/highlights");
-    }, 1000);
   };
 
   const handleImageChange = (file) => {

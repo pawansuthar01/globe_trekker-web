@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Plus,
   Edit,
@@ -12,91 +12,37 @@ import {
 } from "lucide-react";
 import SearchBar from "../../../components/AdminComponent/common/SearchBar";
 import DeleteModal from "../../../components/AdminComponent/common/DeleteModal";
+import {
+  deleteStory,
+  fetchStories,
+  markAsFeatured,
+} from "../../../Redux/Slice/storiesSlice";
+import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
 
 const StoryList = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [stories, setStories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  async function FetchStories() {
+    setLoading(true);
+    const res = await dispatch(fetchStories());
+    if (res?.payload?.success) {
+      setStories(res?.payload?.data);
+    }
+    setLoading(false);
+  }
+  useEffect(() => {
+    FetchStories();
+  }, []);
   // Mock data - would come from API in real app
-  const mockStories = [
-    {
-      _id: "1",
-      title: "My Journey Through the Himalayas",
-      slug: "journey-through-himalayas",
-      excerpt: "An incredible adventure through the world's highest mountains.",
-      content: "Lorem ipsum dolor sit amet...",
-      type: "Story",
-      category: "Adventure",
-      tags: ["mountains", "trekking", "nature"],
-      featured: true,
-      author: {
-        name: "Jane Smith",
-        avatar:
-          "https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg",
-        bio: "Travel writer and mountaineer",
-      },
-      coverImage: {
-        url: "https://images.pexels.com/photos/1909140/pexels-photo-1909140.jpeg",
-        alt: "Himalayan mountains",
-      },
-      publishedAt: "2023-05-12T08:00:00Z",
-      date: "2023-05-12",
-      readTime: "8 min",
-    },
-    {
-      _id: "2",
-      title: "Culinary Tour of Thailand",
-      slug: "culinary-tour-thailand",
-      excerpt: "Exploring the flavors and spices of Thai cuisine.",
-      content: "Lorem ipsum dolor sit amet...",
-      type: "Story",
-      category: "Food",
-      tags: ["food", "cuisine", "asia"],
-      featured: false,
-      author: {
-        name: "Michael Wong",
-        avatar:
-          "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg",
-        bio: "Food blogger and chef",
-      },
-      coverImage: {
-        url: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg",
-        alt: "Thai street food",
-      },
-      publishedAt: "2023-06-18T14:30:00Z",
-      date: "2023-06-18",
-      readTime: "5 min",
-    },
-    {
-      _id: "3",
-      title: "Road Trip Along the Pacific Coast Highway",
-      slug: "pacific-coast-highway-road-trip",
-      excerpt:
-        "Stunning views and adventures along America's most scenic drive.",
-      content: "Lorem ipsum dolor sit amet...",
-      type: "Story",
-      category: "Road Trip",
-      tags: ["roadtrip", "california", "coast"],
-      featured: true,
-      author: {
-        name: "Alex Johnson",
-        avatar:
-          "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
-        bio: "Travel photographer and writer",
-      },
-      coverImage: {
-        url: "https://images.pexels.com/photos/1638659/pexels-photo-1638659.jpeg",
-        alt: "Pacific Coast Highway",
-      },
-      publishedAt: "2023-04-05T10:15:00Z",
-      date: "2023-04-05",
-      readTime: "10 min",
-    },
-  ];
 
   // Filter stories based on search term
-  const filteredStories = mockStories.filter(
+  const filteredStories = stories.filter(
     (story) =>
       story.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       story.author.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -106,9 +52,15 @@ const StoryList = () => {
       )
   );
 
-  const handleFeaturedToggle = (id) => {
-    // API call to toggle featured status
-    console.log(`Toggle featured for story with id: ${id}`);
+  const handleFeaturedToggle = async (id) => {
+    // API call to toggle publish status
+    const res = await dispatch(markAsFeatured(id));
+    if (res?.payload?.success) {
+      toast.success(res?.payload?.message);
+      setStories(stories.map((s) => (s._id === id ? res?.payload?.data : s)));
+    } else {
+      toast.error(res?.payload?.message);
+    }
   };
 
   const handleDeleteClick = (id) => {
@@ -116,13 +68,21 @@ const StoryList = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleDelete = () => {
-    // API call to delete story
-    console.log(`Delete story with id: ${deleteId}`);
+  const handleDelete = async () => {
+    // API call to delete Highlight
+    const res = await dispatch(deleteStory(deleteId));
+    console.log(res);
+    if (res?.payload?.success) {
+      toast.success(res?.payload?.message);
+      setStories(stories.filter((s) => s._id !== deleteId));
+    } else {
+      toast.error(res?.payload?.message);
+    }
+
     setIsDeleteModalOpen(false);
     setDeleteId(null);
   };
-
+  if (loading) return;
   return (
     <div className="space-y-6 overflow-x-hidden  p-6">
       <div className="flex justify-between items-center">
@@ -255,12 +215,16 @@ const StoryList = () => {
                             <Star size={18} />
                           )}
                         </button>
-                        <Link
-                          to={`/admin/stories/edit/${story._id}`}
+                        <button
+                          onClick={() =>
+                            navigate(`edit/${story?._id}`, {
+                              state: { story },
+                            })
+                          }
                           className="text-indigo-600 hover:text-indigo-900"
                         >
                           <Edit size={18} />
-                        </Link>
+                        </button>
                         <button
                           onClick={() => handleDeleteClick(story._id)}
                           className="text-red-600 hover:text-red-900"
