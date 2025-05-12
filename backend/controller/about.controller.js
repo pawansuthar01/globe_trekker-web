@@ -82,40 +82,25 @@ export const addAbout = async (req, res, next) => {
 };
 export const updateAbout = async (req, res, next) => {
   try {
+    console.log(req.file);
     const {
       title,
       intro,
       mission,
       values,
       join,
-      teamNames,
-      teamRoles,
-      teamDescriptions,
-    } = req.body;
 
+      teamDescriptions,
+    } = req?.body;
     const existing = await aboutModule.findOne({ key: "About_key" });
     if (!existing) {
       return next(new AppError("No About document found to update", 404));
     }
 
-    let team = existing.team;
     let introImage = existing.introImage;
 
     // If new team images are uploaded, rebuild team array
-    if (req.files?.teamImages) {
-      const images = req.files.teamImages;
-      team = [];
 
-      for (let i = 0; i < images.length; i++) {
-        const uploaded = await uploadToCloudinary(images[i], "About/team");
-        team.push({
-          name: teamNames[i],
-          role: teamRoles[i],
-          description: teamDescriptions[i],
-          imageUrl: uploaded.secure_url,
-        });
-      }
-    }
     if (req.files?.introImage) {
       const image = req.files.introImage[0];
 
@@ -158,6 +143,116 @@ export const getAbout = async (req, res, next) => {
       success: true,
       message: "About content fetched successfully",
       data: about,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
+export const newTeamMemberAdd = async (req, res, next) => {
+  try {
+    const { role, name, description } = req.body;
+
+    if (!name || !role || !description || !req.file) {
+      return next(new AppError("all filed is required to new member add", 404));
+    }
+    let imageUrl = "";
+    if (req.file) {
+      const uploaded = await uploadToCloudinary(
+        req.file,
+        "About/team/imageUrl"
+      );
+      if (uploaded) {
+        imageUrl = uploaded.secure_url;
+      } else {
+        return next(
+          new AppError("something wont wrong to upload image..", 400)
+        );
+      }
+    }
+    const about = await aboutModule.findOne({ key: "About_key" });
+    about.team.push({
+      name: name,
+      description: description,
+      role: role,
+      imageUrl: imageUrl,
+    });
+    await about.save();
+    res.status(200).json({
+      success: true,
+      message: "successfully new member add...",
+      data: about,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
+export const UpdateTeamMember = async (req, res, next) => {
+  try {
+    const { id } = req.parse;
+    if (!id) {
+      return next(new AppError("id is required to update team member...", 404));
+    }
+
+    const { role, name, descriptions } = req.body;
+    const aboutDoc = await aboutModule.findOne({
+      key: "About_key",
+    });
+    if (aboutDoc) {
+      return next(new AppError("About document not found", 404));
+    }
+    const teamMember = aboutDoc.team.find((member) => member.id === id);
+    if (!teamMember) {
+      return next(new AppError("Team member not found", 404));
+    }
+
+    if (req.file) {
+      const uploaded = await uploadToCloudinary(
+        req.file,
+        "About/team/imageUrl"
+      );
+      if (uploaded) {
+        teamMember.imageUrl = uploaded.secure_url;
+      } else {
+        return next(
+          new AppError("something wont wrong to upload image..", 400)
+        );
+      }
+    }
+    if (role) teamMember.role = role;
+    if (name) teamMember.name = name;
+    if (descriptions) teamMember.descriptions = descriptions;
+    await aboutDoc.save();
+
+    res.status(200).json({
+      success: true,
+      message: "successfully update member ...",
+      data: aboutDoc,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
+export const DeleteTeamMember = async (req, res, next) => {
+  try {
+    const { id } = req.parse;
+    if (!id) {
+      return next(new AppError("id is required to update team member...", 404));
+    }
+
+    const aboutDoc = await aboutModule.findOne({
+      key: "About_key",
+    });
+    if (aboutDoc) {
+      return next(new AppError("About document not found", 404));
+    }
+    aboutDoc.team = aboutDoc.team.filter((member) => member.id !== id);
+
+    // Save the updated
+    await aboutDoc.save();
+    res.status(200).json({
+      success: true,
+      message: "successfully delete member ...",
+      data: aboutDoc,
     });
   } catch (error) {
     return next(new AppError(error.message, 500));

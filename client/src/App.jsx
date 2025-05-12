@@ -31,6 +31,7 @@ import BannerPage from "./pages/Admin/banner/BannerPage";
 import TeamMembers from "./pages/Admin/about/TeamMembers";
 import CheckLogin from "./pages/checkLoginValid";
 import PageNotFound from "./pages/NotFound";
+import RequireAuth from "./components/AdminComponent/auth/ProtectedRoute";
 function App() {
   return (
     <Routes>
@@ -51,30 +52,25 @@ function App() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/search" element={<SearchPage />} />
       </Route>
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute>
-            <AdminLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Dashboard />} />
-        <Route path="destinations" element={<DestinationList />} />
-        <Route path="about" element={<AboutUpdatePage />} />
-        <Route path="about/team" element={<TeamMembers />} />
-        <Route path="banners" element={<BannerPage />} />
-        <Route path="destinations/create" element={<DestinationForm />} />
-        <Route path="destinations/edit/:id" element={<DestinationForm />} />
-        <Route path="highlights" element={<HighlightList />} />
-        <Route path="highlights/create" element={<HighlightForm />} />
-        <Route path="highlights/edit/:id" element={<HighlightForm />} />
-        <Route path="stories" element={<StoryList />} />
-        <Route path="stories/create" element={<StoryForm />} />
-        <Route path="stories/edit/:id" element={<StoryForm />} />
-        <Route path="users" element={<UserList />} />
-        <Route path="users/:id" element={<UserDetail />} />
-        <Route path="contacts" element={<ContactList />} />
+      <Route element={<RequireAuth allowedRole={["ADMIN", "AUTHOR"]} />}>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="/admin" element={<Dashboard />} />
+          <Route path="destinations" element={<DestinationList />} />
+          <Route path="about" element={<AboutUpdatePage />} />
+          <Route path="about/team" element={<TeamMembers />} />
+          <Route path="banners" element={<BannerPage />} />
+          <Route path="destinations/create" element={<DestinationForm />} />
+          <Route path="destinations/edit/:id" element={<DestinationForm />} />
+          <Route path="highlights" element={<HighlightList />} />
+          <Route path="highlights/create" element={<HighlightForm />} />
+          <Route path="highlights/edit/:id" element={<HighlightForm />} />
+          <Route path="stories" element={<StoryList />} />
+          <Route path="stories/create" element={<StoryForm />} />
+          <Route path="stories/edit/:id" element={<StoryForm />} />
+          <Route path="users" element={<UserList />} />
+          <Route path="users/:id" element={<UserDetail />} />
+          <Route path="contacts" element={<ContactList />} />
+        </Route>
       </Route>
     </Routes>
   );

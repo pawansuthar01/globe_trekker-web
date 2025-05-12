@@ -33,16 +33,6 @@ App.use(
   })
 );
 
-App.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", process.env.FRONTEND_URL);
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, X-Requested-With"
-  );
-  next();
-});
 App.set("trust proxy", 1);
 
 App.use(cookieParser());
@@ -52,15 +42,9 @@ App.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
-    cookie: {
-      httpOnly: true,
-      secure: true, // must be true for SameSite=None to work
-      sameSite: "None", // iOS needs SameSite=None
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    },
+    cookie: sessionCookieOptions,
   })
 );
-console.log(process.env.NODE_ENV === "production" ? "None" : "Lax");
 App.use(passport.initialize());
 App.use(passport.session());
 

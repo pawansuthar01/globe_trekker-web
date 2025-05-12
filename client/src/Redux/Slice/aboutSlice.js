@@ -33,11 +33,50 @@ export const addAbout = createAsyncThunk("about/add", async (formData) => {
 // ✅ 3. Update About data (Admin)
 export const updateAbout = createAsyncThunk(
   "about/update",
+  async (formData) => {
+    try {
+      const res = await axiosInstance.put(`/api/v5/admin/about`, formData);
+      return res.data;
+    } catch (err) {
+      return err.response?.data || err.message;
+    }
+  }
+);
+export const updateAboutTeam = createAsyncThunk(
+  "about/update",
   async ({ id, formData }) => {
     try {
-      const res = await axiosInstance.put(`/api/v5/admin/about`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await axiosInstance.put(
+        `/api/v5/admin/about/team/${id}`,
+        formData
+      );
+      return res.data;
+    } catch (err) {
+      return err.response?.data || err.message;
+    }
+  }
+);
+export const newAboutTeam = createAsyncThunk(
+  "about/update",
+  async (formData) => {
+    try {
+      const res = await axiosInstance.put(
+        `/api/v5/admin/about/team/new`,
+        formData
+      );
+      return res.data;
+    } catch (err) {
+      return err.response?.data || err.message;
+    }
+  }
+);
+export const DeleteAboutTeam = createAsyncThunk(
+  "about/team/delete",
+  async (id) => {
+    try {
+      const res = await axiosInstance.delete(
+        `/api/v5/admin/about/team/delete/${id}`
+      );
       return res.data;
     } catch (err) {
       return err.response?.data || err.message;

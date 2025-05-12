@@ -31,7 +31,13 @@ import {
   GetContact,
   markAsReadContact,
 } from "../controller/userContact.controller.js";
-import { addAbout, updateAbout } from "../controller/about.controller.js";
+import {
+  addAbout,
+  DeleteTeamMember,
+  newTeamMemberAdd,
+  updateAbout,
+  UpdateTeamMember,
+} from "../controller/about.controller.js";
 import { addContact, updateContact } from "../controller/contact.controller.js";
 import { getAllSearchKeywords } from "../controller/search.controller.js";
 import { getAllUser } from "../controller/user.controller.js";
@@ -117,7 +123,17 @@ Admin.route("/about")
     ]),
     updateAbout
   )
-  .post(upload.fields([{ name: "teamImages", maxCount: 10 }]), addAbout);
+  .post(
+    upload.fields([
+      { name: "teamImages", maxCount: 10 },
+      { name: "introImage", maxCount: 1 },
+    ]),
+    addAbout
+  );
+Admin.put("/about/team/new", upload.single("image"), newTeamMemberAdd);
+Admin.put("/about/team/:id", upload.single("image"), UpdateTeamMember);
+
+Admin.put("/about/team/delete/:id", DeleteTeamMember);
 // < **  routes --  End-About** >
 
 // < **   routes -- Start web -contact-del** >

@@ -1,49 +1,40 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Save, Plus, ChevronRight } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { fetchAbout, updateAbout } from "../../../Redux/Slice/aboutSlice";
+import FileUpload from "../../../components/AdminComponent/common/FileUpload";
 
 const AboutUpdatePage = () => {
   // Sample data
-  const [aboutData, setAboutData] = useState({
-    title: "About Our Company",
-    intro:
-      "We are a leading provider of innovative solutions that help businesses transform and thrive in the digital era.",
-    mission: [
-      "To provide exceptional services that exceed client expectations",
-      "To foster innovation and creativity in everything we do",
-      "To create a positive impact on society through our work",
-    ],
-    values: [
-      {
-        icon: "star",
-        title: "Excellence",
-        description: "We strive for excellence in all our endeavors",
-      },
-      {
-        icon: "users",
-        title: "Collaboration",
-        description: "We believe in the power of teamwork and collaboration",
-      },
-      {
-        icon: "thumbs-up",
-        title: "Integrity",
-        description: "We uphold the highest standards of integrity and ethics",
-      },
-    ],
-    join: {
-      title: "Join Our Team",
-      description:
-        "We're always looking for talented individuals to join our team and contribute to our success.",
-    },
-  });
+  const dispatch = useDispatch();
+  const [originalAboutData, setOriginalAboutData] = useState();
 
+  const [loading, setLoading] = useState(false);
+  const [newIntroImage, setIntroImage] = useState();
+  const [aboutData, setAboutData] = useState();
+
+  const FetchAboutData = async () => {
+    setLoading(true);
+    const res = await dispatch(fetchAbout());
+    if (res?.payload?.success) {
+      setAboutData(res.payload.data);
+      setOriginalAboutData(JSON.parse(JSON.stringify(res.payload.data))); // deep clone
+    }
+    setLoading(false);
+  };
+  useEffect(() => {
+    FetchAboutData();
+  }, []);
   const handleTitleChange = (e) => {
     setAboutData({
       ...aboutData,
       title: e.target.value,
     });
   };
-
+  const handelIntroImageChange = (file) => {
+    setIntroImage(file);
+  };
   const handleIntroChange = (e) => {
     setAboutData({
       ...aboutData,
@@ -114,12 +105,52 @@ const AboutUpdatePage = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Logic to save about data
-    alert("About page updated successfully!");
-  };
+    e.preventDefault();
 
+    const formData = new FormData();
+
+    // Compare and append changed fields
+    if (aboutData.title !== originalAboutData.title) {
+      formData.append("title", aboutData.title);
+    }
+
+    if (aboutData.intro !== originalAboutData.intro) {
+      formData.append("intro", aboutData.intro);
+    }
+
+    if (newIntroImage) {
+      formData.append("introImage", newIntroImage);
+    }
+
+    if (
+      JSON.stringify(aboutData.mission) !==
+      JSON.stringify(originalAboutData.mission)
+    ) {
+      formData.append("mission", JSON.stringify(aboutData.mission));
+    }
+
+    if (
+      JSON.stringify(aboutData.values) !==
+      JSON.stringify(originalAboutData.values)
+    ) {
+      formData.append("values", JSON.stringify(aboutData.values));
+    }
+
+    if (
+      aboutData.join.title !== originalAboutData.join.title ||
+      aboutData.join.description !== originalAboutData.join.description
+    ) {
+      formData.append("join", JSON.stringify(aboutData.join));
+    }
+    const res = await dispatch(updateAbout(formData));
+    if (res?.payload?.success) {
+      setAboutData(res.payload.data);
+      setOriginalAboutData(JSON.parse(JSON.stringify(res.payload.data))); // deep clone
+    }
+  };
+  if (loading) return;
   return (
     <div className=" overflow-hidden p-6">
       <div className="page-header">
@@ -159,7 +190,7 @@ const AboutUpdatePage = () => {
               type="text"
               id="title"
               className="form-input"
-              value={aboutData.title}
+              value={aboutData?.title || ""}
               onChange={handleTitleChange}
             />
           </div>
@@ -172,8 +203,18 @@ const AboutUpdatePage = () => {
               id="intro"
               rows={4}
               className="form-textarea"
-              value={aboutData.intro}
+              value={aboutData?.intro || ""}
               onChange={handleIntroChange}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="intro" className="form-label">
+              Image
+            </label>
+
+            <FileUpload
+              onChange={handelIntroImageChange}
+              value={aboutData?.introImage || ""}
             />
           </div>
         </div>
@@ -182,23 +223,25 @@ const AboutUpdatePage = () => {
           <h2 className="mb-4 text-lg font-semibold text-gray-900">Mission</h2>
 
           <div className="space-y-3">
-            {aboutData.mission.map((item, index) => (
-              <div key={index} className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  className="form-input"
-                  value={item}
-                  onChange={(e) => handleMissionChange(index, e.target.value)}
-                />
-                <button
-                  type="button"
-                  className="rounded-md p-2 text-red-500 hover:bg-red-50"
-                  onClick={() => removeMissionItem(index)}
-                >
-                  &times;
-                </button>
-              </div>
-            ))}
+            {!loading &&
+              aboutData &&
+              aboutData?.mission.map((item, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={item || ""}
+                    onChange={(e) => handleMissionChange(index, e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="rounded-md p-2 text-red-500 hover:bg-red-50"
+                    onClick={() => removeMissionItem(index)}
+                  >
+                    &times;
+                  </button>
+                </div>
+              ))}
 
             <button
               type="button"
@@ -217,64 +260,70 @@ const AboutUpdatePage = () => {
           </h2>
 
           <div className="space-y-6">
-            {aboutData.values.map((value, index) => (
-              <div
-                key={index}
-                className="rounded-lg border border-gray-200 p-4"
-              >
-                <div className="mb-4 flex items-center justify-between">
-                  <h3 className="text-md font-medium text-gray-900">
-                    Value {index + 1}
-                  </h3>
-                  <button
-                    type="button"
-                    className="rounded-md p-1 text-red-500 hover:bg-red-50"
-                    onClick={() => removeValue(index)}
-                  >
-                    &times;
-                  </button>
+            {!loading &&
+              aboutData &&
+              aboutData?.values.map((value, index) => (
+                <div
+                  key={index}
+                  className="rounded-lg border border-gray-200 p-4"
+                >
+                  <div className="mb-4 flex items-center justify-between">
+                    <h3 className="text-md font-medium text-gray-900">
+                      Value {index + 1}
+                    </h3>
+                    <button
+                      type="button"
+                      className="rounded-md p-1 text-red-500 hover:bg-red-50"
+                      onClick={() => removeValue(index)}
+                    >
+                      &times;
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <div className="form-group">
+                      <label className="form-label">Icon</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        value={value.icon || ""}
+                        onChange={(e) =>
+                          handleValueChange(index, "icon", e.target.value)
+                        }
+                        placeholder="e.g., star, users"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Title</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        value={value?.title || ""}
+                        onChange={(e) =>
+                          handleValueChange(index, "title", e.target.value)
+                        }
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Description</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        value={value.description || ""}
+                        onChange={(e) =>
+                          handleValueChange(
+                            index,
+                            "description",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
                 </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                  <div className="form-group">
-                    <label className="form-label">Icon</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      value={value.icon}
-                      onChange={(e) =>
-                        handleValueChange(index, "icon", e.target.value)
-                      }
-                      placeholder="e.g., star, users"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Title</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      value={value.title}
-                      onChange={(e) =>
-                        handleValueChange(index, "title", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Description</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      value={value.description}
-                      onChange={(e) =>
-                        handleValueChange(index, "description", e.target.value)
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
+              ))}
 
             <button
               type="button"
@@ -298,7 +347,7 @@ const AboutUpdatePage = () => {
               <input
                 type="text"
                 className="form-input"
-                value={aboutData.join.title}
+                value={aboutData?.join.title || ""}
                 onChange={(e) => handleJoinChange("title", e.target.value)}
               />
             </div>
@@ -308,7 +357,7 @@ const AboutUpdatePage = () => {
               <textarea
                 className="form-textarea"
                 rows={3}
-                value={aboutData.join.description}
+                value={aboutData?.join.description || ""}
                 onChange={(e) =>
                   handleJoinChange("description", e.target.value)
                 }

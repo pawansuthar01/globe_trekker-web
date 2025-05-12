@@ -86,7 +86,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2  gap-5 justify-evenly">
+      <div className="grid  max-sm:grid-cols-1 grid-cols-2  gap-5 justify-evenly">
         {stats.map((stat) => (
           <Link
             key={stat.id}
@@ -155,28 +155,28 @@ const Dashboard = () => {
         </h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <Link
-            to="/about/team/new"
+            to="/admin/about/team"
             className="flex flex-col items-center rounded-lg border border-gray-200 p-4 text-center transition-colors hover:border-blue-500 hover:bg-blue-50"
           >
             <Users className="h-8 w-8 text-blue-500" />
             <span className="mt-2 text-sm font-medium">Add Team Member</span>
           </Link>
           <Link
-            to="/banners/new"
+            to="/admin/banners/new"
             className="flex flex-col items-center rounded-lg border border-gray-200 p-4 text-center transition-colors hover:border-purple-500 hover:bg-purple-50"
           >
             <ImageIcon className="h-8 w-8 text-purple-500" />
             <span className="mt-2 text-sm font-medium">Create Banner</span>
           </Link>
           <Link
-            to="/about"
+            to="/admin/about"
             className="flex flex-col items-center rounded-lg border border-gray-200 p-4 text-center transition-colors hover:border-green-500 hover:bg-green-50"
           >
             <FileText className="h-8 w-8 text-green-500" />
             <span className="mt-2 text-sm font-medium">Edit About Page</span>
           </Link>
           <Link
-            to="/contacts"
+            to="/admin/contacts"
             className="flex flex-col items-center rounded-lg border border-gray-200 p-4 text-center transition-colors hover:border-red-500 hover:bg-red-50"
           >
             <Mail className="h-8 w-8 text-red-500" />

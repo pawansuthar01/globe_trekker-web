@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import FileUpload from "../../../components/AdminComponent/common/FileUpload";
+import { useDispatch } from "react-redux";
+import { newAboutTeam, updateAboutTeam } from "../../../Redux/Slice/aboutSlice";
 
 const TeamMembers = () => {
   // Sample data
@@ -44,7 +46,7 @@ const TeamMembers = () => {
         "https://images.pexels.com/photos/3777943/pexels-photo-3777943.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
     },
   ]);
-
+  const dispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
@@ -96,14 +98,32 @@ const TeamMembers = () => {
     setTempMember({ ...tempMember, [name]: value });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!tempMember.name || !tempMember.role) {
       alert("Name and role are required!");
       return;
     }
-
+    console.log(tempMember);
+    const formData = new FormData();
+    if (tempMember.name) {
+      formData.append("name", tempMember.name);
+    }
+    if (tempMember.name) {
+      formData.append("description", tempMember.description);
+    }
+    if (tempMember.name) {
+      formData.append("role", tempMember.role);
+    }
+    if (tempMember.imageUrl) {
+      formData.append("image", tempMember.imageUrl);
+    }
     if (editingMember) {
       // Update existing member
+      const res = await dispatch(
+        updateAboutTeam({ id: editingMember.id, formData })
+      );
+      console.log(res);
+      return;
       setTeamMembers(
         teamMembers.map((member) =>
           member.id === editingMember.id ? { ...member, ...tempMember } : member
@@ -111,6 +131,9 @@ const TeamMembers = () => {
       );
     } else {
       // Add new member
+      const res = await dispatch(newAboutTeam(formData));
+      console.log(res);
+      return;
       const newMember = {
         id: Date.now().toString(),
         name: tempMember.name,
