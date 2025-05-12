@@ -1,30 +1,47 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { ContinueWithGoogle } from "../Redux/Slice/authSlice";
+import { useNavigate, useParams } from "react-router-dom";
+import { ContinueWithGoogle, setCookieCall } from "../Redux/Slice/authSlice";
 import toast from "react-hot-toast";
+import { useState } from "react";
 
 const CheckLogin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { token } = useParams();
 
   useEffect(() => {
-    const verifyGoogleLogin = async () => {
-      try {
-        const res = await dispatch(ContinueWithGoogle());
-        if (res.payload.success) {
-          toast.success("Welcome back, traveler!");
+    async function setCookie() {
+      const ContinueWithGoogleRes = await dispatch(ContinueWithGoogle());
+      console.log(ContinueWithGoogleRes);
+      if (ContinueWithGoogleRes?.payload?.success) {
+        const res = await dispatch(setCookieCall(token));
+        console.log(res);
+        if (res?.payload?.success) {
           navigate("/");
-        } else {
-          throw new Error("Login failed");
         }
-      } catch (error) {
-        toast.error("Login failed. Please login again.");
-        navigate("/login");
       }
-    };
-
-    verifyGoogleLogin();
+    }
+    setCookie();
+  }, []);
+  useEffect(() => {
+    // const verifyGoogleLogin = async () => {
+    //   // try {
+    //   console.log(token);
+    //   // if (!token) return;
+    //   //
+    //   //   if (res.payload.success) {
+    //   //     // toast.success("Welcome back, traveler!");
+    //   //     // navigate("/");
+    //   //   } else {
+    //   //     throw new Error("Login failed");
+    //   //   }
+    //   // } catch (error) {
+    //   //   toast.error("Login failed. Please login again.");
+    //   //   navigate("/login");
+    //   // }
+    // };
+    // verifyGoogleLogin();
   }, [dispatch, navigate]);
 
   return (

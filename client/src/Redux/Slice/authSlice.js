@@ -133,6 +133,16 @@ export const getAllUsers = createAsyncThunk("/auth/User", async () => {
     return error?.response?.data || error?.message || "Something went wrong";
   }
 });
+export const setCookieCall = createAsyncThunk("/auth/cookie", async (token) => {
+  try {
+    console.log(token);
+    const res = await axiosInstance.post(`/api/v3/auth/set-cookie/${token}`);
+
+    return res.data;
+  } catch (error) {
+    return error?.response?.data || error?.message || "Something went wrong";
+  }
+});
 export const HandelDelete = createAsyncThunk("delete/", async (data) => {
   try {
     const token = localStorage.getItem("Authenticator");

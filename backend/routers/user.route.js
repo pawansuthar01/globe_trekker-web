@@ -31,9 +31,19 @@ user.get(
 
     const token = user.generate_JWT_TOKEN();
     res.cookie("token", token, cookieOptions);
-    res.redirect(`${process.env.FRONTEND_URL}/auth/check-login`);
+    res.redirect(`${process.env.FRONTEND_URL}/auth/check-login/${token}`);
   }
 );
+user.post("/set-cookie/:token", (req, res) => {
+  const { token } = req.params;
+  console.log(token);
+  res.cookie("token", token, cookieOptions);
+  res.status(200).json({
+    success: true,
+    message: "login successFully...",
+    user: req.user,
+  });
+});
 // ✅ NEW: Authenticated user info route
 user.get("/me", (req, res) => {
   if (req.isAuthenticated()) {
