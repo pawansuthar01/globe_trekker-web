@@ -77,6 +77,14 @@ export const activateBanner = createAsyncThunk(
     }
   }
 );
+export const newBanner = createAsyncThunk("banner/new", async (data) => {
+  try {
+    const res = await axiosInstance.post(`/api/v5/admin/banner/new`, data);
+    return res.data;
+  } catch (err) {
+    return err.response?.data || err.message;
+  }
+});
 
 const bannerSlice = createSlice({
   name: "banner",
@@ -97,27 +105,11 @@ const bannerSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Update banner
-      .addCase(updateBanner.fulfilled, (state, action) => {
-        const idx = state.banners.findIndex(
-          (b) => b._id === action.payload._id
-        );
-        if (idx !== -1) state.banners[idx] = action.payload;
-      })
-
       // Delete banner
       .addCase(deleteBanner.fulfilled, (state, action) => {
         state.banners = state.banners.filter(
           (b) => b._id !== action.payload.id
         );
-      })
-
-      // Activate banner
-      .addCase(activateBanner.fulfilled, (state, action) => {
-        const idx = state.banners.findIndex(
-          (b) => b._id === action.payload._id
-        );
-        if (idx !== -1) state.banners[idx] = action.payload;
       });
   },
 });

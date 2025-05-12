@@ -3,6 +3,7 @@ import {
   ActiveBanner,
   deleteBanner,
   getBanner,
+  newBanner,
   updateBanner,
 } from "../controller/banner.Controller.js";
 import upload from "../middleware/multerMiddleware.js";
@@ -49,6 +50,7 @@ Admin.route("/banner/:id")
   .put(upload.array("image", 3), updateBanner)
   .delete(deleteBanner);
 Admin.route("/banner").get(getBanner);
+Admin.post("/banner/new", upload.array("image", 3), newBanner);
 Admin.put("/banner-active/:id", ActiveBanner);
 // < **  Banner routes -- End ** >
 // < **  stories routes -- Start ** >

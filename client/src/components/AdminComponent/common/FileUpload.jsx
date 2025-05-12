@@ -4,6 +4,8 @@ import { Upload, X } from "lucide-react";
 const FileUpload = ({
   accept = "image/*",
   onChange,
+  index,
+  onBannerChange,
   value,
   preview = true,
   className = "",
@@ -15,8 +17,8 @@ const FileUpload = ({
 
   const handleFileChange = (event) => {
     const file = event.target.files?.[0] || null;
-    onChange(file);
-
+    onChange && onChange(file);
+    onBannerChange && onBannerChange(index, file);
     if (file && preview) {
       const reader = new FileReader();
       reader.onloadend = () => {

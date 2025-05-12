@@ -4,6 +4,7 @@ import fs from "fs/promises";
 import Banner from "../module/banner.Module.js";
 // new banner add//
 export const newBanner = async (req, res, next) => {
+  console.log("yes");
   const { title, description, smallDescription, active } = req.body;
   if (!title || !description || !smallDescription || !req.files) {
     return next(
@@ -13,6 +14,7 @@ export const newBanner = async (req, res, next) => {
   }
   try {
     let images = [];
+
     if (req.files && req.files.length > 0) {
       images = await Promise.all(
         req.files.map(async (file) => {
@@ -32,7 +34,9 @@ export const newBanner = async (req, res, next) => {
         new AppError("Image upload failed. No banner was Create..", 402)
       );
     }
-
+    if (active) {
+      await Banner.updateMany({}, { $set: { active: false } });
+    }
     const banner = new Banner({
       title,
       description,
@@ -78,10 +82,11 @@ export const activeBannerGet = async (req, res, next) => {
 // update banner //
 export const updateBanner = async (req, res, next) => {
   const { id } = req.params;
+
   if (!id) {
     return next(new AppError("id is required to update Banner..", 402));
   }
-  const { title, description, smallDescription, index } = req.body;
+  const { title, description, smallDescription, index, active } = req.body;
 
   try {
     const banner = await Banner.findById(id);
@@ -126,11 +131,15 @@ export const updateBanner = async (req, res, next) => {
         }
       }
     }
+    if (active) {
+      await Banner.updateMany({}, { $set: { active: false } });
+    }
     const updateBanner = {
       ...(title && { title }),
       ...(description && { description }),
       ...(smallDescription && { smallDescription }),
       ...(smallDescription && { smallDescription }),
+      ...(active && { active }),
       images: updateImages,
     };
     const updatedBanner = await Banner.findByIdAndUpdate(id, updateBanner, {

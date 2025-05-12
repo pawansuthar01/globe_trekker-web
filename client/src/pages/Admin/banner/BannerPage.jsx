@@ -10,72 +10,20 @@ import {
   Check,
   Image as ImageIcon,
 } from "lucide-react";
+import { useDispatch } from "react-redux";
+import {
+  activateBanner,
+  fetchBanners,
+  newBanner,
+  updateBanner,
+} from "../../../Redux/Slice/bannerSlice";
+import { useEffect } from "react";
+import FileUpload from "../../../components/AdminComponent/common/FileUpload";
 
 const BannerPage = () => {
   // Sample data
-  const [banners, setBanners] = useState([
-    {
-      id: "1",
-      title: "Summer Sale",
-      description: "Get up to 50% off on all summer collections.",
-      smallDescription: "Limited time offer",
-      images: [
-        {
-          public_id: "banner1_1",
-          secure_url:
-            "https://images.pexels.com/photos/5632402/pexels-photo-5632402.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-          public_id: "banner1_2",
-          secure_url:
-            "https://images.pexels.com/photos/5632397/pexels-photo-5632397.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-      ],
-      active: true,
-      createdAt: "2023-05-15T10:30:00Z",
-    },
-    {
-      id: "2",
-      title: "New Arrivals",
-      description: "Check out our latest products and collections.",
-      smallDescription: "Fresh and trendy",
-      images: [
-        {
-          public_id: "banner2_1",
-          secure_url:
-            "https://images.pexels.com/photos/4968391/pexels-photo-4968391.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-      ],
-      active: false,
-      createdAt: "2023-06-20T14:15:00Z",
-    },
-    {
-      id: "3",
-      title: "Holiday Special",
-      description: "Discover our exclusive holiday deals and gifts.",
-      smallDescription: "Celebrate with us",
-      images: [
-        {
-          public_id: "banner3_1",
-          secure_url:
-            "https://images.pexels.com/photos/5624982/pexels-photo-5624982.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-          public_id: "banner3_2",
-          secure_url:
-            "https://images.pexels.com/photos/5632398/pexels-photo-5632398.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-        {
-          public_id: "banner3_3",
-          secure_url:
-            "https://images.pexels.com/photos/4439901/pexels-photo-4439901.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        },
-      ],
-      active: true,
-      createdAt: "2023-07-05T09:45:00Z",
-    },
-  ]);
-
+  const [banners, setBanners] = useState([]);
+  const dispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState(null);
@@ -87,7 +35,16 @@ const BannerPage = () => {
     images: [],
     active: false,
   });
-
+  const FetchBanners = async () => {
+    const res = await dispatch(fetchBanners());
+    console.log(res);
+    if (res?.payload?.success) {
+      setBanners(res?.payload?.data);
+    }
+  };
+  useEffect(() => {
+    FetchBanners();
+  }, []);
   // Filtered banners
   const filteredBanners = banners.filter(
     (banner) =>
@@ -126,29 +83,17 @@ const BannerPage = () => {
     const { name, checked } = e.target;
     setTempBanner({ ...tempBanner, [name]: checked });
   };
-
-  const handleImageChange = (index, value) => {
+  const handleImageChange = (index, file) => {
     const updatedImages = [...(tempBanner.images || [])];
 
-    if (index < updatedImages.length) {
-      updatedImages[index] = {
-        ...updatedImages[index],
-        secure_url: value,
-        public_id: `image_${Date.now()}_${index}`,
-      };
-    } else {
-      updatedImages.push({
-        secure_url: value,
-        public_id: `image_${Date.now()}_${index}`,
-      });
-    }
+    // Replace or add the file at the given index
+    updatedImages[index] = {
+      file, // Store the file temporarily
+      secure_url: URL.createObjectURL(file), // Preview purpose
+      public_id:
+        updatedImages[index]?.public_id || `image_${Date.now()}_${index}`,
+    };
 
-    setTempBanner({ ...tempBanner, images: updatedImages });
-  };
-
-  const removeImage = (index) => {
-    const updatedImages = [...(tempBanner.images || [])];
-    updatedImages.splice(index, 1);
     setTempBanner({ ...tempBanner, images: updatedImages });
   };
 
@@ -165,13 +110,13 @@ const BannerPage = () => {
     setTempBanner({ ...tempBanner, images: updatedImages });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (
       !tempBanner.title ||
       !tempBanner.description ||
       !tempBanner.smallDescription
     ) {
-      alert("Title, description and small description are required!");
+      alert("Title, description, and small description are required!");
       return;
     }
 
@@ -180,46 +125,52 @@ const BannerPage = () => {
       return;
     }
 
-    if (editingBanner) {
-      // Update existing banner
-      setBanners(
-        banners.map((banner) =>
-          banner.id === editingBanner.id ? { ...banner, ...tempBanner } : banner
-        )
-      );
-    } else {
-      // Add new banner
-      const newBanner = {
-        id: Date.now().toString(),
-        title: tempBanner.title,
-        description: tempBanner.description,
-        smallDescription: tempBanner.smallDescription,
-        images: tempBanner.images || [],
-        active: tempBanner.active || false,
-        createdAt: new Date().toISOString(),
-      };
-      setBanners([...banners, newBanner]);
-    }
+    const formData = new FormData();
+    formData.append("title", tempBanner.title);
+    formData.append("description", tempBanner.description);
+    formData.append("smallDescription", tempBanner.smallDescription);
+    formData.append("active", tempBanner.active);
 
-    closeModal();
+    // Append only new or changed images (File objects)
+    tempBanner.images.forEach((img, index) => {
+      if (img.file) {
+        formData.append(`image`, img.file); // send all images as a list
+        formData.append(`index`, index); // to help backend know where to replace
+      } else {
+        formData.append(`existingImages`, JSON.stringify(img)); // to retain old ones
+      }
+    });
+
+    // Send to backend (example with axios)
+    const res = await (editingBanner
+      ? dispatch(updateBanner({ id: editingBanner._id, formData }))
+      : dispatch(newBanner(formData)));
+    console.log(res);
+    if (res.payload.success) {
+      FetchBanners(); // refresh list
+      closeModal();
+    }
   };
 
   const handleDelete = (id) => {
     if (confirm("Are you sure you want to delete this banner?")) {
-      setBanners(banners.filter((banner) => banner.id !== id));
+      setBanners(banners.filter((banner) => banner._id !== id));
     }
   };
 
-  const toggleActive = (id) => {
+  const toggleActive = async (id) => {
+    await dispatch(activateBanner(id));
     setBanners(
       banners.map((banner) =>
-        banner.id === id ? { ...banner, active: !banner.active } : banner
+        banner._id === id
+          ? { ...banner, active: true }
+          : { ...banner, active: false }
       )
     );
   };
 
   return (
-    <div className=" space-y-6 overflow-hidden p-6">
+    <div className=" space-y-6 overflow-hidden w-screen p-6">
       <div className="page-header">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Banners</h1>
@@ -288,7 +239,7 @@ const BannerPage = () => {
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
                 {filteredBanners.map((banner) => (
-                  <tr key={banner.id} className="hover:bg-gray-50">
+                  <tr key={banner._id} className="hover:bg-gray-50">
                     <td className="whitespace-nowrap px-6 py-4">
                       <div className="flex items-center">
                         {banner.images.length > 0 && (
@@ -336,7 +287,7 @@ const BannerPage = () => {
                     </td>
                     <td className="px-6 py-4">
                       <button
-                        onClick={() => toggleActive(banner.id)}
+                        onClick={() => toggleActive(banner._id)}
                         className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
                           banner.active
                             ? "bg-green-100 text-green-800"
@@ -413,7 +364,7 @@ const BannerPage = () => {
       {/* Add/Edit Modal */}
       {isModalOpen && (
         <div className="modal-overlay">
-          <div className="modal w-full max-w-2xl">
+          <div className="modal w-full max-w-2xl  ">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-gray-900">
                 {editingBanner ? "Edit Banner" : "Add Banner"}
@@ -427,7 +378,7 @@ const BannerPage = () => {
               </button>
             </div>
 
-            <div className="mt-6 grid grid-cols-1 gap-6">
+            <div className="mt-6 grid grid-cols-1 gap-6 my-2 max-sm:h-96 overflow-x-scroll">
               <div className="form-group">
                 <label htmlFor="title" className="form-label">
                   Title <span className="text-red-500">*</span>
@@ -490,37 +441,17 @@ const BannerPage = () => {
                     </button>
                   )}
                 </div>
-                {(tempBanner.images || []).map((image, index) => (
-                  <div key={index} className="mb-3 flex items-start space-x-3">
-                    <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                      {image.secure_url ? (
-                        <img
-                          src={image.secure_url}
-                          alt={`Preview ${index + 1}`}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-gray-100 text-gray-400">
-                          <ImageIcon className="h-6 w-6" />
-                        </div>
-                      )}
+                <div className="flex justify-evenly flex-wrap gap-6">
+                  {(tempBanner.images || []).map((image, index) => (
+                    <div key={index} className="flex w-36">
+                      <FileUpload
+                        value={image?.secure_url}
+                        index={index}
+                        onBannerChange={handleImageChange}
+                      />
                     </div>
-                    <input
-                      type="text"
-                      className="form-input flex-1"
-                      value={image.secure_url}
-                      onChange={(e) => handleImageChange(index, e.target.value)}
-                      placeholder="Enter image URL"
-                    />
-                    <button
-                      type="button"
-                      className="rounded-md p-2 text-red-500 hover:bg-red-50"
-                      onClick={() => removeImage(index)}
-                    >
-                      <X className="h-5 w-5" />
-                    </button>
-                  </div>
-                ))}
+                  ))}
+                </div>
                 {(tempBanner.images || []).length === 0 && (
                   <button
                     type="button"
@@ -555,7 +486,6 @@ const BannerPage = () => {
                 </p>
               </div>
             </div>
-
             <div className="mt-6 flex justify-end space-x-3">
               <button
                 type="button"
