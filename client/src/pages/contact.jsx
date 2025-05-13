@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { MapPin, Mail, Phone, Send } from "lucide-react";
+import { MapPin, Mail, Phone, Send, X } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { getWebContacts } from "../Redux/Slice/web_contactSlice";
 import ContactSkeleton from "../components/Skeleton/contactSekeleton";
+import { addNewContact } from "../Redux/Slice/UserContactSlice";
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
-    name: "",
+    fullName: "",
     email: "",
     subject: "",
     message: "",
@@ -21,19 +22,20 @@ const ContactPage = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // In a real app, this would connect to a backend API
-    // For now, just simulate a successful submission
-    setTimeout(() => {
+    const res = await dispatch(addNewContact(formData));
+    console.log(res);
+    console.log(formData);
+    if (res?.payload?.success) {
       setIsSubmitted(true);
       setFormData({
-        name: "",
+        fullName: "",
         email: "",
         subject: "",
         message: "",
       });
-    }, 500);
+    }
   };
   const fetchContactData = async () => {
     setLoading(true);
@@ -63,8 +65,8 @@ const ContactPage = () => {
           <ContactSkeleton />
         ) : (
           <div className="flex flex-col lg:flex-row gap-12">
-            <div className="lg:w-1/3">
-              <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+            <div className="w-full ">
+              <div className="bg-white p-6  rounded-lg shadow-md mb-8">
                 <h2 className="text-xl font-semibold mb-6">Get In Touch</h2>
 
                 <div className="flex items-start mb-6">
@@ -178,7 +180,7 @@ const ContactPage = () => {
           </div>
         )}
 
-        <div className="lg:w-2/3">
+        <div className=" ">
           <div className="bg-white p-6 md:p-8 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-6">Send Us a Message</h2>
 
@@ -189,21 +191,27 @@ const ContactPage = () => {
                   Your message has been sent successfully. We'll get back to you
                   as soon as possible.
                 </p>
+                <button
+                  onClick={() => setIsSubmitted(false)}
+                  className=" border-2 border-green-500  rounded-3xl p-2 hover:bg-green-400 hover:border-green-300"
+                >
+                  <X className="text-green-800 hover:text-green-500" />
+                </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <div>
                     <label
-                      htmlFor="name"
+                      htmlFor="fullName"
                       className="block text-neutral-700 font-medium mb-2"
                     >
                       Your Name
                     </label>
                     <input
                       type="text"
-                      id="name"
-                      name="name"
+                      id="fullName"
+                      name="fullName"
                       value={formData.name}
                       onChange={handleChange}
                       className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-300"

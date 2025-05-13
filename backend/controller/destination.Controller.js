@@ -27,7 +27,7 @@ export const newDestination = async (req, res, next) => {
       isPublished,
       itinerary, // Array of objects: [{ day, title, activities }]
     } = req.body;
-    console.log(req.body.travelTips);
+
     if (
       !description ||
       !name ||

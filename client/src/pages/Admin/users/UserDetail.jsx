@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   ArrowLeft,
   Mail,
@@ -16,67 +16,10 @@ const UserDetail = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const { user } = useLocation()?.state || [];
   useEffect(() => {
-    // In a real app, you would fetch the user data from an API
-    // For now, we'll use mock data
-    const fetchUser = async () => {
-      setLoading(true);
-      try {
-        // Mock API response
-        const mockUser = {
-          _id: "1",
-          fullName: "John Doe",
-          email: "john.doe@example.com",
-          phoneNumber: "+1234567890",
-          avatar: {
-            secure_url:
-              "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
-          },
-          role: "USER",
-          isSubscribed: true,
-          gender: "Male",
-          dob: "1990-05-15",
-          address: {
-            country: "United States",
-            state: "California",
-            city: "San Francisco",
-          },
-          createdAt: "2023-01-15T10:30:00Z",
-          travelAchievements: [
-            {
-              key: "beach-lover",
-              title: "Beach Lover",
-              description: "Visited more than 10 beaches around the world",
-              icon: "🏖️",
-              achievedAt: "2023-03-20T14:30:00Z",
-            },
-            {
-              key: "mountain-explorer",
-              title: "Mountain Explorer",
-              description: "Hiked in 5 different mountain ranges",
-              icon: "🏔️",
-              achievedAt: "2023-05-10T09:15:00Z",
-            },
-            {
-              key: "city-hopper",
-              title: "City Hopper",
-              description: "Explored 20+ major cities across 3 continents",
-              icon: "🏙️",
-              achievedAt: "2023-02-05T11:45:00Z",
-            },
-          ],
-        };
-
-        setUserData(mockUser);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
+    setUserData(user);
+    setLoading(false);
   }, [id]);
 
   if (loading) {
@@ -118,17 +61,13 @@ const UserDetail = () => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="flex items-center">
               <div className="flex-shrink-0 h-16 w-16">
-                {userData.avatar ? (
+                {
                   <img
                     className="h-16 w-16 rounded-full object-cover border-2 border-white"
-                    src={userData.avatar.secure_url}
+                    src={userData?.avatar?.secure_url}
                     alt={userData.fullName}
                   />
-                ) : (
-                  <div className="h-16 w-16 rounded-full bg-indigo-100 border-2 border-white flex items-center justify-center text-2xl text-indigo-600">
-                    {userData.fullName.charAt(0).toUpperCase()}
-                  </div>
-                )}
+                }
               </div>
               <div className="ml-4">
                 <h2 className="text-xl font-bold text-gray-900">

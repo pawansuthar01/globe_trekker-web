@@ -1,48 +1,34 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import { ContinueWithGoogle, setCookieCall } from "../Redux/Slice/authSlice";
+import { useNavigate } from "react-router-dom";
+import { ContinueWithGoogle, setToken } from "../Redux/Slice/authSlice";
 import toast from "react-hot-toast";
-import { useState } from "react";
 
 const CheckLogin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { token } = useParams();
 
   useEffect(() => {
-    async function setCookie() {
-      const ContinueWithGoogleRes = await dispatch(ContinueWithGoogle());
-      toast(ContinueWithGoogle?.payload?.message);
-      if (ContinueWithGoogleRes?.payload?.success) {
-        const res = await dispatch(setCookieCall(token));
-        toast(res?.payload?.message);
+    const token = new URLSearchParams(window.location.search).get("token");
+    if (token) {
+      dispatch(setToken(token));
 
-        if (res?.payload?.success) {
-          navigate("/");
+      // 3. ✅ Continue login
+      dispatch(ContinueWithGoogle()).then((res) => {
+        const { success, message } = res?.payload || {};
+
+        if (success) {
+          toast.success(message || "Login successful");
+          navigate("/"); // 4. ✅ Redirect to homepage
+        } else {
+          toast.error(message || "Login failed");
+          navigate("/login");
         }
-      }
+      });
+    } else {
+      toast.error("Token missing from URL");
+      navigate("/login");
     }
-    setCookie();
-  }, []);
-  useEffect(() => {
-    // const verifyGoogleLogin = async () => {
-    //   // try {
-    //   console.log(token);
-    //   // if (!token) return;
-    //   //
-    //   //   if (res.payload.success) {
-    //   //     // toast.success("Welcome back, traveler!");
-    //   //     // navigate("/");
-    //   //   } else {
-    //   //     throw new Error("Login failed");
-    //   //   }
-    //   // } catch (error) {
-    //   //   toast.error("Login failed. Please login again.");
-    //   //   navigate("/login");
-    //   // }
-    // };
-    // verifyGoogleLogin();
   }, [dispatch, navigate]);
 
   return (

@@ -1,63 +1,44 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Search, Mail, CheckCircle, XCircle } from "lucide-react";
 import SearchBar from "../../../components/AdminComponent/common/SearchBar";
+import { useDispatch } from "react-redux";
+import {
+  getAllContacts,
+  markContactAsRead,
+} from "../../../Redux/Slice/UserContactSlice";
 
 const ContactList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedContactId, setSelectedContactId] = useState(null);
-
-  // Mock data - would come from API in real app
-  const mockContacts = [
-    {
-      _id: "1",
-      fullName: "Alice Johnson",
-      email: "alice.johnson@example.com",
-      subject: "Question about Bali tour packages",
-      message:
-        "Hello, I'm planning a trip to Bali next month and I was wondering if you offer any special tour packages that include visits to the temples and rice terraces. Also, what's the best time to visit to avoid the rainy season?",
-      read: false,
-      createdAt: "2023-06-10T14:30:00Z",
-    },
-    {
-      _id: "2",
-      fullName: "Robert Chen",
-      email: "robert.chen@example.com",
-      subject: "Feedback on my recent trip",
-      message:
-        "I just got back from the guided tour of Japan and I wanted to say that it was absolutely amazing! Our guide, Yuki, was incredibly knowledgeable and made the experience so much better. The itinerary was well-planned and gave us a great mix of popular attractions and off-the-beaten-path experiences.",
-      read: true,
-      createdAt: "2023-06-08T09:15:00Z",
-    },
-    {
-      _id: "3",
-      fullName: "Sarah Williams",
-      email: "sarah.williams@example.com",
-      subject: "Issue with booking confirmation",
-      message:
-        "I made a booking for a tour in Paris starting on July 15th, but I haven't received any confirmation email yet. The payment was processed from my account. My booking reference number is BK12345. Can you please check and let me know the status?",
-      read: false,
-      createdAt: "2023-06-09T16:45:00Z",
-    },
-    {
-      _id: "4",
-      fullName: "David Rodriguez",
-      email: "david.rodriguez@example.com",
-      subject: "Special dietary requirements",
-      message:
-        "I've booked the Mediterranean cruise tour for August. I have some dietary restrictions (I'm vegan and allergic to nuts) and I wanted to make sure this will be accommodated during the meals included in the tour. Please let me know if I need to provide any additional information.",
-      read: true,
-      createdAt: "2023-06-07T11:20:00Z",
-    },
-  ];
+  const [loading, setLoading] = useState(false);
+  const [contacts, setContacts] = useState([]);
+  const dispatch = useDispatch();
+  const FetchContacts = async () => {
+    try {
+      setLoading(true);
+      const res = await dispatch(getAllContacts());
+      if (res?.payload?.success) {
+        setContacts(res?.payload?.data);
+      }
+      console.log(res);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log(error.message);
+    }
+  };
+  useEffect(() => {
+    FetchContacts();
+  }, []);
 
   // Find the selected contact
   const selectedContact = selectedContactId
-    ? mockContacts.find((contact) => contact._id === selectedContactId)
+    ? contacts?.find((contact) => contact._id === selectedContactId)
     : null;
 
   // Filter contacts based on search term and status filter
-  const filteredContacts = mockContacts.filter(
+  const filteredContacts = contacts?.filter(
     (contact) =>
       (contact.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -67,14 +48,10 @@ const ContactList = () => {
         (statusFilter === "unread" && !contact.read))
   );
 
-  const markAsRead = (id) => {
+  const markAsRead = async (id) => {
     // API call to mark contact as read
-    console.log(`Mark contact with id ${id} as read`);
-  };
-
-  const markAsUnread = (id) => {
-    // API call to mark contact as unread
-    console.log(`Mark contact with id ${id} as unread`);
+    await dispatch(markContactAsRead(id));
+    setContacts(contacts.map((c) => (c._id === id ? { ...c, read: true } : c)));
   };
 
   return (
@@ -175,11 +152,11 @@ const ContactList = () => {
                     <div className="flex space-x-2">
                       {selectedContact.read ? (
                         <button
-                          onClick={() => markAsUnread(selectedContact._id)}
+                          disabled
                           className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200"
                         >
                           <XCircle size={16} className="mr-1" />
-                          Mark as Unread
+                          Read
                         </button>
                       ) : (
                         <button

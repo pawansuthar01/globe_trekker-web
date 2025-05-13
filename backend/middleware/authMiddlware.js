@@ -5,19 +5,23 @@ import AppError from "../utils/AppError.js";
 
 export const isLoggedIn = async (req, res, next) => {
   try {
-    const { token } = req.cookies;
-    if (!token) {
-      return next(new AppError("Unauthenticated,please login ", 401));
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
+
+    const token = authHeader.split(" ")[1];
 
     const userDetails = await JWT.verify(token, process.env.JWT_SECRET);
 
     req.user = {
       id: userDetails.id,
-      userName: userDetails.userName,
+      fullName: userDetails.name,
       email: userDetails.email,
       role: userDetails.role,
       exp: userDetails.exp,
+      avatar: userDetails.avatar,
     };
   } catch (error) {
     return next(new AppError(error.message, 500));

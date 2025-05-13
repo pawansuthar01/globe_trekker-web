@@ -71,7 +71,7 @@ const StoryList = () => {
   const handleDelete = async () => {
     // API call to delete Highlight
     const res = await dispatch(deleteStory(deleteId));
-    console.log(res);
+
     if (res?.payload?.success) {
       toast.success(res?.payload?.message);
       setStories(stories.filter((s) => s._id !== deleteId));

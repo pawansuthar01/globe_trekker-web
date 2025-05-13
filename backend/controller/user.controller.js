@@ -24,10 +24,11 @@ export const UpdateUser = async (req, res, next) => {
   existingUser.phoneNumber = phoneNumber || existingUser.phoneNumber;
   existingUser.isSubscribed = isSubscribed || existingUser.isSubscribed;
   await existingUser.save();
+  const token = existingUser.generate_JWT_TOKEN();
   res.status(200).json({
     success: true,
     message: "User update successfully",
-
+    AuthenticatorToken: token,
     user: existingUser,
   });
 };
@@ -47,11 +48,10 @@ export const registerUser = async (req, res, next) => {
   });
 
   const token = newUser.generate_JWT_TOKEN();
-  res.cookie("token", token, cookieOptions);
   res.status(201).json({
     success: true,
     message: "User registered successfully",
-
+    AuthenticatorToken: token,
     user: newUser,
   });
 };
@@ -65,11 +65,10 @@ export const loginUser = async (req, res, next) => {
   if (!isMatch) return next(new AppError("password not match..."), 401);
 
   const token = user.generate_JWT_TOKEN();
-  res.cookie("token", token, cookieOptions);
   res.status(200).json({
     success: true,
     message: "Login successful",
-
+    AuthenticatorToken: token,
     user: user,
   });
 };
@@ -83,10 +82,12 @@ export const getCurrentUser = async (req, res, next) => {
     if (!user) {
       return next(new AppError("user does not found...", 404));
     }
+    const token = user.generate_JWT_TOKEN();
     res.status(200).json({
       success: true,
       message: "successFully get profile",
       user,
+      AuthenticatorToken: token,
     });
   } catch (error) {
     return next(new AppError(error.message, 500));
@@ -95,20 +96,24 @@ export const getCurrentUser = async (req, res, next) => {
 
 export const checkUserValid = async (req, res, next) => {
   try {
-    if (!req.params.id) {
+    if (!req.user.id) {
       return next(new AppError("id user does not found...", 404));
     }
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.user.id);
     if (!user) {
       return next(new AppError("user does not found...", 401));
     }
+    const token = user.generate_JWT_TOKEN();
     res.status(200).json({
       success: true,
-      message: "successFully get profile",
+      message: "successFully login...",
       user,
+      AuthenticatorToken: token,
     });
   } catch (error) {
-    return next(new AppError(error.message, 500));
+    return next(
+      new AppError(error.message || "Fail Login  Please try next time...", 500)
+    );
   }
 };
 // if (profile.fullName && profile.email && profile.avatar && profile.phoneNumber) {

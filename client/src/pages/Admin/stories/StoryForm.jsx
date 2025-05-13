@@ -3,6 +3,8 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Save, Plus, X } from "lucide-react";
 import FormField from "../../../components/AdminComponent/form/FormField";
 import FileUpload from "../../../components/AdminComponent/common/FileUpload";
+import { addStory, updateStory } from "../../../Redux/Slice/storiesSlice";
+import { useDispatch } from "react-redux";
 
 const initialFormData = {
   title: "",
@@ -17,32 +19,34 @@ const initialFormData = {
     bio: "",
   },
   coverImage: null,
-  images: [],
+  images: [{ url: "", caption: "" }],
   imagesPreviews: [],
   readTime: "",
 };
 
 const StoryForm = () => {
+  const dispatch = useDispatch();
   const { id } = useParams();
   const navigate = useNavigate();
   const { story } = useLocation()?.state || [];
-  const [formData, setFormData] = useState(initialFormData);
+  const [formData, setFormData] = useState();
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
   const [newTag, setNewTag] = useState("");
+  const [removedImages, setRemovedImages] = useState([]);
 
   const isEditMode = !!id;
 
   useEffect(() => {
     if (isEditMode) {
-      setFormData({
-        ...initialFormData,
-        ...story,
-
-        coverImage: null,
-        images: [],
-      });
+      setFormData(story);
+      setLoadingData(false);
+    } else {
+      setFormData(initialFormData);
+      setLoadingData(false);
     }
+    console.log(formData);
   }, [id, isEditMode]);
 
   const handleChange = (e) => {
@@ -78,43 +82,27 @@ const StoryForm = () => {
     }));
   };
 
-  const handleAuthorAvatarChange = (file) => {
-    setFormData((prev) => ({
-      ...prev,
-      author: {
-        ...prev.author,
-        avatar: file,
-      },
-    }));
-  };
-
   const handleImagesChange = (file) => {
     if (file) {
+      const newFiles = Array.isArray(file) ? file : [file];
       setFormData((prev) => ({
         ...prev,
-        images: [...prev.images, file],
+        images: [...prev.images, ...newFiles],
       }));
-
-      // Create preview URL
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prev) => ({
-          ...prev,
-          imagesPreviews: [...prev.imagesPreviews, reader.result],
-        }));
-      };
-      reader.readAsDataURL(file);
     }
   };
 
   const removeImage = (index) => {
+    const imageToRemove = formData.images[index];
+    if (!(imageToRemove.file instanceof File)) {
+      setRemovedImages((prev) => [...prev, imageToRemove]);
+    }
+
     setFormData((prev) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
-      imagesPreviews: prev.imagesPreviews.filter((_, i) => i !== index),
     }));
   };
-
   const addTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
       setFormData((prev) => ({
@@ -155,10 +143,6 @@ const StoryForm = () => {
       newErrors.coverImage = "Cover image is required";
     }
 
-    if (!formData.author.name.trim()) {
-      newErrors["author.name"] = "Author name is required";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -169,72 +153,48 @@ const StoryForm = () => {
     if (!validateForm()) {
       return;
     }
+    const form = new FormData();
 
+    // Append basic fields
+    form.append("title", formData.title);
+    form.append("content", formData.content);
+    form.append("excerpt", formData.excerpt);
+    form.append("category", formData.category);
+    form.append("featured", formData.featured);
+    form.append("readTime", formData.readTime);
+
+    formData.images.forEach((img, index) => {
+      if (img instanceof File) {
+        form.append("image", img); // All files go as 'image'
+      }
+    });
+    formData.images.forEach((img, index) => {
+      form.append("caption", img.caption || "");
+    });
+    if (formData.coverImage instanceof File) {
+      form.append(`coverImage`, formData.coverImage);
+    }
+
+    formData.tags.forEach((tag) => form.append("tags[]", tag));
+    removedImages.forEach((img) => form.append("removedImages", img.url));
     setLoading(true);
-
+    const res = await dispatch(
+      isEditMode ? updateStory({ id: id, formData: form }) : addStory(form)
+    );
+    console.log(res);
     try {
-      // Upload cover image if new file is selected
-      let coverImageUrl = formData.coverImagePreview;
-      if (formData.coverImage) {
-        coverImageUrl = await uploadFile(
-          formData.coverImage,
-          "stories",
-          `covers/${formData.title}-${Date.now()}`
-        );
-      }
-
-      // Upload author avatar if new file is selected
-      let avatarUrl = formData.author.avatarPreview;
-      if (formData.author.avatar) {
-        avatarUrl = await uploadFile(
-          formData.author.avatar,
-          "authors",
-          `avatars/${formData.author.name}-${Date.now()}`
-        );
-      }
-
-      // Upload additional images
-      const uploadedImages = await Promise.all(
-        formData.images.map((file, index) =>
-          uploadFile(
-            file,
-            "stories",
-            `images/${formData.title}-${Date.now()}-${index}`
-          )
-        )
-      );
-
-      // Prepare data for API
-      const storyData = {
-        ...formData,
-        coverImage: {
-          url: coverImageUrl,
-          alt: formData.title,
-        },
-        author: {
-          ...formData.author,
-          avatar: avatarUrl,
-        },
-        images: uploadedImages.map((url) => ({
-          url,
-          caption: "",
-        })),
-      };
-
-      // In a real app, you would send the data to an API
-      console.log("Submitting story data:", storyData);
-
-      // Simulate API call
-      setTimeout(() => {
-        setLoading(false);
-        navigate("/admin/stories");
-      }, 1000);
+      setLoading(false);
+      // // Simulate API call
+      // setTimeout(() => {
+      //   navigate("/admin/stories");
+      // }, 1000);
     } catch (error) {
       console.error("Error uploading files:", error);
       setLoading(false);
       // Handle error appropriately
     }
   };
+  if (loadingData) return;
 
   return (
     <div className="space-y-6 overflow-hidden p-6">
@@ -289,7 +249,7 @@ const StoryForm = () => {
               <FileUpload
                 accept="image/*"
                 onChange={handleCoverImageChange}
-                value={formData.coverImagePreview}
+                value={formData.coverImage?.url}
               />
             </FormField>
 
@@ -299,31 +259,48 @@ const StoryForm = () => {
               error={errors.images}
             >
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {formData.imagesPreviews.map((preview, index) => (
-                  <div key={index} className="relative">
-                    <img
-                      src={preview}
+                {formData?.images?.map((image, index) => (
+                  <div key={index} className="relative border p-2 rounded">
+                    <FileUpload
+                      onChange={handleImagesChange}
                       alt={`Preview ${index + 1}`}
-                      className="h-40 w-full object-cover rounded-lg"
+                      value={image.url}
+                      className="mb-2"
                     />
+                    <FormField
+                      label="caption"
+                      id="caption"
+                      error={errors.caption}
+                      required
+                    >
+                      <input
+                        type="text"
+                        name={`caption-${index}`}
+                        placeholder="Enter caption"
+                        value={image.caption}
+                        onChange={(e) => {
+                          const updatedImages = [...formData.images];
+                          updatedImages[index].caption = e.target.value;
+                          setFormData((prev) => ({
+                            ...prev,
+                            images: updatedImages,
+                          }));
+                        }}
+                        className=" w-full text-sm border rounded p-1"
+                      />
+                    </FormField>
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      className="absolute -top-2 right-1 bg-red-500 text-white p-1 rounded-full"
                     >
-                      <X size={16} />
+                      <X size={12} />
                     </button>
                   </div>
                 ))}
-                <FileUpload
-                  accept="image/*"
-                  onChange={handleImagesChange}
-                  value={null}
-                  className="h-40"
-                />
               </div>
             </FormField>
-
+            <FileUpload onChange={handleImagesChange} />
             <FormField
               label="Short Excerpt"
               id="excerpt"
@@ -373,6 +350,7 @@ const StoryForm = () => {
                   <option value="">Select a category</option>
                   <option value="Adventure">Adventure</option>
                   <option value="Food">Food</option>
+                  <option value="Travel">Travel</option>
                   <option value="Culture">Culture</option>
                   <option value="Road Trip">Road Trip</option>
                   <option value="Backpacking">Backpacking</option>

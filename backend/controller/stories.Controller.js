@@ -3,6 +3,7 @@ import AppError from "../utils/AppError.js";
 import Story from "../module/stories.Module.js";
 export const newStory = async (req, res, next) => {
   try {
+    const { fullName, bio, avatar } = req.user;
     const {
       title,
       content,
@@ -10,9 +11,7 @@ export const newStory = async (req, res, next) => {
       category,
       tags,
       featured,
-      authorName,
-      authorAvatar,
-      authorBio,
+
       readTime,
       caption,
     } = req.body;
@@ -24,9 +23,8 @@ export const newStory = async (req, res, next) => {
       !category ||
       !tags ||
       !featured ||
-      !authorAvatar ||
-      !authorBio ||
-      !authorName ||
+      !avatar ||
+      !fullName ||
       !readTime ||
       !caption
     ) {
@@ -72,9 +70,9 @@ export const newStory = async (req, res, next) => {
       tags: typeof tags === "string" ? JSON.parse(tags) : tags,
       featured: featured === "true",
       author: {
-        name: authorName,
-        avatar: authorAvatar,
-        bio: authorBio,
+        name: fullName,
+        avatar: avatar.secure_url,
+        bio: bio || "",
       },
       coverImage,
       images,
@@ -95,6 +93,7 @@ export const newStory = async (req, res, next) => {
 
 export const updateStory = async (req, res, next) => {
   try {
+    const { fullName, bio, avatar } = req.user;
     const story = await Story.findById(req.params.id);
     if (!story) {
       return next(new AppError("Story not found", 404));
@@ -107,9 +106,7 @@ export const updateStory = async (req, res, next) => {
       category,
       tags,
       featured,
-      authorName,
-      authorAvatar,
-      authorBio,
+
       readTime,
       caption,
     } = req.body;
@@ -126,9 +123,9 @@ export const updateStory = async (req, res, next) => {
 
     // Update author
     story.author = {
-      name: authorName || story.author.name,
-      avatar: authorAvatar || story.author.avatar,
-      bio: authorBio || story.author.bio,
+      name: fullName || story.author.name,
+      avatar: avatar.secure_url || story.author.avatar,
+      bio: bio || story.author.bio,
     };
 
     // Update cover image if new one uploaded
@@ -144,26 +141,45 @@ export const updateStory = async (req, res, next) => {
         alt: story.title,
       };
     }
+    if (req.body.removedImages) {
+      const removedImages = Array.isArray(req.body.removedImages)
+        ? req.body.removedImages
+        : [req.body.removedImages];
 
-    // Replace full images if new ones uploaded
-    if (req.files?.image) {
-      story.images = [];
-      for (let i = 0; i < req.files.image.length; i++) {
-        const result = await cloudinary.v2.uploader.upload(
-          req.files.image[i].path,
-          {
-            folder: "stories/gallery",
-          }
-        );
-        story.images.push({
-          url: result.secure_url,
-          caption: caption?.[i] || "",
-        });
-      }
+      story.images = story.images.filter(
+        (image) => !removedImages.includes(image.url)
+      );
     }
 
-    // ✅ Only update specific captions
-    if (!req.files?.image && caption && typeof caption === "object") {
+    const files = Array.isArray(req.files?.image)
+      ? req.files.image
+      : req.files?.image
+      ? [req.files.image]
+      : [];
+
+    const parsedCaptions = (() => {
+      try {
+        return Array.isArray(caption)
+          ? caption
+          : typeof caption === "string"
+          ? JSON.parse(caption)
+          : [];
+      } catch (e) {
+        return [];
+      }
+    })();
+
+    for (let i = 0; i < files.length; i++) {
+      const result = await cloudinary.v2.uploader.upload(files[i].path, {
+        folder: "stories/gallery",
+      });
+
+      story.images.push({
+        url: result.secure_url,
+        caption: parsedCaptions[i] || "",
+      });
+    }
+    if (!files.length && caption && typeof caption === "object") {
       Object.keys(caption).forEach((key) => {
         const index = parseInt(key);
         if (!isNaN(index) && story.images[index]) {

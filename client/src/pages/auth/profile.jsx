@@ -39,21 +39,23 @@ const Profile = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto sm:ml-5 p-2 ">
-      <div className="relative mb-8">
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-lg"></div>
-        <div className="relative p-6">
-          <h1 className="text-3xl font-bold text-emerald-800 mb-2">
-            Welcome, Fellow Traveler!
-          </h1>
-          <p className="text-emerald-600">
-            Manage your travel preferences and account details below.
-          </p>
+    <div className=" flex  justify-center  sm:ml-5 p-2 ">
+      <div className="w-[70%]">
+        <div className="relative mb-8 ">
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-lg"></div>
+          <div className="relative p-6">
+            <h1 className="text-3xl font-bold text-emerald-800 mb-2">
+              Welcome, Fellow Traveler!
+            </h1>
+            <p className="text-emerald-600">
+              Manage your travel preferences and account details below.
+            </p>
+          </div>
         </div>
+        <ProfileHeader user={data} />
+        <ProfileForm user={data} />
+        <AccountInfo user={data} />
       </div>
-      <ProfileHeader user={data} />
-      <ProfileForm user={data} />
-      <AccountInfo user={data} />
     </div>
   );
 };

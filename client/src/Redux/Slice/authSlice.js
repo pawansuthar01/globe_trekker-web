@@ -1,16 +1,21 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../helper/axiosInstance";
+const getValidToken = () => {
+  const token = localStorage.getItem("Authenticator");
+  return token && token !== "undefined" ? token : null;
+};
 
 const initialState = {
-  isLoggedIn: localStorage.getItem("isLoggedIn") || false,
+  isLoggedIn: localStorage.getItem("isLoggedIn") === "true",
   role: localStorage.getItem("role") || "",
   exp: Number(localStorage.getItem("exp")) || 0,
   userName: localStorage.getItem("userName") || "",
-  data:
-    localStorage.getItem("data") == undefined
-      ? JSON.parse(localStorage.getItem("data"))
-      : {},
+  Authenticator: getValidToken(),
+  data: localStorage.getItem("data")
+    ? JSON.parse(localStorage.getItem("data"))
+    : {},
 };
+
 const User_basic_url = `/api/v3/auth`;
 export const ContinueWithGoogle = createAsyncThunk("/auth/google", async () => {
   try {
@@ -126,7 +131,7 @@ export const checkToken = createAsyncThunk(
 );
 export const getAllUsers = createAsyncThunk("/auth/User", async () => {
   try {
-    const res = await axiosInstance.get("/api/v3/Admin/User");
+    const res = await axiosInstance.get("/api/v5/Admin/users");
 
     return res.data;
   } catch (error) {
@@ -162,12 +167,7 @@ export const HandelPromotion = createAsyncThunk(
   "user/roleUpdate",
   async (data) => {
     try {
-      const token = localStorage.getItem("Authenticator");
-      const res = await axiosInstance.put("/api/v3/Admin/User", data, {
-        headers: {
-          Authorization: `${token}`,
-        },
-      });
+      const res = await axiosInstance.put("/api/v3/Admin/User", data);
 
       return res.data;
     } catch (error) {
@@ -180,6 +180,11 @@ const authSliceRedux = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    setToken: (state, action) => {
+      state.Authenticator = action.payload;
+
+      localStorage.setItem("Authenticator", action.payload);
+    },
     logout: (state) => {
       localStorage.setItem("data", null);
       localStorage.setItem("isLoggedIn", false);
@@ -190,6 +195,8 @@ const authSliceRedux = createSlice({
       state.userName = "";
 
       state.exp = 0;
+      localStorage.removeItem("Authenticator");
+      state.Authenticator = null;
       state.isLoggedIn = false;
       state.data = "";
       state.role = "";
@@ -222,9 +229,14 @@ const authSliceRedux = createSlice({
           localStorage.setItem("data", JSON.stringify(action?.payload?.user));
           localStorage.setItem("role", action?.payload?.user.role);
           localStorage.setItem("userName", action?.payload?.user.userName);
+          localStorage.setItem(
+            "Authenticator",
+            action?.payload?.AuthenticatorToken
+          );
+          state.Authenticator = action?.payload?.AuthenticatorToken;
 
           state.userName = action?.payload?.user.userName;
-          null;
+
           state.role = state.data = action?.payload?.user;
           state.role = action?.payload?.user.role;
         }
@@ -272,13 +284,14 @@ const authSliceRedux = createSlice({
       })
       .addCase(LoadAccount.fulfilled, (state, action) => {
         if (action.payload.success) {
-          const { user, exp } = action.payload;
+          const { user, exp, AuthenticatorToken } = action.payload;
           localStorage.setItem("data", JSON.stringify(user));
           localStorage.setItem("isLoggedIn", true);
           localStorage.setItem("exp", Number(exp));
           localStorage.setItem("role", user.role);
           localStorage.setItem("userName", user.userName);
-
+          localStorage.setItem("Authenticator", AuthenticatorToken);
+          state.Authenticator = AuthenticatorToken;
           state.userName = user.userName;
 
           state.exp = Number(exp);
@@ -289,5 +302,5 @@ const authSliceRedux = createSlice({
       });
   },
 });
-export const { logout } = authSliceRedux.actions;
+export const { logout, setToken } = authSliceRedux.actions;
 export default authSliceRedux.reducer;

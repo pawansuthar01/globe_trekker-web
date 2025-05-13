@@ -2,7 +2,7 @@ import userContact from "../module/UserContact.Module.js";
 import AppError from "../utils/AppError.js";
 
 // Add a mark as Read
-export const markAsReadContact = async (req, res) => {
+export const markAsReadContact = async (req, res, next) => {
   const { id } = req.params;
 
   try {
@@ -26,7 +26,7 @@ export const markAsReadContact = async (req, res) => {
   }
 };
 // Add a new contact message
-export const addNewContact = async (req, res) => {
+export const addNewContact = async (req, res, next) => {
   const { fullName, email, subject, message } = req.body;
 
   if (!fullName || !email || !subject || !message) {

@@ -47,14 +47,6 @@ const FileUpload = ({
     event.preventDefault();
   };
 
-  const clearFile = () => {
-    onChange(null);
-    setPreviewUrl(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
   return (
     <div className={`relative ${className}`}>
       <div

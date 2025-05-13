@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from "../../helper/axiosInstance";
 
 const initialState = {
   contacts: [],
@@ -12,7 +12,7 @@ export const addNewContact = createAsyncThunk(
   "contact/add",
   async (data, thunkAPI) => {
     try {
-      const res = await axios.post("/userContact", data);
+      const res = await axiosInstance.post("/contact", data);
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -25,7 +25,7 @@ export const getAllContacts = createAsyncThunk(
   "contact/getAll",
   async (_, thunkAPI) => {
     try {
-      const res = await axios.get("/api/v5/admin/contact");
+      const res = await axiosInstance.get("/api/v5/admin/contact");
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -38,7 +38,7 @@ export const markContactAsRead = createAsyncThunk(
   "contact/markAsRead",
   async (id, thunkAPI) => {
     try {
-      const res = await axios.put(`/api/v5/admin/contact/${id}`);
+      const res = await axiosInstance.put(`/api/v5/admin/contact/${id}`);
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -63,29 +63,6 @@ const userContactSlice = createSlice({
       .addCase(getAllContacts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      })
-
-      // Add New Contact
-      .addCase(addNewContact.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(addNewContact.fulfilled, (state, action) => {
-        state.loading = false;
-        state.contacts.push(action.payload);
-      })
-      .addCase(addNewContact.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-
-      // Mark as Read
-      .addCase(markContactAsRead.fulfilled, (state, action) => {
-        const idx = state.contacts.findIndex(
-          (c) => c._id === action.payload._id
-        );
-        if (idx !== -1) {
-          state.contacts[idx] = action.payload;
-        }
       });
   },
 });

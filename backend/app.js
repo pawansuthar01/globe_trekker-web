@@ -33,14 +33,11 @@ App.use(
   })
 );
 
-App.set("trust proxy", 1);
-
 App.use(cookieParser());
 App.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    proxy: true,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: sessionCookieOptions,

@@ -75,6 +75,7 @@ userSchema.methods = {
     return JWT.sign(
       {
         email: this.email,
+        fullName: this.fullName,
         id: this._id,
         role: this.role,
         isSubscribed: this.isSubscribed,

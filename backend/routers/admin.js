@@ -55,6 +55,7 @@ Admin.put("/banner-active/:id", ActiveBanner);
 // < **  Banner routes -- End ** >
 // < **  stories routes -- Start ** >
 Admin.route("/stories").post(
+  isLoggedIn,
   upload.fields([
     { name: "coverImage", maxCount: 1 },
     { name: "image", maxCount: 5 },

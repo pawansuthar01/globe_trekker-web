@@ -1,9 +1,27 @@
+// axiosInstance.ts
 import axios from "axios";
-export const basic_url = "https://globe-trekker-web.onrender.com";
-//  "http://localhost:5000";
-//
 
-const axiosInstance = axios.create();
-axiosInstance.defaults.baseURL = basic_url;
-axiosInstance.defaults.withCredentials = true;
+// export const basic_url = "http://localhost:5000";
+export const basic_url = "https://your-live-backend.com";
+
+const axiosInstance = axios.create({
+  baseURL: basic_url,
+  withCredentials: true, // only needed if using cookies
+});
+
+//  add token to each request
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("Authenticator");
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export default axiosInstance;
