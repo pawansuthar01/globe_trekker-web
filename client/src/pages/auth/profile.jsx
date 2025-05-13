@@ -40,7 +40,7 @@ const Profile = () => {
 
   return (
     <div className=" flex  justify-center  sm:ml-5 p-2 ">
-      <div className="w-[70%]">
+      <div className="w-[70%] max-sm:w-full">
         <div className="relative mb-8 ">
           <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-lg"></div>
           <div className="relative p-6">

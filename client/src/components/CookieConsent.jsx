@@ -1,56 +1,142 @@
-import { useEffect, useState } from "react";
-import { Cookies } from "react-cookie-consent";
+import React, { useState, useEffect } from "react";
+import CookieConsent, { Cookies } from "react-cookie-consent";
 
-const CustomCookieBanner = () => {
-  const [showBanner, setShowBanner] = useState(false);
+const CookieConsentBanner = () => {
+  const [showSettings, setShowSettings] = useState(false);
 
-  useEffect(() => {
-    const consent = Cookies.get("cookieConsent");
-    if (!consent) {
-      setShowBanner(true);
-    }
-  }, []);
+  const loadGoogleAnalytics = () => {
+    const script = document.createElement("script");
+    script.src = "https://www.googletagmanager.com/gtag/js?id=G-6XCRD0TSGY";
+    script.async = true;
+    document.head.appendChild(script);
+
+    script.onload = () => {
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        window.dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-6XCRD0TSGY");
+    };
+  };
 
   const handleAccept = () => {
-    Cookies.set("cookieConsent", "true", { expires: 150 });
-    setShowBanner(false);
-    console.log("✅ Cookies accepted");
-
-    // Optional: Load Google Ads/Analytics here
+    Cookies.set("analytics", "true");
+    Cookies.set("ads", "true");
+    loadGoogleAnalytics(); // Load GA when accepted
   };
 
   const handleDecline = () => {
-    Cookies.set("cookieConsent", "false", { expires: 150 });
-    setShowBanner(false);
-    console.log("❌ Cookies declined");
+    Cookies.set("analytics", "false");
+    Cookies.set("ads", "false");
   };
 
-  if (!showBanner) return null;
+  const handleSaveSettings = (analytics, ads) => {
+    Cookies.set("analytics", String(analytics));
+    Cookies.set("ads", String(ads));
+    setShowSettings(false);
+
+    // Load GA only if analytics consent is given
+    if (analytics) {
+      loadGoogleAnalytics();
+    }
+  };
+
+  useEffect(() => {
+    const isAnalyticsAllowed = Cookies.get("analytics") === "true";
+    if (isAnalyticsAllowed) {
+      loadGoogleAnalytics(); // Load GA if already accepted
+    }
+  }, []);
 
   return (
-    <div className="fixed bottom-0 w-full z-50 bg-gray-900 text-white p-4 shadow-md">
-      <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-        <p className="text-sm text-gray-300">
-          We use cookies to improve your experience and show relevant ads. By
-          accepting, you consent to our cookies.
-        </p>
-        <div className="flex gap-3 mt-2 md:mt-0">
-          <button
-            onClick={handleDecline}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm"
-          >
-            Decline
-          </button>
-          <button
-            onClick={handleAccept}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm"
-          >
-            Accept
-          </button>
+    <>
+      <CookieConsent
+        location="bottom"
+        buttonText="Accept All"
+        containerClasses="!fixed !bottom-20 md:!bottom-0 !left-0 !right-0 z-50"
+        declineButtonText="Decline"
+        enableDeclineButton
+        onAccept={handleAccept}
+        onDecline={handleDecline}
+        cookieName="site_cookie_consent"
+        style={{
+          background: "#2B373B",
+          bottom: "20px",
+          position: "fixed",
+          left: "0px",
+          right: "0px",
+          zIndex: "9999",
+        }}
+        buttonStyle={{
+          background: "#14b8a6",
+          color: "#fff",
+          fontSize: "13px",
+        }}
+        declineButtonStyle={{
+          background: "#f43f5e",
+          color: "#fff",
+          fontSize: "13px",
+        }}
+      >
+        We use cookies to enhance your experience, analyze traffic, and serve
+        personalized ads.{" "}
+        <button
+          onClick={() => setShowSettings(true)}
+          className="ml-4 underline text-blue-300"
+        >
+          Cookie Settings
+        </button>
+      </CookieConsent>
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-6 rounded shadow-lg w-[90%] max-w-md">
+            <h2 className="text-xl font-bold mb-4">Cookie Settings</h2>
+            <p className="mb-2">Select which cookies you allow:</p>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const analytics = e.currentTarget.analytics.checked;
+                const ads = e.currentTarget.ads.checked;
+                handleSaveSettings(analytics, ads);
+              }}
+            >
+              <div className="mb-2">
+                <label>
+                  <input type="checkbox" name="analytics" defaultChecked />{" "}
+                  Analytics Cookies
+                </label>
+              </div>
+              <div className="mb-4">
+                <label>
+                  <input type="checkbox" name="ads" defaultChecked />{" "}
+                  Advertising Cookies
+                </label>
+              </div>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowSettings(false)}
+                  className="px-4 py-1 rounded bg-gray-300 dark:bg-gray-600"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-1 rounded bg-emerald-600 text-white"
+                >
+                  Save Settings
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 
-export default CustomCookieBanner;
+export default CookieConsentBanner;

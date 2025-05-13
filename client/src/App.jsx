@@ -32,6 +32,7 @@ import TeamMembers from "./pages/Admin/about/TeamMembers";
 import CheckLogin from "./pages/checkLoginValid";
 import PageNotFound from "./pages/NotFound";
 import RequireAuth from "./components/AdminComponent/auth/ProtectedRoute";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 function App() {
   return (
     <Routes>
@@ -51,6 +52,7 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
       </Route>
       <Route element={<RequireAuth allowedRole={["ADMIN", "AUTHOR"]} />}>
         <Route path="/admin" element={<AdminLayout />}>

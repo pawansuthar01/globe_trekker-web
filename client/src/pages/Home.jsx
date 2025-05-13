@@ -14,7 +14,7 @@ export const Home = () => {
       <LatestStories />
       <TrekkersHighlights />
       <NewsletterSection />
-      {/* <CustomCookieBanner /> */}
+      <CustomCookieBanner />
     </div>
   );
 };
