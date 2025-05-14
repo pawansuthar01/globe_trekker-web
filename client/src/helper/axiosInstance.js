@@ -2,7 +2,7 @@
 import axios from "axios";
 
 // export const basic_url = "http://localhost:5000";
-export const basic_url = "https://globe-trekkeeb.onrender.com";
+export const basic_url = "https://globe-trekker-web.onrender.com";
 
 const axiosInstance = axios.create({
   baseURL: basic_url,

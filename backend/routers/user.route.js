@@ -24,7 +24,7 @@ user.get(
 user.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "/login",
+    failureRedirect: `${process.env.FRONTEND_URL}/login`,
   }),
   (req, res) => {
     const user = req.user;
