@@ -6,7 +6,7 @@ import DeleteModal from "../../../components/AdminComponent/common/DeleteModal";
 import { useDispatch } from "react-redux";
 import {
   deleteDestination,
-  fetchAllDestinations,
+  fetchDestinations,
   markAsPublished,
 } from "../../../Redux/Slice/detinationSlice";
 import { useEffect } from "react";
@@ -21,7 +21,7 @@ const DestinationList = () => {
   const [destination, setDestination] = useState([]);
 
   const FetchDestination = async () => {
-    const res = await dispatch(fetchAllDestinations());
+    const res = await dispatch(fetchDestinations());
     if (res?.payload?.success) {
       setDestination(res?.payload?.data);
     }

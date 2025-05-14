@@ -4,7 +4,6 @@ import { Calendar, MapPin, Star, Clock, Heart } from "lucide-react";
 import ImageWithLoaderPercentage from "../../components/Skeleton/imageLoder";
 import { useDispatch } from "react-redux";
 import { fetchDestinationById } from "../../Redux/Slice/detinationSlice";
-import formatDate from "../../utils/DataFormat";
 
 const DestinationDetailPage = () => {
   const { id } = useParams();
@@ -13,7 +12,6 @@ const DestinationDetailPage = () => {
   const [destination, setDestination] = useState();
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    // Simulated API call - replace with actual API integration
     if (!DataDestination) {
       const fetchDestination = async () => {
         try {
@@ -54,159 +52,222 @@ const DestinationDetailPage = () => {
 
   return (
     destination && (
-      <div className="min-h-screen pt-24 pb-16">
-        <div className="container mx-auto px-4">
+      <div className="min-h-screen ">
+        <div className="container mx-auto px-4 py-8">
+          {/* Top Ad Space */}
+          {/* <div className="mb-8 p-4 bg-gray-100 rounded-lg text-center">
+            <div className="h-[90px] flex items-center justify-center text-gray-400">
+              Advertisement Space (728x90)
+            </div>
+          </div> */}
+
           {/* Header */}
-          <header className="mb-8">
-            <p className="text-sm  fond-bold">
-              Post On:{" "}
-              <span className="text-blue-300">
-                {" "}
-                {formatDate(destination.createdAt)}
+          <header className="mb-8 animate-fade-in">
+            <p className="text-sm font-medium text-gray-500">
+              Posted on:{" "}
+              <span className="text-blue-500">
+                {new Date(destination.createdAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
               </span>
             </p>
-            <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-4">
+
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mt-2 mb-4 leading-tight">
               {destination.name}
             </h1>
-            <div className="flex flex-wrap items-center gap-4 text-neutral-600">
-              <div className="flex items-center">
-                <MapPin className="h-5 w-5 mr-2 text-primary-600" />
-                <span>
+
+            <div className="flex flex-wrap items-center gap-4 text-gray-600">
+              <div className="flex items-center bg-white/80 backdrop-blur-sm shadow-sm px-3 py-1.5 rounded-full">
+                <MapPin className="h-5 w-5 mr-2 text-blue-600" />
+                <span className="font-medium">
                   {destination.location.country}, {destination.location.region}
                 </span>
               </div>
-              <div className="flex items-center">
-                <Star className="h-5 w-5 mr-2 text-accent-500" />
+
+              <div className="flex items-center bg-white/80 backdrop-blur-sm shadow-sm px-3 py-1.5 rounded-full">
+                <Star className="h-5 w-5 mr-2 text-amber-500 fill-amber-500" />
                 <span>
-                  {destination.rating.value} ({destination.rating.count}{" "}
-                  reviews)
+                  <span className="font-medium">
+                    {destination.rating.value}
+                  </span>{" "}
+                  ({destination.rating.count} reviews)
                 </span>
               </div>
             </div>
           </header>
-          {/* Main image gallery */}
+
+          {/* Image Gallery */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            {destination?.images.map((image, index) => (
+            {destination.images.map((image, index) => (
               <div
                 key={index}
-                className="relative aspect-video rounded-lg overflow-hidden"
+                className="relative aspect-video rounded-lg overflow-hidden group shadow-md 
+                       transition-transform hover:scale-[1.02] duration-300"
               >
                 <ImageWithLoaderPercentage
                   src={image.secure_url}
-                  alt={image.caption}
-                  className="w-full h-full object-cover"
+                  alt={image.caption || `Destination image ${index + 1}`}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-3 text-sm">
-                  {image.caption}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-100" />
+                <div className="absolute bottom-0 left-0 right-0 bg-black/50 backdrop-blur-sm text-white p-3 transform transition-all">
+                  <p className="font-medium text-sm">{image.caption}</p>
                 </div>
               </div>
             ))}
           </div>
-          {/* Content grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main content */}
-            <div className="lg:col-span-2">
-              <section className="bg-white rounded-lg shadow-md p-2 mb-8">
-                <div className="flex flex-wrap gap-2">
-                  {destination.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
+
+          {/* Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Main Content */}
+            <div className="lg:col-span-3">
+              {/* About Section */}
+              <section className="bg-white rounded-xl shadow-sm overflow-hidden transition-all hover:shadow-md border border-gray-100 mb-8">
+                <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50">
+                  <div className="flex flex-wrap gap-2">
+                    {destination.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
+
                 <div className="p-6">
-                  <h2 className="text-2xl font-semibold mb-4">About</h2>
-                  <p className="text-neutral-600 mb-6">
+                  <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+                    About
+                  </h2>
+                  <p className="text-gray-600 mb-6 leading-relaxed">
                     {destination.description}
                   </p>
-                  <p className="text-neutral-600">
+                  <p className="text-gray-600 leading-relaxed">
                     {destination.longDescription}
                   </p>
                 </div>
               </section>
 
-              <section className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-2xl font-semibold mb-4">Travel Tips</h2>
-                <ul className="space-y-3">
+              {/* Travel Tips Section */}
+              <section className="bg-white rounded-xl shadow-sm p-6 mb-8 transition-all hover:shadow-md border border-gray-100">
+                <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+                  Travel Tips
+                </h2>
+                <div className="grid gap-4">
                   {destination.travelTips.map((tip, index) => (
-                    <li key={index} className="flex items-start">
-                      <span className="inline-block w-6 h-6 bg-primary-100 text-primary-600 rounded-full flex-shrink-0  items-center justify-center mr-3">
+                    <div
+                      key={index}
+                      className="flex items-start group p-4 rounded-lg hover:bg-gray-50"
+                    >
+                      <span className="inline-flex h-8 w-8 bg-blue-100 text-blue-600 rounded-full flex-shrink-0 items-center justify-center mr-4 transition-all group-hover:bg-blue-600 group-hover:text-white font-medium">
                         {index + 1}
                       </span>
-                      <span className="text-neutral-600">{tip}</span>
-                    </li>
+                      <p className="text-gray-600 leading-relaxed pt-1">
+                        {tip}
+                      </p>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </section>
+
+              {/* Itinerary Section */}
+              <section className="bg-white rounded-xl shadow-sm p-6 transition-all hover:shadow-md border border-gray-100">
+                <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+                  Detailed Itinerary
+                </h2>
+                <div className="space-y-8">
+                  {destination.itinerary.map((day) => (
+                    <div key={day._id} className="relative pl-8 pb-8 last:pb-0">
+                      <div className="absolute left-0 top-0 bottom-0 w-px bg-blue-200" />
+                      <div className="absolute left-[-8px] top-0 w-4 h-4 rounded-full bg-blue-600 border-4 border-white" />
+
+                      <h3 className="text-xl font-semibold text-blue-600 mb-4">
+                        Day {day.day}: {day.title}
+                      </h3>
+
+                      <ul className="space-y-3">
+                        {day.activities.map((activity, idx) => (
+                          <li
+                            key={idx}
+                            className="flex items-start gap-3 text-gray-600"
+                          >
+                            <span className="inline-flex h-6 w-6 bg-blue-100 text-blue-600 rounded-full items-center justify-center text-sm flex-shrink-0">
+                              {idx + 1}
+                            </span>
+                            {activity}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Bottom Ad Space */}
+              {/* <div className="mt-8 p-4 bg-gray-100 rounded-lg text-center">
+                <div className="h-[250px] flex items-center justify-center text-gray-400">
+                  Advertisement Space (728x250)
+                </div>
+              </div> */}
             </div>
 
             {/* Sidebar */}
-            <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold mb-4">Quick Info</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    <Calendar className="h-5 w-5 text-primary-600 mr-3" />
-                    <div>
-                      <div className="font-medium">Best Time to Visit</div>
-                      <div className="text-neutral-600">
-                        {destination.bestTimeToVisit}
+            <div className="lg:col-span-1">
+              <div className="sticky top-4">
+                Sidebar Ad Space
+                {/* <div className="mb-8 p-4 bg-gray-100 rounded-lg text-center">
+                  <div className="h-[600px] flex items-center justify-center text-gray-400">
+                    Advertisement Space (300x600)
+                  </div>
+                </div> */}
+                {/* Quick Info */}
+                <div className="bg-white rounded-xl shadow-sm p-6 mb-6 border border-gray-100">
+                  <h3 className="text-lg font-semibold mb-4">Quick Info</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center">
+                      <Calendar className="h-5 w-5 text-blue-600 mr-3" />
+                      <div>
+                        <div className="font-medium">Best Time to Visit</div>
+                        <div className="text-gray-600">
+                          {destination.bestTimeToVisit}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex items-center">
-                    <Clock className="h-5 w-5 text-primary-600 mr-3" />
-                    <div>
-                      <div className="font-medium">Suggested Duration</div>
-                      <div className="text-neutral-600">
-                        {destination?.SuggestedDuration}
+                    <div className="flex items-center">
+                      <Clock className="h-5 w-5 text-blue-600 mr-3" />
+                      <div>
+                        <div className="font-medium">Suggested Duration</div>
+                        <div className="text-gray-600">
+                          {destination.SuggestedDuration}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              {/* Itinerary Section */}
-              <section className="bg-white rounded-lg shadow-md p-6 mb-8">
-                <h2 className="text-2xl font-semibold mb-4">Itinerary</h2>
-                {destination.itinerary.map((dayPlan) => (
-                  <div key={dayPlan._id} className="mb-4">
-                    <h3 className="text-lg font-bold text-primary-700 mb-1">
-                      Day {dayPlan.day}: {dayPlan.title}
-                    </h3>
-                    <ul className="list-disc list-inside text-neutral-600">
-                      {dayPlan.activities.map((activity, idx) => (
-                        <li key={idx}>{activity}</li>
-                      ))}
-                    </ul>
+                {/* Popular For Section */}
+                <section className="bg-white rounded-xl shadow-sm p-6 mb-6 border border-gray-100">
+                  <h2 className="text-xl font-semibold mb-4">Popular For</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {destination.popularFor.map((item, index) => (
+                      <span
+                        key={index}
+                        className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm font-medium"
+                      >
+                        {item}
+                      </span>
+                    ))}
                   </div>
-                ))}
-              </section>
-
-              {/* Tags Section */}
-
-              {/* Popular For Section */}
-              <section className="bg-white rounded-lg shadow-md p-6 mb-8">
-                <h2 className="text-2xl font-semibold mb-4">Popular For</h2>
-                <div className="flex flex-wrap gap-2">
-                  {destination.popularFor.map((item, index) => (
-                    <span
-                      key={index}
-                      className="bg-accent-100 text-accent-700 px-3 py-1 rounded-full text-sm"
-                    >
-                      {item}
-                    </span>
-                  ))}
+                </section>
+                {/* Action Button */}
+                <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+                  <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-all hover:shadow-lg flex items-center justify-center gap-2">
+                    <Heart className="h-5 w-5" />
+                    Save to Favorites
+                  </button>
                 </div>
-              </section>
-
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <button className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 px-6 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-                  <Heart className="h-5 w-5" />
-                  Save to Favorites
-                </button>
               </div>
             </div>
           </div>

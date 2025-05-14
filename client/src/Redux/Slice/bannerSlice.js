@@ -91,14 +91,14 @@ const bannerSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Fetch all banners
-      .addCase(fetchBanners.pending, (state) => {
+      .addCase(fetchActiveBanners.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchBanners.fulfilled, (state, action) => {
+      .addCase(fetchActiveBanners.fulfilled, (state, action) => {
         state.loading = false;
         state.banners = action.payload;
       })
-      .addCase(fetchBanners.rejected, (state, action) => {
+      .addCase(fetchActiveBanners.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

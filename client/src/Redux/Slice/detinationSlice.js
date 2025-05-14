@@ -24,6 +24,19 @@ export const fetchAllDestinations = createAsyncThunk(
   }
 );
 
+// Get all destinations
+export const fetchDestinations = createAsyncThunk(
+  "destination/fetchAll/admin",
+  async () => {
+    try {
+      const { data } = await axiosInstance.get("/api/v3/destination/admin");
+      return data;
+    } catch (err) {
+      return err.response?.data?.message;
+    }
+  }
+);
+
 // Get destination by ID
 export const fetchDestinationById = createAsyncThunk(
   "destination/fetchById",

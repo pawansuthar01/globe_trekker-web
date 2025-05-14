@@ -69,6 +69,7 @@ const ImageWithLoaderPercentage = ({
         <img
           src={imageDataUrl}
           alt={alt}
+          loading="lazy"
           className={`w-full h-full object-cover ${rounded} transition-opacity duration-500 ${
             loaded ? "opacity-100" : "opacity-0"
           }`}

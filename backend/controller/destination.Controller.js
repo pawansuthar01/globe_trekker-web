@@ -5,6 +5,11 @@ import cloudinary from "cloudinary";
 export const newDestination = async (req, res, next) => {
   try {
     const { id } = req.user;
+    if (!id) {
+      return next(
+        new AppError("admin id required to upload  destination...", 404)
+      );
+    }
     const {
       name,
       description,
@@ -390,6 +395,22 @@ export const getAllDestination = async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 };
+export const getDestination = async (req, res, next) => {
+  try {
+    const publishedDestinations = await destinationModule.find({
+      isPublished: true,
+    });
+
+    // Step 3: Response
+    res.status(200).json({
+      success: true,
+      message: "Successfully fetched published destinations.",
+      data: publishedDestinations,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
 /*<=  user save the  destination =>*/
 
 // await grantAchievement(userId, "DESTINATION_LIKED");
@@ -539,16 +560,21 @@ export const PublishedDestination = async (req, res, next) => {
 /*<=  get only   Featured destination by true =>*/
 export const getFeaturedDestination = async (req, res, next) => {
   try {
-    const featuredDestination = await destinationModule.find({
-      featured: true,
+    const publishedDestinations = await destinationModule.find({
+      isPublished: true,
     });
+    // Step 2: Unme se featured aur non-featured ko alag kar rahe hain
+    const featured = publishedDestinations.filter(
+      (dest) => dest.featured === true
+    );
     const featuredDestinationCount = await destinationModule.countDocuments({
+      isPublished: true,
       featured: true,
     });
     res.status(200).json({
       success: true,
       message: "successfully get All featured destination...",
-      data: featuredDestination,
+      data: featured,
       count: featuredDestinationCount,
     });
   } catch (error) {

@@ -33,6 +33,7 @@ import CheckLogin from "./pages/checkLoginValid";
 import PageNotFound from "./pages/NotFound";
 import RequireAuth from "./components/AdminComponent/auth/ProtectedRoute";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import CheckLoggedIn from "./components/AdminComponent/auth/isLoogedIn";
 function App() {
   return (
     <Routes>
@@ -46,10 +47,12 @@ function App() {
         <Route path="/stories/:id" element={<StoryDetailPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
-        <Route path="/login" element={<LoginPage />} />
         <Route path="/auth/check-login" element={<CheckLogin />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/signup" element={<SignupPage />} />
+        <Route element={<CheckLoggedIn />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+        </Route>
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />

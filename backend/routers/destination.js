@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   addReview,
   getAllDestination,
+  getDestination,
   getDestinationById,
   getFeaturedDestination,
   getPublishedDestination,
@@ -17,7 +18,8 @@ destination.route("/save/:destinationId/:userId").put(saveDestination);
 destination
   .route("/remove/:destinationId/:userId")
   .put(RemoveToSaveDestination);
-destination.get("/", getAllDestination);
+destination.get("/admin", getAllDestination);
+destination.get("/", getDestination);
 destination.get("/featured", getFeaturedDestination);
 destination.get("/:id", getDestinationById);
 destination.get("/published", getPublishedDestination);
