@@ -42,7 +42,7 @@ const emptyDestination = {
       longitude: "",
     },
   },
-  images: [],
+  images: [{ secure_url: "" }],
   thumbnail: null,
 };
 const DestinationForm = () => {
@@ -332,16 +332,12 @@ const DestinationForm = () => {
   };
 
   const removeImage = (index) => {
-    const imageToRemove = formData.images[index];
-
-    if (!(imageToRemove instanceof File)) {
-      setRemovedImages((prev) => [...prev, imageToRemove]);
+    const updateImages = [...formData.images];
+    updateImages.splice(index, 1);
+    if (!(updateImages instanceof File)) {
+      setRemovedImages((prev) => [...prev, updateImages]);
     }
-
-    setFormData((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-    }));
+    setFormData({ ...formData, images: updateImages });
   };
   // Handle change for day or title
   const handleDayChange = (index, field, value) => {
@@ -478,25 +474,21 @@ const DestinationForm = () => {
               error={errors.images}
             >
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <FileUpload
-                  onChange={(file) => {
-                    handleImagesChange(file); // Handle image change
-                  }}
-                />
-
                 {formData.images.map((image, index) => (
                   <div key={index} className="relative mt-4">
                     <FileUpload
                       onChange={(file) => handleImagesChange(file)} // handle new image upload
                       value={image.secure_url}
                     />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)} // Remove image on click
-                      className="absolute -top-2 right-1 bg-red-500 text-white p-1 rounded-full"
-                    >
-                      <X size={12} />
-                    </button>
+                    {index >= 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)} // Remove image on click
+                        className="absolute -top-2 right-1 bg-red-500 text-white p-1 rounded-full"
+                      >
+                        <X size={12} />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -572,12 +564,11 @@ const DestinationForm = () => {
                 required
               >
                 <input
-                  type="number"
+                  type="text"
                   name="location.coordinates.latitude"
                   id="location.coordinates.latitude"
                   value={formData?.location?.coordinates?.latitude}
                   onChange={handleCoordinateChange}
-                  step="0.0001"
                   className="shadow-sm focus:ring-indigo-500 border p-1 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                 />
               </FormField>
@@ -589,12 +580,11 @@ const DestinationForm = () => {
                 error={errors["location.coordinates.longitude"]}
               >
                 <input
-                  type="number"
+                  type="text"
                   name="location.coordinates.longitude"
                   id="location.coordinates.longitude"
                   value={formData?.location?.coordinates?.longitude || ""}
                   onChange={handleCoordinateChange}
-                  step="0.0001"
                   className="shadow-sm focus:ring-indigo-500 border p-1 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                 />
               </FormField>

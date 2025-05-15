@@ -5,7 +5,10 @@ import FormField from "../../../components/AdminComponent/form/FormField";
 import FileUpload from "../../../components/AdminComponent/common/FileUpload";
 import { addStory, updateStory } from "../../../Redux/Slice/storiesSlice";
 import { useDispatch } from "react-redux";
-
+import toast from "react-hot-toast";
+const generateRandomId = () => {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+};
 const initialFormData = {
   title: "",
   excerpt: "",
@@ -13,14 +16,10 @@ const initialFormData = {
   category: "",
   tags: [],
   featured: false,
-  author: {
-    name: "",
-    avatar: null,
-    bio: "",
-  },
+
   coverImage: null,
-  images: [{ url: "", caption: "" }],
-  imagesPreviews: [],
+  images: [{ url: "", caption: "", id: generateRandomId() }],
+
   readTime: "",
 };
 
@@ -46,7 +45,6 @@ const StoryForm = () => {
       setFormData(initialFormData);
       setLoadingData(false);
     }
-    console.log(formData);
   }, [id, isEditMode]);
 
   const handleChange = (e) => {
@@ -85,23 +83,27 @@ const StoryForm = () => {
   const handleImagesChange = (file) => {
     if (file) {
       const newFiles = Array.isArray(file) ? file : [file];
+
+      const newImageObjects = newFiles.map((f) => ({
+        file: f,
+        url: "",
+        caption: "",
+        id: generateRandomId(), // 👈 assign unique ID
+      }));
+
       setFormData((prev) => ({
         ...prev,
-        images: [...prev.images, ...newFiles],
+        images: [...prev.images, ...newImageObjects],
       }));
     }
   };
-
-  const removeImage = (index) => {
-    const imageToRemove = formData.images[index];
-    if (!(imageToRemove.file instanceof File)) {
-      setRemovedImages((prev) => [...prev, imageToRemove]);
+  const removeImageByIndex = (index) => {
+    const updateImages = [...formData.images];
+    updateImages.splice(index, 1);
+    if (!(updateImages instanceof File)) {
+      setRemovedImages((prev) => [...prev, updateImages]);
     }
-
-    setFormData((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-    }));
+    setFormData({ ...formData, images: updateImages });
   };
   const addTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
@@ -143,6 +145,16 @@ const StoryForm = () => {
       newErrors.coverImage = "Cover image is required";
     }
 
+    if (formData.images.length == 0) {
+      newErrors.images = " image is required";
+    }
+    if (formData.tags.length == 0) {
+      newErrors.tags = " tags is required";
+    }
+    if (!formData.readTime) {
+      newErrors.readTime = " readTime is required";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -163,9 +175,9 @@ const StoryForm = () => {
     form.append("featured", formData.featured);
     form.append("readTime", formData.readTime);
 
-    formData.images.forEach((img, index) => {
-      if (img instanceof File) {
-        form.append("image", img); // All files go as 'image'
+    formData.images.forEach((img) => {
+      if (img.file) {
+        form.append("image", img.file); // Only upload new files
       }
     });
     formData.images.forEach((img, index) => {
@@ -181,13 +193,16 @@ const StoryForm = () => {
     const res = await dispatch(
       isEditMode ? updateStory({ id: id, formData: form }) : addStory(form)
     );
-    console.log(res);
+
+    if (res?.payload?.success) {
+      toast.success(res?.payload?.message);
+      setFormData(res?.payload?.data);
+    } else {
+      console.error("Error updating destination:", res?.payload?.message);
+      toast.error(res?.payload?.message);
+    }
     try {
       setLoading(false);
-      // // Simulate API call
-      // setTimeout(() => {
-      //   navigate("/admin/stories");
-      // }, 1000);
     } catch (error) {
       console.error("Error uploading files:", error);
       setLoading(false);
@@ -257,15 +272,14 @@ const StoryForm = () => {
               label="Additional Images"
               id="images"
               error={errors.images}
+              required
             >
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {formData?.images?.map((image, index) => (
-                  <div key={index} className="relative border p-2 rounded">
+                {formData.images?.map((image, index) => (
+                  <div key={image.id} className="relative mt-4">
                     <FileUpload
-                      onChange={handleImagesChange}
-                      alt={`Preview ${index + 1}`}
+                      onChange={(file) => handleImagesChange(file)} // handle new image upload
                       value={image.url}
-                      className="mb-2"
                     />
                     <FormField
                       label="caption"
@@ -289,18 +303,19 @@ const StoryForm = () => {
                         className=" w-full text-sm border rounded p-1"
                       />
                     </FormField>
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute -top-2 right-1 bg-red-500 text-white p-1 rounded-full"
-                    >
-                      <X size={12} />
-                    </button>
+                    {index >= 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeImageByIndex(index)} // Remove image on click
+                        className="absolute -top-2 right-1 bg-red-500 text-white p-1 rounded-full"
+                      >
+                        <X size={12} />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
             </FormField>
-            <FileUpload onChange={handleImagesChange} />
             <FormField
               label="Short Excerpt"
               id="excerpt"
