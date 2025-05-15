@@ -57,8 +57,8 @@ export const fetchPublishedDestinations = createAsyncThunk(
     try {
       const { data } = await axiosInstance.get("/api/v3/destination/published");
       return data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message);
+    } catch (error) {
+      return error?.response?.data || error?.message || "Something went wrong";
     }
   }
 );
@@ -70,8 +70,8 @@ export const fetchFeaturedDestinations = createAsyncThunk(
     try {
       const { data } = await axiosInstance.get("/api/v3/destination/featured");
       return data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message);
+    } catch (error) {
+      return error?.response?.data || error?.message || "Something went wrong";
     }
   }
 );
@@ -117,8 +117,8 @@ export const saveDestination = createAsyncThunk(
         `/api/v3/destination/save/${destinationId}/${userId}`
       );
       return data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message);
+    } catch (error) {
+      return error?.response?.data || error?.message || "Something went wrong";
     }
   }
 );
@@ -132,8 +132,8 @@ export const removeSavedDestination = createAsyncThunk(
         `/api/v3/destination/remove/${destinationId}/${userId}`
       );
       return data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message);
+    } catch (error) {
+      return error?.response?.data || error?.message || "Something went wrong";
     }
   }
 );
@@ -150,8 +150,8 @@ export const createDestination = createAsyncThunk(
         formData
       );
       return data;
-    } catch (err) {
-      return err.response?.data?.message;
+    } catch (error) {
+      return error?.response?.data || error?.message || "Something went wrong";
     }
   }
 );

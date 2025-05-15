@@ -15,7 +15,7 @@ const AdminLayout = () => {
 
       {/* Mobile sidebar (always rendered, animated with classes) */}
       <div
-        className={`fixed inset-0 z-40 flex md:hidden transition-opacity duration-300 ${
+        className={`fixed inset-0 z-50 flex md:hidden transition-opacity duration-300 ${
           sidebarOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"

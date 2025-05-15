@@ -78,7 +78,7 @@ Admin.route("/destination").post(
   isLoggedIn,
   upload.fields([
     { name: "thumbnail", maxCount: 1 },
-    { name: "image", maxCount: 5 },
+    { name: "image", maxCount: 7 },
   ]),
   newDestination
 );
@@ -86,7 +86,7 @@ Admin.route("/destination/:id")
   .put(
     upload.fields([
       { name: "thumbnail", maxCount: 1 },
-      { name: "image", maxCount: 5 },
+      { name: "image", maxCount: 7 },
     ]),
     updateDestination
   )

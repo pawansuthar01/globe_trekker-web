@@ -32,7 +32,7 @@ const NavItem = ({ to, icon, label }) => {
 };
 const Sidebar = () => {
   return (
-    <div className="fixed top-0 left-0 h-screen w-64 flex flex-col border-r border-gray-200 bg-white transform transition-transform duration-300 ease-in-out z-30">
+    <div className="fixed top-0 left-0 h-screen w-64 flex flex-col border-r border-gray-200 bg-white transform transition-transform duration-300 ease-in-out z-50">
       <div className="flex h-16 flex-shrink-0 items-center px-4">
         <h1 className="text-xl font-bold text-indigo-600">Travel Admin</h1>
       </div>

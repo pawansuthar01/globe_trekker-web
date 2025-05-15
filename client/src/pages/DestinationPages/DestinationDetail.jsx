@@ -4,6 +4,7 @@ import { Calendar, MapPin, Star, Clock, Heart } from "lucide-react";
 import ImageWithLoaderPercentage from "../../components/Skeleton/imageLoder";
 import { useDispatch } from "react-redux";
 import { fetchDestinationById } from "../../Redux/Slice/detinationSlice";
+import ImageCarousel from "../../components/images";
 
 const DestinationDetailPage = () => {
   const { id } = useParams();
@@ -97,27 +98,7 @@ const DestinationDetailPage = () => {
               </div>
             </div>
           </header>
-
-          {/* Image Gallery */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            {destination.images.map((image, index) => (
-              <div
-                key={index}
-                className="relative aspect-video rounded-lg overflow-hidden group shadow-md 
-                       transition-transform hover:scale-[1.02] duration-300"
-              >
-                <ImageWithLoaderPercentage
-                  src={image.secure_url}
-                  alt={image.caption || `Destination image ${index + 1}`}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-100" />
-                <div className="absolute bottom-0 left-0 right-0 bg-black/50 backdrop-blur-sm text-white p-3 transform transition-all">
-                  <p className="font-medium text-sm">{image.caption}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <ImageCarousel images={destination.images} />
 
           {/* Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -217,7 +198,7 @@ const DestinationDetailPage = () => {
             {/* Sidebar */}
             <div className="lg:col-span-1">
               <div className="sticky top-4">
-                Sidebar Ad Space
+                {/* Sidebar Ad Space */}
                 {/* <div className="mb-8 p-4 bg-gray-100 rounded-lg text-center">
                   <div className="h-[600px] flex items-center justify-center text-gray-400">
                     Advertisement Space (300x600)

@@ -40,7 +40,7 @@ const SidebarNav = ({ expanded, onMouseEnter, onMouseLeave }) => {
 
   return (
     <aside
-      className={`fixed left-0 top-0 h-full bg-white shadow-lg z-30 transition-all duration-300 ease-in-out
+      className={`fixed left-0 top-0 h-full bg-white shadow-lg z-50 transition-all duration-300 ease-in-out
         ${expanded ? "w-64" : "w-[72px]"}`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}

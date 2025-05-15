@@ -8,7 +8,7 @@ const TopBar = ({ isScrolled }) => {
 
   return (
     <header
-      className={`fixed top-0 right-0 left-0 md:left-[72px] py-5 z-20 transition-all duration-300 ${
+      className={`fixed top-0 right-0 left-0 md:left-[72px] py-5 z-50 transition-all duration-300 ${
         isScrolled
           ? "bg-white shadow-md py-2"
           : "bg-white/80 backdrop-blur-sm py-4"
