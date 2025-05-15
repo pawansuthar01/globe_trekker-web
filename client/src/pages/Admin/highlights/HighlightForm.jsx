@@ -8,6 +8,7 @@ import {
   updateHighlight,
 } from "../../../Redux/Slice/highlightSlice";
 import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
 
 const initialFormData = {
   name: "",
@@ -19,6 +20,7 @@ const initialFormData = {
   region: "",
   rating: 0,
   isPublished: true,
+  featured: true,
   date: new Date().toISOString().split("T")[0],
 };
 
@@ -117,6 +119,12 @@ const HighlightForm = () => {
     }
     if (formData.location) {
       form.append("location", formData.location);
+    }
+    if (formData.featured) {
+      form.append("featured", formData.featured);
+    }
+    if (formData.isPublished) {
+      form.append("isPublished", formData.isPublished);
     }
 
     if (formData.image && formData.image instanceof File) {
@@ -322,6 +330,22 @@ const HighlightForm = () => {
                 className="ml-2 block text-sm text-gray-900"
               >
                 Publish this highlight
+              </label>
+            </div>
+            <div className="flex items-center">
+              <input
+                id="featured"
+                name="featured"
+                type="checkbox"
+                checked={formData.featured}
+                onChange={handleChange}
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <label
+                htmlFor="featured"
+                className="ml-2 block text-sm text-gray-900"
+              >
+                featured this highlight
               </label>
             </div>
           </form>

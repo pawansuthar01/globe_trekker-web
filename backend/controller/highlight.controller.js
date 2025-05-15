@@ -16,8 +16,16 @@ const uploadToCloudinary = async (file, folder) => {
 
 export const addHighlight = async (req, res, next) => {
   const { avatar } = req.user;
-  const { name, isPublished, date, location, region, description, rating } =
-    req.body;
+  const {
+    name,
+    isPublished,
+    featured,
+    date,
+    location,
+    region,
+    description,
+    rating,
+  } = req.body;
 
   if (!name || !description || !location || !region || !rating || !req.files) {
     return next(new AppError("highlight data is required to upload..."), 402);
@@ -53,6 +61,7 @@ export const addHighlight = async (req, res, next) => {
       isPublished,
       date,
       image,
+      featured,
       avatar: avatar.secure_url,
       video,
       location,
@@ -80,7 +89,7 @@ export const updateHighlight = async (req, res, next) => {
 
   const {
     name,
-
+    featured,
     isPublished,
     date,
     location,
@@ -124,6 +133,7 @@ export const updateHighlight = async (req, res, next) => {
     // Update other fields
     highlight.name = name || highlight.name;
     highlight.isPublished = isPublished || highlight.isPublished;
+    highlight.featured = featured || highlight.featured;
     highlight.avatar = avatar.secure_url || highlight.avatar;
     highlight.date = date || highlight.date;
     highlight.location = location || highlight.location;
@@ -252,6 +262,24 @@ export const getFeaturedHighlight = async (req, res, next) => {
       count: featuredHighlightCount,
       totalPages: Math.ceil(featuredHighlightCount / limit),
       currentPage: page,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
+/*<=  get only   Featured highlight by true =>*/
+export const getHomeHighlight = async (req, res, next) => {
+  try {
+    // Fetch the featured highlights with pagination
+    const featuredHighlight = await Highlight.find({ featured: true })
+      .limit(1)
+      .sort({ createdAt: -1 });
+
+    // Send the response with the data, count, and pagination info
+    res.status(200).json({
+      success: true,
+      message: "Successfully fetched featured highlights",
+      data: featuredHighlight,
     });
   } catch (error) {
     return next(new AppError(error.message, 500));

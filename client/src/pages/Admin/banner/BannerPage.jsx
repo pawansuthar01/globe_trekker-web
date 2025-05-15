@@ -28,6 +28,7 @@ const BannerPage = () => {
   const dispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
   const [editingBanner, setEditingBanner] = useState(null);
 
   const [tempBanner, setTempBanner] = useState({
@@ -142,7 +143,7 @@ const BannerPage = () => {
         formData.append(`existingImages`, JSON.stringify(img)); // to retain old ones
       }
     });
-
+    setIsUpdate(true);
     const res = await (editingBanner
       ? dispatch(updateBanner({ id: editingBanner._id, formData }))
       : dispatch(newBanner(formData)));
@@ -150,6 +151,7 @@ const BannerPage = () => {
       FetchBanners();
       closeModal();
     }
+    setIsUpdate(false);
   };
 
   const handleDelete = async (id) => {
@@ -374,9 +376,9 @@ const BannerPage = () => {
 
       {/* Add/Edit Modal */}
       {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal w-full max-w-2xl  ">
-            <div className="flex items-center justify-between">
+        <div className="modal-overlay  fixed inset-0 z-50 flex items-center  justify-center bg-black bg-opacity-50 p-4 sm:p-6">
+          <div className="modal w-full m-2 max-w-2xl bg-white rounded-lg shadow-lg overflow-y-auto max-h-full">
+            <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-xl font-semibold text-gray-900">
                 {editingBanner ? "Edit Banner" : "Add Banner"}
               </h2>
@@ -388,7 +390,6 @@ const BannerPage = () => {
                 <X className="h-6 w-6" />
               </button>
             </div>
-
             <div className="mt-6 grid grid-cols-1 gap-6 my-2 max-sm:h-96 overflow-x-scroll">
               <div className="form-group">
                 <label htmlFor="title" className="form-label">
@@ -497,7 +498,8 @@ const BannerPage = () => {
                 </p>
               </div>
             </div>
-            <div className="mt-6 flex justify-end space-x-3">
+
+            <div className="px-4 py-3 flex justify-end gap-2 border-t">
               <button
                 type="button"
                 className="btn btn-secondary"
@@ -507,11 +509,18 @@ const BannerPage = () => {
               </button>
               <button
                 type="button"
+                disabled={isUpdate}
                 className="btn btn-primary"
                 onClick={handleSave}
               >
                 <Save className="mr-2 h-4 w-4" />
-                {editingBanner ? "Update" : "Add Banner"}
+                {isUpdate
+                  ? editingBanner
+                    ? "Loading..."
+                    : "Loading..."
+                    ? "Update"
+                    : "loading..."
+                  : "Add Banner"}
               </button>
             </div>
           </div>

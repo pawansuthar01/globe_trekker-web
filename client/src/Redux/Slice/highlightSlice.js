@@ -49,6 +49,20 @@ export const fetchFeaturedHighlights = createAsyncThunk(
   }
 );
 
+// Get featured Highlights
+export const fetchHomeHighlights = createAsyncThunk(
+  "highlight/fetchFeaturedHighlights",
+  async () => {
+    try {
+      const res = await axiosInstance.get("/highlight/home");
+
+      return res.data;
+    } catch (err) {
+      return err.response?.data?.message;
+    }
+  }
+);
+
 // Get highlight by ID (public)
 export const fetchHighlightById = createAsyncThunk(
   "highlight/fetchById",

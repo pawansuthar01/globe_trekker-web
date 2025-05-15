@@ -1,11 +1,17 @@
 import React, { useEffect } from "react";
-import { ChevronRight, MapPin, Star } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+  MapPin,
+  Star,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import ImageWithLoaderPercentage from "../Skeleton/imageLoder";
 import ShortVideoCard, { VideoPlayIcon } from "../Highlights/videoCard";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { fetchFeaturedHighlights } from "../../Redux/Slice/highlightSlice";
+import { fetchHomeHighlights } from "../../Redux/Slice/highlightSlice";
 
 const TrekkersHighlights = () => {
   const [showVideo, setShowVideo] = useState({
@@ -13,13 +19,14 @@ const TrekkersHighlights = () => {
     video: "",
     name: "",
   });
+  const [expanded, setExpanded] = useState(false);
   const [highlight, setHighlight] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
   const fetchHighlight = async () => {
     setLoading(true);
-    const res = await dispatch(fetchFeaturedHighlights());
+    const res = await dispatch(fetchHomeHighlights());
     if (res?.payload?.success) {
       setHighlight(res?.payload?.data);
     }
@@ -29,6 +36,20 @@ const TrekkersHighlights = () => {
   useEffect(() => {
     fetchHighlight();
   }, []);
+
+  const toggleExpanded = () => {
+    setExpanded(!expanded);
+  };
+
+  // Ensure highlight.text is not undefined
+  const highlightText = highlight[0]?.description || "";
+
+  // Determine if the highlight text should be truncated
+  const shouldTruncate = highlightText.length > 250;
+  const truncatedText =
+    shouldTruncate && !expanded
+      ? `${highlightText.substring(0, 250)}...`
+      : highlightText;
   return (
     <section className="py-16  text-black ">
       <div className="container mx-auto px-4">
@@ -67,8 +88,8 @@ const TrekkersHighlights = () => {
                       ))}
                     </div>
 
-                    <blockquote className=" italic flex-grow mb-4">
-                      "{highlight.description}"
+                    <blockquote className="italic text-gray-700 text-sm mb-3 flex-grow">
+                      "{truncatedText}"
                     </blockquote>
                   </div>
                   <div className="flex gap-5 max-sm:flex-col">
