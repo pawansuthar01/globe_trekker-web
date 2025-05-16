@@ -38,19 +38,19 @@ const StoriesPage = () => {
     }
     setLoading(false);
   };
-
-  // Filter stories based on category and search term
   const filteredStories = stories?.filter((story) => {
+    // Agar category match ho ya search term match ho title/excerpt me
     const matchesCategory =
       activeCategory === "all" ||
-      story.category.toLowerCase() === activeCategory;
-    //
+      story.category?.toLowerCase() === activeCategory.toLowerCase();
+
     const matchesSearch =
       !searchTerm ||
       story.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       story.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
 
-    return matchesCategory && matchesSearch;
+    // Ab condition: category match ho ya search term match ho
+    return matchesCategory || matchesSearch;
   });
   useEffect(() => {
     if (stories.length > 0) {

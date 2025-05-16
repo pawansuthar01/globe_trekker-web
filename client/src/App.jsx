@@ -34,6 +34,8 @@ import PageNotFound from "./pages/NotFound";
 import RequireAuth from "./components/AdminComponent/auth/ProtectedRoute";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CheckLoggedIn from "./components/AdminComponent/auth/isLoogedIn";
+import TermsAndConditions from "./pages/TermsAndConditions";
+import CookiePolicy from "./pages/CookiePolicy";
 function App() {
   return (
     <Routes>
@@ -56,6 +58,8 @@ function App() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsAndConditions />} />
+        <Route path="/cookies" element={<CookiePolicy />} />
       </Route>
       <Route element={<RequireAuth allowedRole={["ADMIN", "AUTHOR"]} />}>
         <Route path="/admin" element={<AdminLayout />}>

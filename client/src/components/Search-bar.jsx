@@ -1,10 +1,57 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, X } from "lucide-react";
-export const Search_bar = ({ searchVisible, setSearchVisible }) => {
+
+export const SearchBar = ({ searchVisible, setSearchVisible, onResults }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const debounceTimeout = useRef(null);
   const navigate = useNavigate();
+
+  // Debounce search input
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      onResults && onResults([]); // Agar search khali hai toh results clear kar do
+      return;
+    }
+
+    setLoading(true);
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+
+    debounceTimeout.current = setTimeout(() => {
+      fetchSearchResults(searchTerm);
+    }, 500); // 500ms ke baad backend call
+
+    return () => clearTimeout(debounceTimeout.current);
+  }, [searchTerm]);
+
+  // Backend API call function
+  const fetchSearchResults = async (query) => {
+    try {
+      const response = await fetch(
+        `/api/search?q=${encodeURIComponent(query)}`,
+        {
+          method: "GET",
+          credentials: "include", // session cookie ya auth token ke liye
+        }
+      );
+
+      if (!response.ok) throw new Error("Network response was not ok");
+
+      const data = await response.json();
+
+      // Agar session/token backend se aata hai wo bhi yahan handle kar sakte hain
+      // const sessionToken = response.headers.get("Authorization");
+
+      onResults && onResults(data.results); // parent component ko results bhejo
+      setLoading(false);
+    } catch (error) {
+      console.error("Search fetch failed:", error);
+      onResults && onResults([]);
+      setLoading(false);
+    }
+  };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -14,6 +61,7 @@ export const Search_bar = ({ searchVisible, setSearchVisible }) => {
       setSearchVisible(false);
     }
   };
+
   return (
     <>
       <AnimatePresence>
@@ -37,7 +85,7 @@ export const Search_bar = ({ searchVisible, setSearchVisible }) => {
             <button
               type="button"
               onClick={() => setSearchVisible(false)}
-              className="absolute right-3  top-4.1"
+              className="absolute right-3 top-4.1"
             >
               <X className="h-5 w-5 text-neutral-500" />
             </button>
@@ -48,10 +96,16 @@ export const Search_bar = ({ searchVisible, setSearchVisible }) => {
       {!searchVisible && (
         <button
           onClick={() => setSearchVisible(true)}
-          className="p-2 rounded-full hover:bg-neutral-100 transition-all duration-300   ease-linear"
+          className="p-2 rounded-full hover:bg-neutral-100 transition-all duration-300 ease-linear"
         >
           <Search className="h-5 w-5 text-neutral-700" />
         </button>
+      )}
+
+      {loading && searchTerm.trim() && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 bg-white border p-2 rounded shadow z-50">
+          Searching...
+        </div>
       )}
     </>
   );

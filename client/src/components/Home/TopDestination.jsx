@@ -29,9 +29,12 @@ const TopDestinations = () => {
   const filteredDestinations =
     activeCategory === "popular"
       ? destination
-      : destination.filter((dest) => dest.category === activeCategory);
+      : destination.filter((dest) =>
+          dest.location.region
+            ?.toLowerCase()
+            .includes(activeCategory.toLowerCase())
+        );
   const shouldAnimate = isInView && hasAnimated;
-
   // Lock animation after first animation trigger
   useEffect(() => {
     if (shouldAnimate && activeCategory === "popular") {

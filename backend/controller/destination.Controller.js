@@ -560,9 +560,12 @@ export const PublishedDestination = async (req, res, next) => {
 /*<=  get only   Featured destination by true =>*/
 export const getFeaturedDestination = async (req, res, next) => {
   try {
-    const publishedDestinations = await destinationModule.find({
-      isPublished: true,
-    });
+    const publishedDestinations = await destinationModule
+      .find({
+        isPublished: true,
+      })
+      .sort({ createdAt: -1 })
+      .limit(10);
     // Step 2: Unme se featured aur non-featured ko alag kar rahe hain
     const featured = publishedDestinations.filter(
       (dest) => dest.featured === true
@@ -606,7 +609,11 @@ export const getDestinationById = async (req, res, next) => {
     if (!id) {
       return next(new AppError("id are required to get destination...", 400));
     }
-    const destination = await destinationModule.findById(id);
+    const destination = await destinationModule.findOne({
+      _id: id,
+      isPublished: true,
+    });
+    console.log(destination);
     if (!destination) {
       return next(new AppError("destination not found...", 404));
     }

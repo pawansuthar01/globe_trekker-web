@@ -38,10 +38,11 @@ const DestinationsPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
   const toggleTag = (tag) => {
-    if (activeTags.includes(tag)) {
-      setActiveTags(activeTags.filter((t) => t !== tag));
+    const lowerTag = tag.toLowerCase();
+    if (activeTags.includes(lowerTag)) {
+      setActiveTags(activeTags.filter((t) => t !== lowerTag));
     } else {
-      setActiveTags([...activeTags, tag]);
+      setActiveTags([...activeTags, lowerTag]);
     }
   };
   const fetchDestinationsData = async () => {
@@ -52,10 +53,36 @@ const DestinationsPage = () => {
     }
     setLoading(false);
   };
+  const getSimplifiedRegion = (regionName) => {
+    const name = regionName.toLowerCase().trim();
 
+    if (name.includes("europe") || name.includes("île-de-france"))
+      return "europe";
+    if (
+      name.includes("asia") ||
+      name.includes("aisa") || // handle typo
+      name.includes("meghalaya") ||
+      name.includes("uttarakhand") ||
+      name.includes("himachal") ||
+      name.includes("karnataka") ||
+      name.includes("lakshadweep") ||
+      name.includes("uttar pradesh") ||
+      name.includes("kansai")
+    )
+      return "asia";
+    if (name.includes("africa")) return "africa";
+    if (name.includes("america") || name.includes("caribbean"))
+      return "americas";
+    if (name.includes("oceania") || name.includes("australia"))
+      return "oceania";
+
+    return "other";
+  };
   const filteredDestinations = destination?.filter((destination) => {
-    // Filter by category
-    if (activeCategory !== "all" && destination.category !== activeCategory) {
+    if (
+      activeCategory !== "all" &&
+      getSimplifiedRegion(destination.location?.region || "") !== activeCategory
+    ) {
       return false;
     }
 
@@ -70,7 +97,8 @@ const DestinationsPage = () => {
     // Filter by tags
     if (
       activeTags.length > 0 &&
-      !destination.tags.some((tag) => activeTags.includes(tag))
+      (!Array.isArray(destination.tags) ||
+        !destination.tags.some((tag) => activeTags.includes(tag.toLowerCase())))
     ) {
       return false;
     }
@@ -79,7 +107,6 @@ const DestinationsPage = () => {
   });
   useEffect(() => {
     fetchDestinationsData();
-    console.log(destination);
   }, []);
   return (
     <div className="min-h-screen pt-24 pb-16">
@@ -107,6 +134,7 @@ const DestinationsPage = () => {
               />
               <MapPin className="absolute left-3 top-3.5 h-5 w-5 text-neutral-400" />
             </div>
+
             <button
               onClick={() => setShowFilters(!showFilters)}
               className="md:hidden flex items-center justify-center gap-2 py-3 px-4 rounded-lg border border-neutral-300 bg-white"
