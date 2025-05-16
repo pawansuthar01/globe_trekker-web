@@ -2,15 +2,18 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ChevronRight, Calendar, Clock } from "lucide-react";
 import ImageWithLoaderPercentage from "../Skeleton/imageLoder";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchHomeStories } from "../../Redux/Slice/storiesSlice";
 import formatDate from "../../utils/DataFormat";
 // Mock data - would come from backend in real implementation
 
 const LatestStories = () => {
+  const { HomeStories, homeSuccess, error } = useSelector(
+    (state) => state?.story
+  );
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [stories, setStories] = useState([]);
+  const [stories, setStories] = useState(HomeStories);
   const featuredStories = stories?.filter((story) => story.featured);
   const regularStories = stories?.filter((story) => !story.featured);
   const fetchStories = async () => {
@@ -20,7 +23,11 @@ const LatestStories = () => {
     }
   };
   useEffect(() => {
-    fetchStories();
+    if (!homeSuccess || error == true || !HomeStories) {
+      fetchStories();
+    } else {
+      setStories(HomeStories);
+    }
   }, []);
   return (
     <section className="py-16">

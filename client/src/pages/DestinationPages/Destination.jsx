@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { MapPin, Filter } from "lucide-react";
+import { MapPin, Filter, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ImageWithLoaderPercentage from "../../components/Skeleton/imageLoder";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchAllDestinations } from "../../Redux/Slice/detinationSlice";
 import DestinationSkeleton from "../../components/Skeleton/destinationPageSkeleton";
+import { SearchBar } from "../../components/Search-bar";
 
 const categories = [
   { id: "all", name: "All" },
@@ -29,12 +30,17 @@ const tags = [
 ];
 
 const DestinationsPage = () => {
+  const { destinations, success, error, totalPages, page } = useSelector(
+    (state) => state.destination
+  );
   const dispatch = useDispatch();
+  const [currentPage, setCurrentPage] = useState(page);
   const [loading, setLoading] = useState(false);
   const [destination, setDestination] = useState([]);
   const [activeCategory, setActiveCategory] = useState("all");
   const [activeTags, setActiveTags] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [search, setSearch] = useState(false);
+  const [searchError, setSearchError] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
   const toggleTag = (tag) => {
@@ -45,12 +51,16 @@ const DestinationsPage = () => {
       setActiveTags([...activeTags, lowerTag]);
     }
   };
-  const fetchDestinationsData = async () => {
+  const fetchDestinationsData = async (page = 1) => {
     setLoading(true);
-    const res = await dispatch(fetchAllDestinations());
+
+    const res = await dispatch(fetchAllDestinations({ page, limit: 25 }));
+
     if (res?.payload?.success) {
-      setDestination(res?.payload?.data);
+      setDestination(res.payload.data);
+      setCurrentPage(res.payload.page);
     }
+
     setLoading(false);
   };
   const getSimplifiedRegion = (regionName) => {
@@ -87,12 +97,6 @@ const DestinationsPage = () => {
     }
 
     // Filter by search term
-    if (
-      searchTerm &&
-      !destination.name.toLowerCase().includes(searchTerm.toLowerCase())
-    ) {
-      return false;
-    }
 
     // Filter by tags
     if (
@@ -105,8 +109,22 @@ const DestinationsPage = () => {
 
     return true;
   });
+  const SearchData = (Data) => {
+    setDestination(Data);
+
+    setSearch(true);
+  };
+  const NoSearchData = () => {
+    setSearchError(true);
+  };
+
   useEffect(() => {
-    fetchDestinationsData();
+    if (!success || error || !destinations) {
+      fetchDestinationsData(currentPage);
+    } else {
+      setLoading(false);
+      setDestination(destinations);
+    }
   }, []);
   return (
     <div className="min-h-screen pt-24 pb-16">
@@ -124,17 +142,21 @@ const DestinationsPage = () => {
         {/* Search and filters */}
         <div className="mb-8">
           <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <div className="relative flex-grow">
-              <input
-                type="text"
-                placeholder="Search destinations..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full py-3 px-4 pl-10 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-300"
-              />
-              <MapPin className="absolute left-3 top-3.5 h-5 w-5 text-neutral-400" />
+            <div className="relative w-full">
+              <SearchBar Data={SearchData} NoSearchData={NoSearchData} />
+              {search && (
+                <button
+                  onClick={() => {
+                    setSearch(false),
+                      setDestination(destinations),
+                      setSearchError(true);
+                  }}
+                  className=" absolute   top-1  rounded-lg  z-30 right-28 text-white bg-red-500 p-2 text-2xl"
+                >
+                  <X />
+                </button>
+              )}
             </div>
-
             <button
               onClick={() => setShowFilters(!showFilters)}
               className="md:hidden flex items-center justify-center gap-2 py-3 px-4 rounded-lg border border-neutral-300 bg-white"
@@ -230,53 +252,95 @@ const DestinationsPage = () => {
         </div>
 
         {/* Destinations grid */}
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <DestinationSkeleton key={index} />
-            ))}
-          </div>
-        ) : filteredDestinations.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredDestinations.map((destination) => (
-              <div
-                onClick={() =>
-                  navigate(`/destinations/${destination._id}`, {
-                    state: { destination },
-                  })
-                }
-                key={destination._id}
-                className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all hover:-translate-y-1"
-              >
-                <div className="relative h-48 overflow-hidden">
-                  <ImageWithLoaderPercentage
-                    src={destination?.thumbnail.url}
-                    alt={destination.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        {searchError ? (
+          loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <DestinationSkeleton key={index} />
+              ))}
+            </div>
+          ) : filteredDestinations.length > 0 ? (
+            <>
+              {!search && totalPages > 1 && (
+                <div className="flex justify-end items-center gap-4 m-2">
+                  <button
+                    disabled={currentPage === 1}
+                    onClick={() => fetchDestinationsData(currentPage - 1)}
+                    className="px-4 py-2 bg-primary-600 text-white rounded disabled:opacity-50"
+                  >
+                    Prev
+                  </button>
+
+                  <span className="text-neutral-700">
+                    Page {page} of {totalPages}
+                  </span>
+
+                  <button
+                    disabled={currentPage === totalPages}
+                    onClick={() => fetchDestinationsData(currentPage + 1)}
+                    className="px-4 py-2 bg-primary-600 text-white rounded disabled:opacity-50"
+                  >
+                    Next
+                  </button>
                 </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-neutral-800 mb-2 group-hover:text-primary-600 transition-colors">
-                    {destination.name}
-                  </h3>
-                  <p className="text-neutral-600 text-sm mb-3 line-clamp-2">
-                    {destination.description}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {destination.tags.slice(0, 3).map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs bg-neutral-100 text-neutral-600 px-2 py-1 rounded-full"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredDestinations.map((destination) => (
+                  <div
+                    onClick={() =>
+                      navigate(`/destinations/${destination._id}`, {
+                        state: { destination },
+                      })
+                    }
+                    key={destination._id}
+                    className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all hover:-translate-y-1"
+                  >
+                    <div className="relative h-48 overflow-hidden">
+                      <ImageWithLoaderPercentage
+                        src={destination?.thumbnail.url}
+                        alt={destination.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold text-neutral-800 mb-2 group-hover:text-primary-600 transition-colors">
+                        {destination.name}
+                      </h3>
+                      <p className="text-neutral-600 text-sm mb-3 line-clamp-2">
+                        {destination.description}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {destination.tags.slice(0, 3).map((tag) => (
+                          <span
+                            key={tag}
+                            className="text-xs bg-neutral-100 text-neutral-600 px-2 py-1 rounded-full"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-neutral-500 text-lg mb-4">
+                No destinations found matching your criteria.
+              </p>
+              <button
+                onClick={() => {
+                  setActiveCategory("all");
+                  setActiveTags([]);
+                }}
+                className="text-primary-600 hover:text-primary-700 font-medium"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )
         ) : (
           <div className="text-center py-12">
             <p className="text-neutral-500 text-lg mb-4">
@@ -284,9 +348,9 @@ const DestinationsPage = () => {
             </p>
             <button
               onClick={() => {
-                setActiveCategory("all");
-                setActiveTags([]);
-                setSearchTerm("");
+                setSearchError(false);
+                setSearch(false);
+                setDestination(destinations);
               }}
               className="text-primary-600 hover:text-primary-700 font-medium"
             >

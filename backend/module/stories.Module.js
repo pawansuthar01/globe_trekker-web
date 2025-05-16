@@ -12,6 +12,7 @@ const storySchema = new mongoose.Schema(
     category: { type: String, index: true },
     tags: [{ type: String, index: true }],
     featured: { type: Boolean, default: false },
+    isPublished: { type: Boolean, default: true },
 
     author: {
       name: String,

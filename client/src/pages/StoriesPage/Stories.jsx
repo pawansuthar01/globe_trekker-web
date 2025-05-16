@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Clock, Search } from "lucide-react";
+import { Calendar, Clock, Search, X } from "lucide-react";
 import ImageWithLoaderPercentage from "../../components/Skeleton/imageLoder";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchStories } from "../../Redux/Slice/storiesSlice";
 import formatDate from "../../utils/DataFormat";
 import StoryListSkeleton from "../../components/Skeleton/storiesSkeletonPage";
+import { SearchBar } from "../../components/Search-bar";
 
 const categories = [
   { id: "all", name: "All Categories" },
@@ -21,18 +22,28 @@ const categories = [
 ];
 
 const StoriesPage = () => {
+  const {
+    stories: story,
+    success,
+    error,
+    totalPages,
+    page,
+  } = useSelector((state) => state?.story);
   const dispatch = useDispatch();
+  const [currentPage, setCurrentPage] = useState(page);
   const [loading, setLoading] = useState(false);
-  const [stories, setStories] = useState([]);
-
+  const [stories, setStories] = useState(story || []);
+  const [search, setSearch] = useState(false);
+  const [searchError, setSearchError] = useState(true);
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [featuredStory, setFeaturedStory] = useState();
   const navigate = useNavigate();
   // Featured story is the first one
-  const fetchStoriesData = async () => {
+  const fetchStoriesData = async (page = 1) => {
     setLoading(true);
-    const res = await dispatch(fetchStories());
+    const res = await dispatch(fetchStories({ page, limit: 25 }));
+    console.log(res);
     if (res?.payload?.success) {
       setStories(res?.payload?.data);
     }
@@ -57,8 +68,20 @@ const StoriesPage = () => {
       setFeaturedStory(stories[0]);
     }
   }, [stories]);
+
+  const SearchData = (Data) => {
+    setStories(Data);
+
+    setSearch(true);
+  };
+  const NoSearchData = () => {
+    setSearchError(true);
+  };
+
   useEffect(() => {
-    fetchStoriesData();
+    if (!success || error == true || story) {
+      fetchStoriesData(currentPage);
+    }
   }, []);
 
   return (
@@ -77,15 +100,22 @@ const StoriesPage = () => {
         {/* Search and filters */}
         <div className="mb-10">
           <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-grow">
-              <input
-                type="text"
-                placeholder="Search stories..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full py-3 px-4 pl-10 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-300"
+            <div className="relative w-full">
+              <SearchBar
+                Data={SearchData}
+                NoSearchData={NoSearchData}
+                stories={true}
               />
-              <Search className="absolute left-3 top-3.5 h-5 w-5 text-neutral-400" />
+              {search && (
+                <button
+                  onClick={() => {
+                    setSearch(false), setStories(story), setSearchError(true);
+                  }}
+                  className=" absolute   top-1  rounded-lg  z-30 right-28 text-white bg-red-500 p-2 text-2xl"
+                >
+                  <X />
+                </button>
+              )}
             </div>
           </div>
 
@@ -113,6 +143,7 @@ const StoriesPage = () => {
           <StoryListSkeleton count={4} />
         ) : (
           stories &&
+          !search &&
           activeCategory === "all" &&
           !searchTerm && (
             <div className="mb-12">
@@ -126,7 +157,7 @@ const StoriesPage = () => {
                 className="group block bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2">
-                  <div className="relative h-64 md:h-auto overflow-hidden">
+                  <div className="relative h-64 md:h-auto max-h-[500px]  overflow-hidden">
                     <ImageWithLoaderPercentage
                       src={featuredStory?.coverImage?.url}
                       alt={featuredStory?.title}
@@ -182,50 +213,79 @@ const StoriesPage = () => {
             <h2 className="text-xl font-semibold mb-6">
               {searchTerm ? "Search Results" : "Latest Stories"}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredStories?.map((story) => (
-                <div
-                  key={story._id}
-                  onClick={() =>
-                    navigate(`/stories/${story._id}`, {
-                      state: { story: story },
-                    })
-                  }
-                  className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow"
+            {!search && totalPages > 1 && (
+              <div className="flex justify-end items-center gap-4 m-2">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => fetchStoriesData(currentPage - 1)}
+                  className="px-4 py-2 bg-primary-600 text-white rounded disabled:opacity-50"
                 >
-                  <div className="relative h-48 overflow-hidden">
-                    <ImageWithLoaderPercentage
-                      src={story?.coverImage.url}
-                      alt={story?.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute top-4 left-4 bg-accent-500 text-white text-xs font-semibold py-1 px-2 rounded">
-                      {story?.category}
-                    </div>
-                  </div>
-                  <div className="p-5">
-                    <div className="flex items-center text-xs text-neutral-500 mb-3 space-x-4">
-                      <div className="flex items-center">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        <span>{formatDate(featuredStory?.publishedAt)}</span>
+                  Prev
+                </button>
+
+                <span className="text-neutral-700">
+                  Page {page} of {totalPages}
+                </span>
+
+                <button
+                  disabled={currentPage === totalPages}
+                  onClick={() => fetchStoriesData(currentPage + 1)}
+                  className="px-4 py-2 bg-primary-600 text-white rounded disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {
+                <>
+                  {filteredStories?.map((story) => (
+                    <div
+                      key={story._id}
+                      onClick={() =>
+                        navigate(`/stories/${story._id}`, {
+                          state: { story: story },
+                        })
+                      }
+                      className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow"
+                    >
+                      <div className="relative h-52 overflow-hidden">
+                        <ImageWithLoaderPercentage
+                          src={story?.coverImage.url}
+                          alt={story?.title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="absolute top-4 left-4 bg-accent-500 text-white text-xs font-semibold py-1 px-2 rounded">
+                          {story?.category}
+                        </div>
                       </div>
-                      <div className="flex items-center">
-                        <Clock className="h-3 w-3 mr-1" />
-                        <span>{story?.readTime}</span>
+                      <div className="p-5">
+                        <div className="flex items-center text-xs text-neutral-500 mb-3 space-x-4">
+                          <div className="flex items-center">
+                            <Calendar className="h-3 w-3 mr-1" />
+                            <span>
+                              {formatDate(featuredStory?.publishedAt)}
+                            </span>
+                          </div>
+                          <div className="flex items-center">
+                            <Clock className="h-3 w-3 mr-1" />
+                            <span>{story?.readTime}</span>
+                          </div>
+                        </div>
+                        <h3 className="text-lg font-semibold text-neutral-800 mb-2 group-hover:text-primary-600 transition-colors line-clamp-2">
+                          {story?.title}
+                        </h3>
+                        <p className="text-neutral-600 text-sm mb-4 line-clamp-3">
+                          {story?.excerpt}
+                        </p>
+                        <div className="text-primary-600 text-sm font-medium group-hover:text-primary-700">
+                          Read more
+                        </div>
                       </div>
                     </div>
-                    <h3 className="text-lg font-semibold text-neutral-800 mb-2 group-hover:text-primary-600 transition-colors line-clamp-2">
-                      {story?.title}
-                    </h3>
-                    <p className="text-neutral-600 text-sm mb-4 line-clamp-3">
-                      {story?.excerpt}
-                    </p>
-                    <div className="text-primary-600 text-sm font-medium group-hover:text-primary-700">
-                      Read more
-                    </div>
-                  </div>
-                </div>
-              ))}
+                  ))}
+                </>
+              }
             </div>
           </div>
         ) : (

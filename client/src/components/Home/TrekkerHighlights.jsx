@@ -10,17 +10,20 @@ import { Link } from "react-router-dom";
 import ImageWithLoaderPercentage from "../Skeleton/imageLoder";
 import ShortVideoCard, { VideoPlayIcon } from "../Highlights/videoCard";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchHomeHighlights } from "../../Redux/Slice/highlightSlice";
 
 const TrekkersHighlights = () => {
+  const { homeHighlight, homeSuccess, error } = useSelector(
+    (state) => state?.highlight
+  );
   const [showVideo, setShowVideo] = useState({
     _id: "",
     video: "",
     name: "",
   });
   const [expanded, setExpanded] = useState(false);
-  const [highlight, setHighlight] = useState([]);
+  const [highlight, setHighlight] = useState(homeHighlight);
   const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
@@ -34,7 +37,11 @@ const TrekkersHighlights = () => {
     setLoading(false);
   };
   useEffect(() => {
-    fetchHighlight();
+    if (homeHighlight == false || error == true) {
+      fetchHighlight();
+    } else {
+      setHighlight(homeHighlight);
+    }
   }, []);
 
   const toggleExpanded = () => {

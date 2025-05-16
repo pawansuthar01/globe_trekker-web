@@ -6,7 +6,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchActiveBanners } from "../../Redux/Slice/bannerSlice";
 import SkeletonBannerPage from "../Skeleton/bannerSkeletonpage";
 const HeroSection = () => {
-  const [banner, setBanner] = useState();
+  const { banners, success, error } = useSelector((state) => state?.banner);
+  const [banner, setBanner] = useState(banners[0]);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const FetchActiveBanners = async () => {
@@ -18,7 +19,11 @@ const HeroSection = () => {
     setLoading(false);
   };
   useEffect(() => {
-    FetchActiveBanners();
+    if (!success || error == false) {
+      FetchActiveBanners();
+    } else {
+      setBanner(banners[0]);
+    }
   }, []);
 
   if (loading || !banner) return <SkeletonBannerPage />;
@@ -58,11 +63,11 @@ const HeroSection = () => {
           <div className="md:w-1/2 lg:w-1/3 mt-8 md:mt-0 flex justify-center md:justify-end animate-fade-in">
             <div className="relative">
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex justify-center items-center h-full w-full">
+                <div className="flex justify-center h-[80%] md:h-[80%] md:w-[80%] items-center">
                   <ImageWithLoaderPercentage
                     alt="Machu Picchu"
                     src={banner.images[0].secure_url}
-                    className="rounded-lg w-full  h-[80%] md:h-[80%] md:w-[80%] object-cover shadow-lg transform hover:scale-102 transition-transform hover:shadow-xl"
+                    className="rounded-lg w-full h-full   object-cover shadow-lg transform hover:scale-102 transition-transform hover:shadow-xl"
                   />
                 </div>
                 <div className="flex flex-col gap-3 w-full md:w-[90%]">

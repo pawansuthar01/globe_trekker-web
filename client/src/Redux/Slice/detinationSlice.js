@@ -3,10 +3,18 @@ import axiosInstance from "../../helper/axiosInstance";
 
 const initialState = {
   loading: false,
-  destinations: [],
-  destination: null,
-  error: null,
-  success: false,
+  destinations: localStorage.getItem("destinations")
+    ? JSON.parse(localStorage.getItem("destinations"))
+    : [],
+  homeDestination: localStorage.getItem("homeDestination")
+    ? JSON.parse(localStorage.getItem("homeDestination"))
+    : [],
+  limit: localStorage.getItem("limit") || 25,
+  totalPages: localStorage.getItem("totalPages") || 1,
+  page: localStorage.getItem("page") || 1,
+  error: localStorage.getItem("error") || false,
+  success: localStorage.getItem("success") || false,
+  homeSuccess: localStorage.getItem("homeSuccess") || false,
 };
 
 // -------------------- USER-SIDE REQUESTS --------------------
@@ -14,10 +22,12 @@ const initialState = {
 // Get all destinations
 export const fetchAllDestinations = createAsyncThunk(
   "destination/fetchAll",
-  async () => {
+  async ({ page = 1, limit = 12 }) => {
     try {
-      const { data } = await axiosInstance.get("/api/v3/destination");
-      return data;
+      const response = await axiosInstance.get(
+        `/api/v3/destination?page=${page}&limit=${limit}`
+      );
+      return response.data;
     } catch (err) {
       return err.response?.data?.message;
     }
@@ -237,12 +247,51 @@ const destinationSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchAllDestinations.fulfilled, (state, action) => {
-        state.loading = false;
-        state.destinations = action.payload;
+        if (action?.payload?.success) {
+          state.page = Number(action?.payload?.page);
+          state.limit = Number(action?.payload?.limit);
+          state.totalPages = Number(action?.payload?.totalPages);
+          state.loading = false;
+          state.success = true;
+          state.error = false;
+          localStorage.setItem("success", true);
+          localStorage.setItem("page", Number(action?.payload?.page));
+          localStorage.setItem("limit", Number(action?.payload?.limit));
+          localStorage.setItem(
+            "totalPages",
+            Number(action?.payload?.totalPages)
+          );
+          state.destinations = action.payload?.data;
+          localStorage.setItem(
+            "destinations",
+            JSON.stringify(action.payload?.data)
+          );
+        } else {
+          localStorage.setItem("success", false);
+          localStorage.setItem("error", true);
+        }
+      })
+      .addCase(fetchFeaturedDestinations.fulfilled, (state, action) => {
+        if (action?.payload?.success) {
+          state.loading = false;
+          state.error = false;
+          localStorage.setItem("homeSuccess", true);
+          localStorage.setItem("error", false);
+          state.homeDestination = action.payload?.data;
+          localStorage.setItem(
+            "homeDestination",
+            JSON.stringify(action.payload?.data)
+          );
+        } else {
+          localStorage.setItem("homeSuccess", false);
+          localStorage.setItem("error", true);
+        }
       })
       .addCase(fetchAllDestinations.rejected, (state, action) => {
+        if (!action?.payload?.success) return;
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload.message;
+        localStorage.setItem("error", action.payload?.message);
       });
   },
 });

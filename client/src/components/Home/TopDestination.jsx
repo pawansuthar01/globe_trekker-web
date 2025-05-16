@@ -4,7 +4,7 @@ import { ChevronRight } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 import ImageWithLoaderPercentage from "../Skeleton/imageLoder";
 import TopDestinationsSkeleton from "../Skeleton/destinationSkeletonPage";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchFeaturedDestinations } from "../../Redux/Slice/detinationSlice";
 
 const categories = [
@@ -17,9 +17,13 @@ const categories = [
 ];
 
 const TopDestinations = () => {
+  const { homeDestination, homeSuccess, error } = useSelector(
+    (state) => state?.destination
+  );
+
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-  const [destination, setDestination] = useState();
+  const [destination, setDestination] = useState(homeDestination);
   const navigate = useNavigate();
   const [hasAnimated, setHasAnimated] = useState(true);
   const containerRef = useRef(null);
@@ -53,7 +57,11 @@ const TopDestinations = () => {
   };
 
   useEffect(() => {
-    fetchDestination();
+    if (!homeSuccess || error == true || !homeDestination) {
+      fetchDestination();
+    } else {
+      setDestination(homeDestination);
+    }
   }, []);
   if (loading || !destination) {
     return <TopDestinationsSkeleton />;
@@ -85,38 +93,41 @@ const TopDestinations = () => {
         </div>
 
         <div className="flex pl-1     overflow-x-auto  gap-6">
-          {filteredDestinations.map((destination) => (
-            <div
-              onClick={() =>
-                navigate(`/destinations/${destination._id}`, {
-                  state: { destination },
-                })
-              }
-              key={destination._id}
-              className="group"
-            >
-              <motion.div
-                initial={{ x: 0 }}
-                animate={shouldAnimate && { x: [-0, -100, -0] }}
-                transition={{
-                  duration: 1,
-                  ease: "linear",
-                  times: [0, 0.5, 1],
-                }}
-                className="relative  w-52 overflow-hidden rounded-lg shadow-md transition-transform group-hover:shadow-xl group-hover:-translate-y-1"
+          {filteredDestinations &&
+            filteredDestinations.map((destination) => (
+              <div
+                onClick={() =>
+                  navigate(`/destinations/${destination._id}`, {
+                    state: { destination },
+                  })
+                }
+                key={destination._id}
+                className="group"
               >
-                <ImageWithLoaderPercentage
-                  src={destination.thumbnail.url}
-                  alt={destination.name}
-                  className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
-                  <h3 className="text-lg font-semibold">{destination.name}</h3>
-                </div>
-              </motion.div>
-            </div>
-          ))}
+                <motion.div
+                  initial={{ x: 0 }}
+                  animate={shouldAnimate && { x: [-0, -100, -0] }}
+                  transition={{
+                    duration: 1,
+                    ease: "linear",
+                    times: [0, 0.5, 1],
+                  }}
+                  className="relative  w-52 overflow-hidden rounded-lg shadow-md transition-transform group-hover:shadow-xl group-hover:-translate-y-1"
+                >
+                  <ImageWithLoaderPercentage
+                    src={destination.thumbnail.url}
+                    alt={destination.name}
+                    className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+                    <h3 className="text-lg font-semibold">
+                      {destination.name}
+                    </h3>
+                  </div>
+                </motion.div>
+              </div>
+            ))}
         </div>
 
         <div className="mt-10 text-center">

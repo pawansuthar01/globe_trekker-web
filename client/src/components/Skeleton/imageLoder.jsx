@@ -47,13 +47,15 @@ const ImageWithLoaderPercentage = ({
 
   return (
     <div
-      className={`relative ${className}`}
+      className={`relative ${className} `}
       onContextMenu={(e) => e.preventDefault()}
       draggable="false"
       style={{ userSelect: "none" }}
     >
       {!loaded && !hasError && (
-        <div className="absolute inset-0 flex flex-col justify-center items-center bg-gray-200 z-10">
+        <div
+          className={`absolute inset-0 flex flex-col justify-center items-center bg-gray-200 z-10 w-full h-full `}
+        >
           <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-2"></div>
           <span className="text-sm font-medium text-gray-600">{progress}%</span>
         </div>

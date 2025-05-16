@@ -264,23 +264,31 @@ export const GetFeaturedStory = async (req, res, next) => {
 };
 export const GetStory = async (req, res, next) => {
   try {
-    const stories = await Story.find({});
-    const storiesCount = await Story.countDocuments({});
-    const storiesFeaturedCount = await Story.countDocuments({ featured: true });
-    if (!stories) {
-      return next(new AppError("Story does not found, try next time...", 400));
-    }
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, parseInt(req.query.limit) || 25);
+    const skip = (page - 1) * limit;
+
+    const [stories, storiesCount, storiesFeaturedCount] = await Promise.all([
+      Story.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
+      Story.countDocuments({}),
+      Story.countDocuments({ featured: true }),
+    ]);
+
     res.status(200).json({
       success: true,
-      message: "SuccessFully Get All Story...",
+      message: "Successfully retrieved stories.",
+      page,
+      limit,
+      totalPages: Math.ceil(storiesCount / limit),
       data: stories,
       count: storiesCount,
-      FeaturedCount: storiesFeaturedCount,
+      featuredCount: storiesFeaturedCount,
     });
   } catch (error) {
     return next(new AppError(error.message, 500));
   }
 };
+
 export const getStoriesById = async (req, res, next) => {
   try {
     const { id } = req.params;

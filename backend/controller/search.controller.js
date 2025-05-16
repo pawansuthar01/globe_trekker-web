@@ -20,6 +20,7 @@ export const searchDestinationsAndStories = async (req, res, next) => {
     if (userId) {
       await grantAchievement(userId, "SEARCH_USED");
     }
+
     const destinations = await destinationModule.find({
       ...filter,
       $or: [
@@ -56,6 +57,7 @@ export const searchDestinationsAndStories = async (req, res, next) => {
 export const suggestSearchKeywords = async (req, res, next) => {
   try {
     const { q } = req.query;
+
     if (!q) return res.json({ success: true, data: [] });
 
     const regex = new RegExp("^" + q, "i");
@@ -93,6 +95,63 @@ export const searchHighlights = async (req, res, next) => {
     res.status(200).json({
       success: true,
       data: highlights,
+    });
+  } catch (err) {
+    next(new AppError(err.message, 500));
+  }
+};
+
+export const searchDestinations = async (req, res, next) => {
+  try {
+    const { keyword } = req.query;
+    if (!keyword) return next(new AppError("Search keyword is required", 400));
+
+    const regex = new RegExp(keyword, "i");
+    await searchModule.create({ keyword });
+
+    const Destinations = await destinationModule.find({
+      isPublished: true,
+      $or: [
+        { name: regex },
+        { location: regex },
+        { region: regex },
+        { description: regex },
+      ],
+    });
+
+    res.status(200).json({
+      success: true,
+      data: Destinations,
+    });
+  } catch (err) {
+    next(new AppError(err.message, 500));
+  }
+};
+
+export const searchStories = async (req, res, next) => {
+  try {
+    const { keyword } = req.query;
+
+    if (!keyword) return next(new AppError("Search keyword is required", 400));
+
+    const regex = new RegExp(keyword, "i");
+    await searchModule.create({ keyword });
+
+    const Stories = await Story.find({
+      $or: [
+        { title: regex },
+        { excerpt: regex },
+        { location: regex },
+        { category: regex },
+        { region: regex },
+        { tags: regex },
+        { content: regex },
+      ],
+    });
+
+    res.status(200).json({
+      success: true,
+      data: Stories,
     });
   } catch (err) {
     next(new AppError(err.message, 500));

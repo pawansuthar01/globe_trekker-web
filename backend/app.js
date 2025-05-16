@@ -73,7 +73,7 @@ App.use("/api/v5/admin", Admin);
 App.use("/contact", userContact);
 App.use("/about", about);
 App.use("/web-contact-del", contact);
-App.use("/search", search);
+App.use("/api/search", search);
 App.use("/api/v3/destination", destination);
 App.use("/api/v3/auth", user);
 App.use("/", (req, res, next) => {

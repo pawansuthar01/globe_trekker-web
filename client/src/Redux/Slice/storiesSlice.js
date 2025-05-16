@@ -2,22 +2,34 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../helper/axiosInstance";
 
 const initialState = {
-  stories: [],
-  featuredStories: [],
-  currentStory: null,
+  stories: localStorage.getItem("stories")
+    ? JSON.parse(localStorage.getItem("stories"))
+    : [],
+  limit: localStorage.getItem("limit") || 25,
+  totalPages: localStorage.getItem("totalPages") || 1,
+  page: localStorage.getItem("page") || 1,
+  HomeStories: localStorage.getItem("HomeStories")
+    ? JSON.parse(localStorage.getItem("HomeStories"))
+    : [],
   loading: false,
-  error: null,
+  error: localStorage.getItem("error") || false,
+  success: localStorage.getItem("success") || false,
+  homeSuccess: localStorage.getItem("homeSuccess") || false,
+  currentStory: null,
 };
 
 // Public APIs
-export const fetchStories = createAsyncThunk("stories/fetchAll", async () => {
-  try {
-    const res = await axiosInstance.get("/story");
-    return res.data;
-  } catch (err) {
-    return err.response?.data || err.message;
+export const fetchStories = createAsyncThunk(
+  "stories/fetchAll",
+  async ({ page = 1, limit = 25 }) => {
+    try {
+      const res = await axiosInstance.get(`/story?page=${page}&limit=${limit}`);
+      return res.data;
+    } catch (err) {
+      return err.response?.data || err.message;
+    }
   }
-});
+);
 
 export const fetchFeaturedStories = createAsyncThunk(
   "stories/fetchFeatured",
@@ -31,7 +43,7 @@ export const fetchFeaturedStories = createAsyncThunk(
   }
 );
 export const fetchHomeStories = createAsyncThunk(
-  "stories/fetchFeatured",
+  "stories/fetchFeatured/home",
   async () => {
     try {
       const res = await axiosInstance.get("/story/home");
@@ -120,9 +132,28 @@ const storiesSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchStories.fulfilled, (state, action) => {
-        state.loading = false;
-        state.stories = action.payload;
+        if (action?.payload?.success) {
+          state.page = Number(action?.payload?.page);
+          state.limit = Number(action?.payload?.limit);
+          state.totalPages = Number(action?.payload?.totalPages);
+          state.loading = false;
+          state.success = true;
+          state.error = false;
+          localStorage.setItem("success", true);
+          localStorage.setItem("page", Number(action?.payload?.page));
+          localStorage.setItem("limit", Number(action?.payload?.limit));
+          localStorage.setItem(
+            "totalPages",
+            Number(action?.payload?.totalPages)
+          );
+          state.stories = action.payload?.data;
+          localStorage.setItem("stories", JSON.stringify(action.payload?.data));
+        } else {
+          localStorage.setItem("success", false);
+          localStorage.setItem("error", true);
+        }
       })
+
       .addCase(fetchStories.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
@@ -130,6 +161,22 @@ const storiesSlice = createSlice({
 
       .addCase(fetchFeaturedStories.fulfilled, (state, action) => {
         state.featuredStories = action.payload;
+      })
+      .addCase(fetchHomeStories.fulfilled, (state, action) => {
+        if (action?.payload?.success) {
+          state.loading = false;
+          state.error = false;
+          localStorage.setItem("homeSuccess", true);
+          localStorage.setItem("error", false);
+          state.HomeStories = action.payload?.data;
+          localStorage.setItem(
+            "HomeStories",
+            JSON.stringify(action.payload?.data)
+          );
+        } else {
+          localStorage.setItem("homeSuccess", false);
+          localStorage.setItem("error", true);
+        }
       })
 
       .addCase(fetchStoryById.fulfilled, (state, action) => {

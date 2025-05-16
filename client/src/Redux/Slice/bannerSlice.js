@@ -2,9 +2,12 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../helper/axiosInstance";
 
 const initialState = {
-  banners: [],
+  banners: localStorage.getItem("banners")
+    ? JSON.parse(localStorage.getItem("banners"))
+    : {},
   loading: false,
-  error: null,
+  error: localStorage.getItem("error") || false,
+  success: localStorage.getItem("success") || false,
 };
 
 // ✅ Get All Banners (Admin)
@@ -95,12 +98,23 @@ const bannerSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchActiveBanners.fulfilled, (state, action) => {
-        state.loading = false;
-        state.banners = action.payload;
+        if (action?.payload?.success) {
+          state.banners = action.payload.data;
+
+          state.loading = false;
+          localStorage.setItem("banners", JSON.stringify(action.payload.data));
+          localStorage.setItem("success", true);
+          localStorage.setItem("error", false);
+        } else {
+          localStorage.setItem("success", false);
+          localStorage.setItem("error", true);
+        }
       })
       .addCase(fetchActiveBanners.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = true;
+        localStorage.setItem("success", false);
+        localStorage.setItem("error", true);
       });
   },
 });

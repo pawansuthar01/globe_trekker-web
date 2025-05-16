@@ -375,7 +375,13 @@ export const updateReview = async (req, res, next) => {
 
 export const getAllDestination = async (req, res, next) => {
   try {
-    const Destination = await destinationModule.find();
+    const { page = 1, limit = 25 } = req.query; // default: page 1, 50 items
+    const skip = (Number(page) - 1) * Number(limit);
+    const Destination = await destinationModule
+      .find()
+      .sort({ createdAt: -1 }) // latest first
+      .skip(skip)
+      .limit(Number(limit));
     const DestinationCount = await destinationModule.countDocuments();
     const isPublishedCount = await destinationModule.countDocuments({
       isPublished: true,
@@ -387,6 +393,9 @@ export const getAllDestination = async (req, res, next) => {
       success: true,
       message: "successFully Destination All get...",
       data: Destination,
+      page: Number(page),
+      limit: Number(limit),
+      totalPages: Math.ceil(DestinationCount / limit),
       DestinationCount: DestinationCount,
       isPublishedCount: isPublishedCount,
       featuredCount: featuredCount,
@@ -397,15 +406,24 @@ export const getAllDestination = async (req, res, next) => {
 };
 export const getDestination = async (req, res, next) => {
   try {
-    const publishedDestinations = await destinationModule.find({
-      isPublished: true,
-    });
-
+    const { page = 1, limit = 50 } = req.query; // default: page 1, 50 items
+    const skip = (Number(page) - 1) * Number(limit);
+    const publishedDestinations = await destinationModule
+      .find({
+        isPublished: true,
+      })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit));
+    const publishedCount = await destinationModule.countDocuments();
     // Step 3: Response
     res.status(200).json({
       success: true,
       message: "Successfully fetched published destinations.",
       data: publishedDestinations,
+      page: Number(page),
+      limit: Number(limit),
+      totalPages: Math.ceil(publishedCount / limit),
     });
   } catch (error) {
     return next(new AppError(error.message, 500));
@@ -613,7 +631,6 @@ export const getDestinationById = async (req, res, next) => {
       _id: id,
       isPublished: true,
     });
-    console.log(destination);
     if (!destination) {
       return next(new AppError("destination not found...", 404));
     }

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from "../../helper/axiosInstance";
 
 const initialState = {
   results: [],
@@ -15,7 +15,7 @@ export const searchDestinationsAndStories = createAsyncThunk(
   "search/general",
   async (keyword, thunkAPI) => {
     try {
-      const res = await axios.get(`/api/search?keyword=${keyword}`);
+      const res = await axiosInstance.get(`/api/search?keyword=${keyword}`);
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -28,7 +28,39 @@ export const searchHighlights = createAsyncThunk(
   "search/highlights",
   async (keyword, thunkAPI) => {
     try {
-      const res = await axios.get(`/api/search/highlights?keyword=${keyword}`);
+      const res = await axiosInstance.get(
+        `/api/search/highlights?keyword=${keyword}`
+      );
+      return res.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+// ✅ 2. Search highlights
+export const searchDestinations = createAsyncThunk(
+  "search/destinations",
+  async (keyword, thunkAPI) => {
+    try {
+      const res = await axiosInstance.get(
+        `/api/search/destinations?keyword=${keyword}`
+      );
+      return res.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+// ✅ 2. Search highlights
+export const searchStories = createAsyncThunk(
+  "search/destinations",
+  async (keyword, thunkAPI) => {
+    try {
+      const res = await axiosInstance.get(
+        `/api/search/stories?keyword=${keyword}`
+      );
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
@@ -39,12 +71,12 @@ export const searchHighlights = createAsyncThunk(
 // ✅ 3. Suggest search keywords
 export const suggestSearchKeywords = createAsyncThunk(
   "search/suggestions",
-  async (_, thunkAPI) => {
+  async (keyword) => {
     try {
-      const res = await axios.get("/api/search/suggest");
+      const res = await axiosInstance.get(`/api/search/suggest?q=${keyword}`);
       return res.data;
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.response?.data || err.message);
+      return err.response?.data || err.message;
     }
   }
 );
@@ -54,7 +86,7 @@ export const getAllSearchKeywords = createAsyncThunk(
   "search/allKeywords",
   async (_, thunkAPI) => {
     try {
-      const res = await axios.get("/api/v5/admin/search");
+      const res = await axiosInstance.get("/api/v5/admin/search");
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);
