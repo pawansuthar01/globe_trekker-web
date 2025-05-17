@@ -115,7 +115,13 @@ const DestinationsPage = () => {
     setSearch(true);
   };
   const NoSearchData = () => {
+    setSearchError(false);
+    setSearch(true);
+  };
+  const handelOldData = () => {
+    setDestination(destinations);
     setSearchError(true);
+    setSearch(false);
   };
 
   useEffect(() => {
@@ -143,19 +149,12 @@ const DestinationsPage = () => {
         <div className="mb-8">
           <div className="flex flex-col md:flex-row gap-4 mb-4">
             <div className="relative w-full">
-              <SearchBar Data={SearchData} NoSearchData={NoSearchData} />
-              {search && (
-                <button
-                  onClick={() => {
-                    setSearch(false),
-                      setDestination(destinations),
-                      setSearchError(true);
-                  }}
-                  className=" absolute   top-1  rounded-lg  z-30 right-28 text-white bg-red-500 p-2 text-2xl"
-                >
-                  <X />
-                </button>
-              )}
+              <SearchBar
+                Data={SearchData}
+                NoSearchData={NoSearchData}
+                destination={true}
+                oldData={handelOldData}
+              />
             </div>
             <button
               onClick={() => setShowFilters(!showFilters)}
@@ -348,7 +347,7 @@ const DestinationsPage = () => {
             </p>
             <button
               onClick={() => {
-                setSearchError(false);
+                setSearchError(true);
                 setSearch(false);
                 setDestination(destinations);
               }}

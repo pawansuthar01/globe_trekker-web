@@ -8,7 +8,7 @@ import { grantAchievement } from "../utils/grantAchievement.js";
 export const searchDestinationsAndStories = async (req, res, next) => {
   try {
     const { keyword } = req.query;
-    const { userId } = req?.user;
+
     if (!keyword) return next(new AppError("Search keyword is required", 400));
 
     const regex = new RegExp(keyword, "i");
@@ -17,9 +17,6 @@ export const searchDestinationsAndStories = async (req, res, next) => {
     await searchModule.create({ keyword });
 
     const filter = { isPublished: true };
-    if (userId) {
-      await grantAchievement(userId, "SEARCH_USED");
-    }
 
     const destinations = await destinationModule.find({
       ...filter,
@@ -49,7 +46,8 @@ export const searchDestinationsAndStories = async (req, res, next) => {
       data: { destinations, stories },
     });
   } catch (err) {
-    next(new AppError(err.message, 500));
+    console.log(err.message);
+    return next(new AppError(err.message, 500));
   }
 };
 

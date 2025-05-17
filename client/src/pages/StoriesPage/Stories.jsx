@@ -43,7 +43,6 @@ const StoriesPage = () => {
   const fetchStoriesData = async (page = 1) => {
     setLoading(true);
     const res = await dispatch(fetchStories({ page, limit: 25 }));
-    console.log(res);
     if (res?.payload?.success) {
       setStories(res?.payload?.data);
     }
@@ -71,11 +70,16 @@ const StoriesPage = () => {
 
   const SearchData = (Data) => {
     setStories(Data);
-
     setSearch(true);
   };
   const NoSearchData = () => {
+    setSearchError(false);
+    setSearch(true);
+  };
+  const handelOldData = () => {
+    setStories(stories);
     setSearchError(true);
+    setSearch(false);
   };
 
   useEffect(() => {
@@ -105,17 +109,8 @@ const StoriesPage = () => {
                 Data={SearchData}
                 NoSearchData={NoSearchData}
                 stories={true}
+                oldData={handelOldData}
               />
-              {search && (
-                <button
-                  onClick={() => {
-                    setSearch(false), setStories(story), setSearchError(true);
-                  }}
-                  className=" absolute   top-1  rounded-lg  z-30 right-28 text-white bg-red-500 p-2 text-2xl"
-                >
-                  <X />
-                </button>
-              )}
             </div>
           </div>
 
@@ -208,101 +203,121 @@ const StoriesPage = () => {
         )}
 
         {/* Stories grid */}
-        {filteredStories?.length > 0 ? (
-          <div>
-            <h2 className="text-xl font-semibold mb-6">
-              {searchTerm ? "Search Results" : "Latest Stories"}
-            </h2>
-            {!search && totalPages > 1 && (
-              <div className="flex justify-end items-center gap-4 m-2">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => fetchStoriesData(currentPage - 1)}
-                  className="px-4 py-2 bg-primary-600 text-white rounded disabled:opacity-50"
-                >
-                  Prev
-                </button>
+        {searchError ? (
+          filteredStories?.length > 0 ? (
+            <div>
+              <h2 className="text-xl font-semibold mb-6">
+                {searchTerm ? "Search Results" : "Latest Stories"}
+              </h2>
+              {!search && totalPages > 1 && (
+                <div className="flex justify-end items-center gap-4 m-2">
+                  <button
+                    disabled={currentPage === 1}
+                    onClick={() => fetchStoriesData(currentPage - 1)}
+                    className="px-4 py-2 bg-primary-600 text-white rounded disabled:opacity-50"
+                  >
+                    Prev
+                  </button>
 
-                <span className="text-neutral-700">
-                  Page {page} of {totalPages}
-                </span>
+                  <span className="text-neutral-700">
+                    Page {page} of {totalPages}
+                  </span>
 
-                <button
-                  disabled={currentPage === totalPages}
-                  onClick={() => fetchStoriesData(currentPage + 1)}
-                  className="px-4 py-2 bg-primary-600 text-white rounded disabled:opacity-50"
-                >
-                  Next
-                </button>
+                  <button
+                    disabled={currentPage === totalPages}
+                    onClick={() => fetchStoriesData(currentPage + 1)}
+                    className="px-4 py-2 bg-primary-600 text-white rounded disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {
+                  <>
+                    {filteredStories?.map((story) => (
+                      <div
+                        key={story._id}
+                        onClick={() =>
+                          navigate(`/stories/${story._id}`, {
+                            state: { story: story },
+                          })
+                        }
+                        className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow"
+                      >
+                        <div className="relative h-52 overflow-hidden">
+                          <ImageWithLoaderPercentage
+                            src={story?.coverImage.url}
+                            alt={story?.title}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                          <div className="absolute top-4 left-4 bg-accent-500 text-white text-xs font-semibold py-1 px-2 rounded">
+                            {story?.category}
+                          </div>
+                        </div>
+                        <div className="p-5">
+                          <div className="flex items-center text-xs text-neutral-500 mb-3 space-x-4">
+                            <div className="flex items-center">
+                              <Calendar className="h-3 w-3 mr-1" />
+                              <span>
+                                {formatDate(featuredStory?.publishedAt)}
+                              </span>
+                            </div>
+                            <div className="flex items-center">
+                              <Clock className="h-3 w-3 mr-1" />
+                              <span>{story?.readTime}</span>
+                            </div>
+                          </div>
+                          <h3 className="text-lg font-semibold text-neutral-800 mb-2 group-hover:text-primary-600 transition-colors line-clamp-2">
+                            {story?.title}
+                          </h3>
+                          <p className="text-neutral-600 text-sm mb-4 line-clamp-3">
+                            {story?.excerpt}
+                          </p>
+                          <div className="text-primary-600 text-sm font-medium group-hover:text-primary-700">
+                            Read more
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                }
               </div>
-            )}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {
-                <>
-                  {filteredStories?.map((story) => (
-                    <div
-                      key={story._id}
-                      onClick={() =>
-                        navigate(`/stories/${story._id}`, {
-                          state: { story: story },
-                        })
-                      }
-                      className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow"
-                    >
-                      <div className="relative h-52 overflow-hidden">
-                        <ImageWithLoaderPercentage
-                          src={story?.coverImage.url}
-                          alt={story?.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                        <div className="absolute top-4 left-4 bg-accent-500 text-white text-xs font-semibold py-1 px-2 rounded">
-                          {story?.category}
-                        </div>
-                      </div>
-                      <div className="p-5">
-                        <div className="flex items-center text-xs text-neutral-500 mb-3 space-x-4">
-                          <div className="flex items-center">
-                            <Calendar className="h-3 w-3 mr-1" />
-                            <span>
-                              {formatDate(featuredStory?.publishedAt)}
-                            </span>
-                          </div>
-                          <div className="flex items-center">
-                            <Clock className="h-3 w-3 mr-1" />
-                            <span>{story?.readTime}</span>
-                          </div>
-                        </div>
-                        <h3 className="text-lg font-semibold text-neutral-800 mb-2 group-hover:text-primary-600 transition-colors line-clamp-2">
-                          {story?.title}
-                        </h3>
-                        <p className="text-neutral-600 text-sm mb-4 line-clamp-3">
-                          {story?.excerpt}
-                        </p>
-                        <div className="text-primary-600 text-sm font-medium group-hover:text-primary-700">
-                          Read more
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </>
-              }
             </div>
-          </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-neutral-500 text-lg mb-4">
+                No stories found matching your criteria.
+              </p>
+              <button
+                onClick={() => {
+                  setActiveCategory("all");
+                  setSearchTerm("");
+                }}
+                className="text-primary-600 hover:text-primary-700 font-medium"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )
         ) : (
-          <div className="text-center py-12">
-            <p className="text-neutral-500 text-lg mb-4">
-              No stories found matching your criteria.
-            </p>
-            <button
-              onClick={() => {
-                setActiveCategory("all");
-                setSearchTerm("");
-              }}
-              className="text-primary-600 hover:text-primary-700 font-medium"
-            >
-              Clear all filters
-            </button>
-          </div>
+          <>
+            <div className="text-center py-12">
+              <p className="text-neutral-500 text-lg mb-4">
+                No stories found matching your criteria.
+              </p>
+              <button
+                onClick={() => {
+                  setStories(story);
+                  setSearch(false);
+                  setSearchError(true);
+                }}
+                className="text-primary-600 hover:text-primary-700 font-medium"
+              >
+                Clear all filters
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>

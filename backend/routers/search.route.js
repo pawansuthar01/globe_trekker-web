@@ -6,6 +6,7 @@ import {
   searchStories,
   suggestSearchKeywords,
 } from "../controller/search.controller.js";
+import { isLoggedIn } from "../middleware/authMiddlware.js";
 
 const search = express.Router();
 

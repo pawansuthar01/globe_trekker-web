@@ -58,7 +58,6 @@ export const updateBanner = createAsyncThunk(
 // ✅ Delete Banner (Admin)
 export const deleteBanner = createAsyncThunk("banner/delete", async (id) => {
   try {
-    console.log(id);
     await axiosInstance.delete(`/api/v5/admin/banner/${id}`);
     return { id };
   } catch (err) {

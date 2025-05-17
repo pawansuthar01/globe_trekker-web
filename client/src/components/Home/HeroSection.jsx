@@ -19,10 +19,11 @@ const HeroSection = () => {
     setLoading(false);
   };
   useEffect(() => {
-    if (!success || error == false) {
+    if (!success || error == true || !banners) {
       FetchActiveBanners();
     } else {
       setBanner(banners[0]);
+      setLoading(false);
     }
   }, []);
 

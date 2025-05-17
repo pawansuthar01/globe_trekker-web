@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Bell, User, X } from "lucide-react";
+import { SearchBar } from "../Search-bar";
 
 const TopBar = ({ isScrolled }) => {
   const [searchVisible, setSearchVisible] = useState(false);
@@ -70,13 +71,13 @@ const TopBar = ({ isScrolled }) => {
         <div className="p-4  animate-slideDown">
           <div className="relative">
             <Search
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400"
+              className="absolute z-30 left-3 top-1/2 transform -translate-y-1/2 text-neutral-400"
               size={18}
             />
-            <input
-              type="text"
-              placeholder="Search destinations, stories..."
-              className="w-full px-10 py-2 bg-neutral-100 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-400"
+            <SearchBar
+              button={false}
+              globeSearch={true}
+              className={`w-full px-10 py-2 bg-neutral-100 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-400`}
             />
           </div>
         </div>

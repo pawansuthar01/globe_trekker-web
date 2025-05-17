@@ -2,9 +2,12 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../helper/axiosInstance";
 
 const initialState = {
-  aboutData: null,
+  aboutData: localStorage.getItem("aboutData")
+    ? JSON.parse(localStorage.getItem("aboutData"))
+    : null,
   loading: false,
-  error: null,
+  success: localStorage.getItem("success") || false,
+  error: localStorage.getItem("error") || false,
 };
 
 // ✅ 1. Get About data (Public)
@@ -103,8 +106,21 @@ const aboutSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchAbout.fulfilled, (state, action) => {
-        state.loading = false;
-        state.aboutData = action.payload?.data;
+        if (action?.payload?.success) {
+          state.success = true;
+          state.error = false;
+          state.aboutData = action.payload?.data;
+          localStorage.setItem("success", true);
+          localStorage.setItem("error", false);
+          localStorage.setItem(
+            "aboutData",
+            JSON.stringify(action.payload.data)
+          );
+        } else {
+          state.loading = false;
+          localStorage.setItem("success", false);
+          localStorage.setItem("error", true);
+        }
       })
       .addCase(fetchAbout.rejected, (state, action) => {
         state.loading = false;
@@ -129,8 +145,22 @@ const aboutSlice = createSlice({
         state.loading = true;
       })
       .addCase(updateAbout.fulfilled, (state, action) => {
-        state.loading = false;
-        state.aboutData = action.payload;
+        console.log(action);
+        if (action?.payload?.success) {
+          state.success = true;
+          state.error = false;
+          state.aboutData = action.payload?.data;
+          localStorage.setItem("success", true);
+          localStorage.setItem("error", false);
+          localStorage.setItem(
+            "aboutData",
+            JSON.stringify(action.payload.data)
+          );
+        } else {
+          state.loading = false;
+          localStorage.setItem("success", false);
+          localStorage.setItem("error", true);
+        }
       })
       .addCase(updateAbout.rejected, (state, action) => {
         state.loading = false;
