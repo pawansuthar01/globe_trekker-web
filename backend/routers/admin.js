@@ -10,6 +10,7 @@ import upload from "../middleware/multerMiddleware.js";
 import {
   deleteStory,
   FeaturedStory,
+  fetchAdminStories,
   newStory,
   updateStory,
 } from "../controller/stories.Controller.js";
@@ -54,14 +55,16 @@ Admin.post("/banner/new", upload.array("image", 3), newBanner);
 Admin.put("/banner-active/:id", ActiveBanner);
 // < **  Banner routes -- End ** >
 // < **  stories routes -- Start ** >
-Admin.route("/stories").post(
-  isLoggedIn,
-  upload.fields([
-    { name: "coverImage", maxCount: 1 },
-    { name: "image", maxCount: 5 },
-  ]),
-  newStory
-);
+Admin.route("/stories")
+  .post(
+    isLoggedIn,
+    upload.fields([
+      { name: "coverImage", maxCount: 1 },
+      { name: "image", maxCount: 5 },
+    ]),
+    newStory
+  )
+  .get(fetchAdminStories);
 Admin.route("/stories/:id")
   .put(
     upload.fields([
@@ -72,6 +75,7 @@ Admin.route("/stories/:id")
   )
   .delete(deleteStory);
 Admin.route("/stories/featured/:id").put(FeaturedStory);
+
 // < **  stories routes -- End ** >
 // < **   routes -- Start newDestination** >
 Admin.route("/destination").post(

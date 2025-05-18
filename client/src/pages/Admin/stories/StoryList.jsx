@@ -4,23 +4,30 @@ import {
   Plus,
   Edit,
   Trash2,
-  Eye,
   EyeOff,
   Star,
   StarOff,
-  Search,
+  RotateCw,
 } from "lucide-react";
 import SearchBar from "../../../components/AdminComponent/common/SearchBar";
 import DeleteModal from "../../../components/AdminComponent/common/DeleteModal";
 import {
   deleteStory,
-  fetchStories,
+  fetchAdminStories,
   markAsFeatured,
 } from "../../../Redux/Slice/storiesSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import StoryListSkeleton from "../../../components/Skeleton/admin/Story/listSkeleton";
 
 const StoryList = () => {
+  const {
+    stories: story,
+    success,
+    error,
+    page,
+    totalPages,
+  } = useSelector((state) => state?.story);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -28,18 +35,23 @@ const StoryList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(false);
-  async function FetchStories() {
+  const [currentPage, setCurrentPage] = useState(page);
+  async function FetchStories(page = 1) {
     setLoading(true);
-    const res = await dispatch(fetchStories());
+
+    const res = await dispatch(fetchAdminStories({ page, limit: 15 }));
     if (res?.payload?.success) {
       setStories(res?.payload?.data);
     }
     setLoading(false);
   }
   useEffect(() => {
-    FetchStories();
+    if (!story || !success || error == true) {
+      FetchStories();
+    } else {
+      setStories(story);
+    }
   }, []);
-  // Mock data - would come from API in real app
 
   // Filter stories based on search term
   const filteredStories = stories.filter(
@@ -68,6 +80,9 @@ const StoryList = () => {
     setIsDeleteModalOpen(true);
   };
 
+  useEffect(() => {
+    setCurrentPage(page);
+  }, [page]);
   const handleDelete = async () => {
     // API call to delete Highlight
     const res = await dispatch(deleteStory(deleteId));
@@ -82,7 +97,7 @@ const StoryList = () => {
     setIsDeleteModalOpen(false);
     setDeleteId(null);
   };
-  if (loading) return;
+
   return (
     <div className="space-y-6 overflow-x-hidden  p-6">
       <div className="flex justify-between items-center">
@@ -96,14 +111,24 @@ const StoryList = () => {
         </Link>
       </div>
 
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <div className="mb-6">
-            <SearchBar
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              placeholder="Search stories by title, author, category or tags..."
-            />
+      <div className="bg-white  shadow  rounded-lg">
+        <div className="px-4 py-5 sm:p-6 ">
+          <div className="flex items-center mb-6">
+            <button
+              disabled={loading}
+              onClick={FetchStories}
+              className="flex bg-green-500 p-2 rounded-md text-white"
+              title="Refresh List"
+            >
+              <RotateCw className="w-4 h-4" />
+            </button>
+            <div className="">
+              <SearchBar
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                placeholder="Search stories by title, author, category or tags..."
+              />
+            </div>
           </div>
 
           <div className="overflow-x-auto">
@@ -120,125 +145,182 @@ const StoryList = () => {
                     Category
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Published
+                    Read Time
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Featured
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Published
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredStories.map((story) => (
-                  <tr key={story._id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10">
-                          <img
-                            className="h-10 w-10 rounded-md object-cover"
-                            src={story.coverImage.url}
-                            alt={story.coverImage.alt}
-                          />
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {story.title}
+              {loading ? (
+                <StoryListSkeleton />
+              ) : (
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredStories.map((story) => (
+                    <tr key={story._id}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10">
+                            <img
+                              className="h-10 w-10 rounded-md object-cover"
+                              src={story.coverImage.url}
+                              alt={story.coverImage.alt}
+                            />
                           </div>
-                          <div className="text-sm text-gray-500 truncate max-w-xs">
-                            {story.excerpt.substring(0, 50)}...
-                          </div>
-                          <div className="mt-1 flex items-center space-x-1">
-                            {story.tags.map((tag) => (
-                              <span
-                                key={tag}
-                                className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-8 w-8">
-                          <img
-                            className="h-8 w-8 rounded-full"
-                            src={story.author.avatar}
-                            alt={story.author.name}
-                          />
-                        </div>
-                        <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">
-                            {story.author.name}
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {story.title}
+                            </div>
+                            <div className="text-sm text-gray-500 truncate max-w-xs">
+                              {story.excerpt.substring(0, 50)}...
+                            </div>
+                            <div className="mt-1 flex items-center space-x-1">
+                              {story.tags.map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        {story.category}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div>{story.date}</div>
-                      <div>{story.readTime} read</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          story.featured
-                            ? "bg-amber-100 text-amber-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {story.featured ? "Featured" : "Regular"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
-                        <button
-                          onClick={() => handleFeaturedToggle(story._id)}
-                          className="text-amber-600 hover:text-amber-900"
-                          title={
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-8 w-8">
+                            <img
+                              className="h-8 w-8 rounded-full"
+                              src={story.author.avatar}
+                              alt={story.author.name}
+                            />
+                          </div>
+                          <div className="ml-3">
+                            <div className="text-sm font-medium text-gray-900">
+                              {story.author.name}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          {story.category}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <div>{story.date}</div>
+                        <div>{story.readTime} read</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             story.featured
-                              ? "Remove from featured"
-                              : "Add to featured"
-                          }
+                              ? "bg-amber-100 text-amber-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
                         >
-                          {story.featured ? (
-                            <StarOff size={18} />
-                          ) : (
-                            <Star size={18} />
-                          )}
-                        </button>
-                        <button
-                          onClick={() =>
-                            navigate(`edit/${story?._id}`, {
-                              state: { story },
-                            })
-                          }
-                          className="text-indigo-600 hover:text-indigo-900"
+                          {story.featured ? "Featured" : "Regular"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            story.isPublished
+                              ? "bg-green-100 text-green-400"
+                              : "bg-gray-100 text-red-800"
+                          }`}
                         >
-                          <Edit size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteClick(story._id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+                          {story.isPublished ? "isPublished" : "Private"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex justify-end space-x-2">
+                          <button
+                            onClick={() => handleFeaturedToggle(story._id)}
+                            className="text-amber-600 hover:text-amber-900"
+                            title={
+                              story.featured
+                                ? "Remove from featured"
+                                : "Add to featured"
+                            }
+                          >
+                            {story.featured ? (
+                              <StarOff size={18} />
+                            ) : (
+                              <Star size={18} />
+                            )}
+                          </button>
+                          <button
+                            onClick={() =>
+                              navigate(`edit/${story?._id}`, {
+                                state: { story },
+                              })
+                            }
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
+                            <Edit size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(story._id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {!loading && filteredStories.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan="7"
+                        className="text-center py-6 text-gray-500"
+                      >
+                        No stories found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              )}
             </table>
           </div>
         </div>
+        {totalPages > 1 && (
+          <div className="flex justify-end items-center gap-4 m-2">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => {
+                setCurrentPage((prev) => prev - 1);
+                FetchStories(currentPage - 1);
+              }}
+              className="px-4 py-2 bg-primary-600 text-white rounded disabled:opacity-50"
+            >
+              Prev
+            </button>
+
+            <span className="text-neutral-700">
+              Page {page} of {totalPages}
+            </span>
+
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => {
+                setCurrentPage((prev) => prev - 1);
+                FetchStories(currentPage + 1);
+              }}
+              className="px-4 py-2 bg-primary-600 text-white rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
 
       <DeleteModal

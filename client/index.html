@@ -1,16 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- Google ads Meta Tags -->
+    <!-- Google Ads Meta Tags -->
     <script
       async
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7557276605338517"
       crossorigin="anonymous"
     ></script>
     <meta name="google-adsense-account" content="ca-pub-7557276605338517" />
+
     <!-- Required Meta Tags -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1"
+    />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://triptales.pawansuthar.in/" />
 
     <!-- SEO Meta Tags -->
     <title>TripTales - Explore the World with Us</title>
@@ -30,22 +37,41 @@
       property="og:description"
       content="Discover your next adventure with TripTales. Plan, explore, and share unforgettable travel experiences."
     />
-    <meta property="og:image" content="/logo.jpeg" />
+    <meta property="og:image" content="logo.jpeg" />
     <meta property="og:url" content="https://triptales.pawansuthar.in" />
     <meta property="og:type" content="website" />
 
     <!-- Twitter Meta -->
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content="logo.jpeg" />
     <meta name="twitter:title" content="TripTales - Explore the World" />
     <meta
       name="twitter:description"
       content="Plan your next adventure with TripTales - your ultimate travel guide."
     />
-    <meta name="twitter:image" content="/logo.jpeg" />
+    <meta name="twitter:image" content="logo.jpeg" />
+
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="logo.jpeg" />
 
     <!-- Favicon -->
-    <link rel="icon" href="/logo.jpeg" />
+    <link rel="icon" href="logo.jpeg" />
+
+    <!-- Structured Data: JSON-LD -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "TripTales",
+        "url": "https://triptales.pawansuthar.in",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://triptales.pawansuthar.in/search?query={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
   </head>
+
   <body>
     <div id="root"></div>
 

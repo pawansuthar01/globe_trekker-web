@@ -24,6 +24,22 @@ export const fetchStories = createAsyncThunk(
   async ({ page = 1, limit = 25 }) => {
     try {
       const res = await axiosInstance.get(`/story?page=${page}&limit=${limit}`);
+
+      return res.data;
+    } catch (err) {
+      return err.response?.data || err.message;
+    }
+  }
+);
+// Public APIs
+export const fetchAdminStories = createAsyncThunk(
+  "stories/fetchAll",
+  async ({ page = 1, limit = 25 }) => {
+    try {
+      const res = await axiosInstance.get(
+        `api/v5/admin/stories?page=${page}&limit=${limit}`
+      );
+
       return res.data;
     } catch (err) {
       return err.response?.data || err.message;

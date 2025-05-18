@@ -6,6 +6,7 @@ const initialState = {
     ? JSON.parse(localStorage.getItem("banners"))
     : {},
   loading: false,
+
   error: localStorage.getItem("error") || false,
   success: localStorage.getItem("success") || false,
 };
@@ -99,12 +100,15 @@ const bannerSlice = createSlice({
       .addCase(fetchActiveBanners.fulfilled, (state, action) => {
         if (action?.payload?.success) {
           state.banners = action.payload.data;
-
+          state.success = true;
+          state.error = false;
           state.loading = false;
           localStorage.setItem("banners", JSON.stringify(action.payload.data));
           localStorage.setItem("success", true);
           localStorage.setItem("error", false);
         } else {
+          state.success = false;
+          state.error = true;
           localStorage.setItem("success", false);
           localStorage.setItem("error", true);
         }
@@ -112,6 +116,7 @@ const bannerSlice = createSlice({
       .addCase(fetchActiveBanners.rejected, (state, action) => {
         state.loading = false;
         state.error = true;
+        state.success = false;
         localStorage.setItem("success", false);
         localStorage.setItem("error", true);
       });

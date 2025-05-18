@@ -269,6 +269,36 @@ export const GetStory = async (req, res, next) => {
     const skip = (page - 1) * limit;
 
     const [stories, storiesCount, storiesFeaturedCount] = await Promise.all([
+      Story.findOne({ isPublished: true })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Story.countDocuments({}),
+      Story.countDocuments({ featured: true }),
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully retrieved stories.",
+      page,
+      limit,
+      totalPages: Math.ceil(storiesCount / limit),
+      data: stories,
+      count: storiesCount,
+      featuredCount: storiesFeaturedCount,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
+
+export const fetchAdminStories = async (req, res, next) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, parseInt(req.query.limit) || 25);
+    const skip = (page - 1) * limit;
+
+    const [stories, storiesCount, storiesFeaturedCount] = await Promise.all([
       Story.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
       Story.countDocuments({}),
       Story.countDocuments({ featured: true }),

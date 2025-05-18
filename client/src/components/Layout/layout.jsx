@@ -50,7 +50,7 @@ const Layout = () => {
       </div>
 
       {/* Mobile Bottom Navigation - Visible only on Mobile */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-30">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-30 overflow-hidden">
         <BottomNav />
       </div>
     </div>

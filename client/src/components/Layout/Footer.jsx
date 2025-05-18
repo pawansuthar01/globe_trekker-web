@@ -172,7 +172,7 @@ const Footer = () => {
                 </li>
                 <li>
                   <Link
-                    to="/sitemap"
+                    to="/sitemap.xml"
                     className="text-neutral-300 hover:text-white transition-colors"
                   >
                     Sitemap

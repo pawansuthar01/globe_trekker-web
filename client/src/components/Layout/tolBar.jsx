@@ -43,6 +43,7 @@ const TopBar = ({ isScrolled }) => {
             </button>
           ) : (
             <button
+              aria-label="Search"
               onClick={() => setSearchVisible(!searchVisible)}
               className="p-2 rounded-full hover:bg-neutral-100 text-neutral-600"
             >
@@ -51,13 +52,17 @@ const TopBar = ({ isScrolled }) => {
           )}
 
           {/* Notifications */}
-          <button className="p-2 rounded-full hover:bg-neutral-100 text-neutral-600 relative">
+          <button
+            aria-label="notice "
+            className="p-2 rounded-full hover:bg-neutral-100 text-neutral-600 relative"
+          >
             <Bell size={20} />
             <span className="absolute top-1 right-1 h-2 w-2 bg-primary-600 rounded-full"></span>
           </button>
 
           {/* Profile - Hidden on Mobile */}
           <button
+            aria-label="profile"
             onClick={() => navigate("/profile")}
             className="hidden md:block p-1 rounded-full hover:bg-neutral-100 text-neutral-600 border border-neutral-200"
           >

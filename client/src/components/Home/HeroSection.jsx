@@ -19,6 +19,7 @@ const HeroSection = () => {
     setLoading(false);
   };
   useEffect(() => {
+    console.log(success);
     if (!success || error == true || !banners) {
       FetchActiveBanners();
     } else {
@@ -47,6 +48,7 @@ const HeroSection = () => {
             <div className="flex flex-wrap gap-4">
               <Link
                 to="/destinations"
+                aria-label="Explore Destinations"
                 className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-full font-medium transition-all flex items-center gap-2"
               >
                 Explore Now
@@ -54,6 +56,7 @@ const HeroSection = () => {
               </Link>
               <Link
                 to="/about"
+                aria-label="about"
                 className="border border-neutral-300 hover:border-primary-600 hover:text-primary-600 px-6 py-3 rounded-full font-medium transition-all"
               >
                 Learn More
