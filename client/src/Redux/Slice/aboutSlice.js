@@ -32,6 +32,20 @@ export const addAbout = createAsyncThunk("about/add", async (formData) => {
     return err.response?.data || err.message;
   }
 });
+// ✅ 2. Add About data (Admin)
+export const FetchActiveAdmin = createAsyncThunk(
+  "activity/get",
+  async ({ page = 1, limit = 10 }) => {
+    try {
+      const res = await axiosInstance.get(
+        `/api/v5/admin?page=${page}limit=${limit}`
+      );
+      return res.data;
+    } catch (err) {
+      return err.response?.data || err.message;
+    }
+  }
+);
 
 // ✅ 3. Update About data (Admin)
 export const updateAbout = createAsyncThunk(

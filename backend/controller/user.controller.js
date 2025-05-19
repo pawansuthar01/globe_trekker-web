@@ -1,10 +1,11 @@
+import { Activity } from "../module/activity.module.js";
 import User from "../module/user.Module.js";
 import AppError from "../utils/AppError.js";
 import { uploadToCloudinary } from "../utils/cloudnary.js";
 import { cookieOptions } from "../utils/cookieOption.js";
 
 export const UpdateUser = async (req, res, next) => {
-  const { id } = req.user;
+  const { id, role, fullName } = req.user;
   const { name, email, isSubscribed, phoneNumber } = req.body;
   if (!id) {
     return next(new AppError("id is required to update user", 404));
@@ -24,6 +25,12 @@ export const UpdateUser = async (req, res, next) => {
   existingUser.phoneNumber = phoneNumber || existingUser.phoneNumber;
   existingUser.isSubscribed = isSubscribed || existingUser.isSubscribed;
   await existingUser.save();
+  await Activity.create({
+    action: "Update user Profile",
+    role: role,
+    type: "update",
+    detail: fullName,
+  });
   const token = existingUser.generate_JWT_TOKEN();
   res.status(200).json({
     success: true,
@@ -48,6 +55,12 @@ export const registerUser = async (req, res, next) => {
   });
 
   const token = newUser.generate_JWT_TOKEN();
+  await Activity.create({
+    action: "new user Profile",
+    role: "USER",
+    type: "add",
+    detail: fullName,
+  });
   res.status(201).json({
     success: true,
     message: "User registered successfully",

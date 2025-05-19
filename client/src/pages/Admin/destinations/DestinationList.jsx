@@ -1,9 +1,17 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Plus, Edit, Trash2, Eye, EyeOff, Search } from "lucide-react";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  EyeOff,
+  Search,
+  RotateCw,
+} from "lucide-react";
 import StatusBadge from "../../../components/AdminComponent/common/StatusBadge";
 import DeleteModal from "../../../components/AdminComponent/common/DeleteModal";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   deleteDestination,
   fetchDestinations,
@@ -11,23 +19,36 @@ import {
 } from "../../../Redux/Slice/detinationSlice";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
+import SearchBar from "../../../components/AdminComponent/common/SearchBar";
+import StoryListSkeleton from "../../../components/Skeleton/admin/Story/listSkeleton";
 
 const DestinationList = () => {
+  const { AllDestinations, success, error, totalPages, page } = useSelector(
+    (state) => state.destination
+  );
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [destination, setDestination] = useState([]);
-
-  const FetchDestination = async () => {
-    const res = await dispatch(fetchDestinations());
+  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(page);
+  const FetchDestination = async (page = 1) => {
+    setLoading(true);
+    const res = await dispatch(fetchDestinations({ page, limit: 15 }));
     if (res?.payload?.success) {
-      setDestination(res?.payload?.data);
+      setDestination(res.payload.data);
     }
+    setLoading(false);
   };
+
   useEffect(() => {
-    FetchDestination();
+    if (AllDestinations.length == 0 || !success || error == true) {
+      FetchDestination(currentPage);
+    } else {
+      setDestination(AllDestinations);
+    }
   }, []);
   // Filter destinations based on search term
   const filteredDestinations = destination?.filter(
@@ -72,7 +93,7 @@ const DestinationList = () => {
   };
 
   return (
-    <div className="space-y-6    p-6">
+    <div className="space-y-6   p-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl max-sm:text-sm font-semibold text-gray-900">
           Destinations
@@ -91,16 +112,23 @@ const DestinationList = () => {
           <div className="flex justify-between items-center">
             <div className="w-full max-w-lg">
               <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
-                  <Search className="h-5 w-5 text-gray-400" />
+                <div className="flex items-center mb-6">
+                  <button
+                    disabled={loading}
+                    onClick={FetchDestination}
+                    className="flex bg-green-500 p-2 rounded-md text-white"
+                    title="Refresh List"
+                  >
+                    <RotateCw className="w-4 h-4" />
+                  </button>
+                  <div className="">
+                    <SearchBar
+                      searchTerm={searchTerm}
+                      setSearchTerm={setSearchTerm}
+                      placeholder="Search destination by title, author, category or tags..."
+                    />
+                  </div>
                 </div>
-                <input
-                  type="text"
-                  className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
-                  placeholder="Search destinations..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
               </div>
             </div>
           </div>
@@ -132,97 +160,142 @@ const DestinationList = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredDestinations.map((destination) => (
-                  <tr key={destination?._id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10">
-                          <img
-                            className="h-10 w-10 rounded-md object-cover"
-                            src={destination?.thumbnail?.url}
-                            alt={destination?.thumbnail?.alt}
-                          />
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {destination?.name}
+              {loading ? (
+                <StoryListSkeleton />
+              ) : (
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredDestinations.map((destination) => (
+                    <tr key={destination?._id}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10">
+                            <img
+                              className="h-10 w-10 rounded-md object-cover"
+                              src={destination?.thumbnail?.url}
+                              alt={destination?.thumbnail?.alt}
+                            />
                           </div>
-                          <div className="text-sm text-gray-500">
-                            {destination?.slug}
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {destination?.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {destination?.slug}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {destination?.location.country}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {destination?.location.region}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {destination?.category}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {destination?.rating.value} ({destination?.rating.count}{" "}
-                        reviews)
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <StatusBadge status={destination?.isPublished} />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          destination?.featured
-                            ? "bg-green-100 text-green-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          {destination?.location.country}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {destination?.location.region}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          {destination?.category}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          {destination?.rating.value} (
+                          {destination?.rating.count} reviews)
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <StatusBadge status={destination?.isPublished} />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            destination?.featured
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {destination?.featured ? "Yes" : "No"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex justify-end space-x-2">
+                          <button
+                            onClick={() =>
+                              handlePublishToggle(destination?._id)
+                            }
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
+                            {destination?.isPublished ? (
+                              <EyeOff size={18} />
+                            ) : (
+                              <Eye size={18} />
+                            )}
+                          </button>
+                          <button
+                            onClick={() =>
+                              navigate(`edit/${destination?._id}`, {
+                                state: { destination },
+                              })
+                            }
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
+                            <Edit size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(destination?._id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {!loading && filteredDestinations.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan="7"
+                        className="text-center py-6 text-gray-500"
                       >
-                        {destination?.featured ? "Yes" : "No"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
-                        <button
-                          onClick={() => handlePublishToggle(destination?._id)}
-                          className="text-indigo-600 hover:text-indigo-900"
-                        >
-                          {destination?.isPublished ? (
-                            <EyeOff size={18} />
-                          ) : (
-                            <Eye size={18} />
-                          )}
-                        </button>
-                        <button
-                          onClick={() =>
-                            navigate(`edit/${destination?._id}`, {
-                              state: { destination },
-                            })
-                          }
-                          className="text-indigo-600 hover:text-indigo-900"
-                        >
-                          <Edit size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteClick(destination?._id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+                        No stories found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              )}
             </table>
           </div>
         </div>
+        {totalPages > 1 && (
+          <div className="flex justify-end items-center gap-4 m-5 p-2">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => {
+                setCurrentPage((prev) => prev - 1);
+                FetchDestination(currentPage - 1);
+              }}
+              className="px-4 py-2 bg-primary-600 text-white rounded disabled:opacity-50"
+            >
+              Prev
+            </button>
+
+            <span className="text-neutral-700">
+              Page {page} of {totalPages}
+            </span>
+
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => {
+                setCurrentPage((prev) => prev - 1);
+                FetchDestination(currentPage + 1);
+              }}
+              className="px-4 py-2 bg-primary-600 text-white rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
 
       <DeleteModal

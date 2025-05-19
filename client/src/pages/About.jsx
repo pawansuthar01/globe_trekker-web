@@ -54,7 +54,10 @@ const AboutPage = () => {
                   .map((_, i) => (
                     <SkeletonBox key={i} className="h-4 w-full mb-3 rounded" />
                   ))
-              : aboutData?.mission.map((p, i) => {
+              : (Array.isArray(aboutData?.mission)
+                  ? aboutData?.mission
+                  : []
+                ).map((p, i) => {
                   return (
                     <p className="text-neutral-700 mb-4" key={i}>
                       {p}
@@ -88,32 +91,36 @@ const AboutPage = () => {
                       <SkeletonBox className="h-3 w-full rounded" />
                     </div>
                   ))
-              : aboutData?.values.map((val) => (
-                  <div
-                    key={val._id}
-                    className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-                  >
-                    <div className="bg-primary-100 p-3 rounded-full w-14 h-14 flex items-center justify-center mb-4">
-                      {val.icon}
+              : (Array.isArray(aboutData?.values) ? aboutData.values : []).map(
+                  (val) => (
+                    <div
+                      key={val._id}
+                      className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+                    >
+                      <div className="bg-primary-100 p-3 rounded-full w-14 h-14 flex items-center justify-center mb-4">
+                        {val.icon}
+                      </div>
+                      <h3 className="text-lg font-semibold mb-2">
+                        {val.title}
+                      </h3>
+                      <p className="text-neutral-600">{val.description}</p>
                     </div>
-                    <h3 className="text-lg font-semibold mb-2">{val.title}</h3>
-                    <p className="text-neutral-600">{val.description}</p>
-                  </div>
-                ))}
+                  )
+                )}
           </div>
         </section>
 
         {/* Team */}
         <section className="mb-16">
           <h2 className="text-2xl font-bold mb-8 text-center">Our Team</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="flex justify-evenly  flex-wrap  gap-8">
             {loading
               ? Array(3)
                   .fill(0)
                   .map((_, i) => (
                     <div
                       key={i}
-                      className="bg-white rounded-lg overflow-hidden shadow-md animate-pulse"
+                      className="bg-white max-w-[350px] rounded-lg overflow-hidden shadow-md animate-pulse"
                     >
                       <SkeletonBox className="w-full h-64" />
                       <div className="p-5">
@@ -123,29 +130,31 @@ const AboutPage = () => {
                       </div>
                     </div>
                   ))
-              : aboutData?.team.map((member) => (
-                  <div
-                    key={member._id}
-                    className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
-                  >
-                    <img
-                      src={member.imageUrl}
-                      alt={member.name}
-                      className="w-full h-64 object-cover"
-                    />
-                    <div className="p-5">
-                      <h3 className="text-lg font-semibold mb-1">
-                        {member.name}
-                      </h3>
-                      <p className="text-neutral-500 text-sm mb-3">
-                        {member.role}
-                      </p>
-                      <p className="text-neutral-600 text-sm">
-                        {member.description}
-                      </p>
+              : (Array.isArray(aboutData?.team) ? aboutData.team : []).map(
+                  (member) => (
+                    <div
+                      key={member._id}
+                      className="bg-white max-w-[350px]  rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+                    >
+                      <img
+                        src={member.imageUrl}
+                        alt={member.name}
+                        className="w-full h-64 object-cover"
+                      />
+                      <div className="p-5">
+                        <h3 className="text-lg font-semibold mb-1">
+                          {member.name}
+                        </h3>
+                        <p className="text-neutral-500 text-sm mb-3">
+                          {member.role}
+                        </p>
+                        <p className="text-neutral-600 text-sm">
+                          {member.description}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                )}
           </div>
         </section>
 

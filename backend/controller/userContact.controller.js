@@ -1,8 +1,10 @@
+import { Activity } from "../module/activity.module.js";
 import userContact from "../module/UserContact.Module.js";
 import AppError from "../utils/AppError.js";
 
 // Add a mark as Read
 export const markAsReadContact = async (req, res, next) => {
+  const { role, fullName } = req.user;
   const { id } = req.params;
 
   try {
@@ -15,6 +17,12 @@ export const markAsReadContact = async (req, res, next) => {
     if (!updatedMessage) {
       return next(new AppError("Message not found", 404));
     }
+    await Activity.create({
+      action: "Mark As Read message",
+      role: role,
+      type: "reply",
+      detail: fullName,
+    });
 
     res.status(200).json({
       success: true,
@@ -39,6 +47,12 @@ export const addNewContact = async (req, res, next) => {
       email,
       subject,
       message,
+    });
+    await Activity.create({
+      action: "new message Form user",
+      role: "USER",
+      type: "add",
+      detail: fullName,
     });
 
     res.status(201).json({

@@ -1,9 +1,11 @@
 import aboutModule from "../module/about.Module.js";
+import { Activity } from "../module/activity.module.js";
 import AppError from "../utils/AppError.js";
 import { uploadToCloudinary } from "../utils/cloudnary.js";
 
 export const addAbout = async (req, res, next) => {
   try {
+    const { role, fullName } = req.user;
     const {
       title,
       intro,
@@ -70,7 +72,12 @@ export const addAbout = async (req, res, next) => {
     });
 
     await aboutData.save();
-
+    await Activity.create({
+      action: "Add About",
+      role: role,
+      type: "add",
+      detail: fullName,
+    });
     res.status(201).json({
       success: true,
       message: "About section added successfully",
@@ -81,17 +88,9 @@ export const addAbout = async (req, res, next) => {
   }
 };
 export const updateAbout = async (req, res, next) => {
+  const { role, fullName } = req.user;
   try {
-    console.log(req.file);
-    const {
-      title,
-      intro,
-      mission,
-      values,
-      join,
-
-      teamDescriptions,
-    } = req?.body;
+    const { title, intro, mission, values, join } = req?.body;
     const existing = await aboutModule.findOne({ key: "About_key" });
     if (!existing) {
       return next(new AppError("No About document found to update", 404));
@@ -116,11 +115,15 @@ export const updateAbout = async (req, res, next) => {
     existing.mission = mission ? JSON.parse(mission) : existing.mission;
     existing.values = values ? JSON.parse(values) : existing.values;
     existing.join = join ? JSON.parse(join) : existing.join;
-    existing.team = team;
     existing.introImage = introImage;
 
     await existing.save();
-
+    await Activity.create({
+      action: "update About",
+      role: role,
+      type: "update",
+      detail: fullName,
+    });
     res.status(200).json({
       success: true,
       message: "About section updated successfully",
@@ -168,6 +171,7 @@ export const getTeam = async (req, res, next) => {
 };
 export const newTeamMemberAdd = async (req, res, next) => {
   try {
+    const { role: activeRole, fullName } = req.user;
     const { role, name, description } = req.body;
 
     if (!name || !role || !description || !req.file) {
@@ -195,6 +199,12 @@ export const newTeamMemberAdd = async (req, res, next) => {
       imageUrl: imageUrl,
     });
     await about.save();
+    await Activity.create({
+      action: "Added team member",
+      role: activeRole,
+      type: "add",
+      detail: fullName,
+    });
     res.status(200).json({
       success: true,
       message: "successfully new member add...",
@@ -206,6 +216,7 @@ export const newTeamMemberAdd = async (req, res, next) => {
 };
 export const UpdateTeamMember = async (req, res, next) => {
   try {
+    const { role: activeRole, fullName } = req.user;
     const { id } = req.params;
 
     if (!id) {
@@ -241,7 +252,12 @@ export const UpdateTeamMember = async (req, res, next) => {
     if (name) teamMember.name = name;
     if (description) teamMember.description = description;
     await aboutDoc.save();
-
+    await Activity.create({
+      action: "update team member",
+      role: activeRole,
+      type: "update",
+      detail: fullName,
+    });
     res.status(200).json({
       success: true,
       message: "successfully update member ...",
@@ -253,6 +269,7 @@ export const UpdateTeamMember = async (req, res, next) => {
 };
 export const DeleteTeamMember = async (req, res, next) => {
   try {
+    const { role: activeRole, fullName } = req.user;
     const { id } = req.params;
     if (!id) {
       return next(new AppError("id is required to update team member...", 404));
@@ -268,6 +285,12 @@ export const DeleteTeamMember = async (req, res, next) => {
 
     // Save the updated
     await aboutDoc.save();
+    await Activity.create({
+      action: "Delete team member",
+      role: activeRole,
+      type: "Delete",
+      detail: fullName,
+    });
     res.status(200).json({
       success: true,
       message: "successfully delete member ...",

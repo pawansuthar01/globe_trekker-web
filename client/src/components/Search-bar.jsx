@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Search, X } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   searchDestinations,
   searchStories,
@@ -24,12 +24,13 @@ export const SearchBar = ({
   w = "w-full",
 }) => {
   const dispatch = useDispatch();
+  const { suggestions: sug } = useSelector((state) => state?.search);
   const navigate = useNavigate();
   const [search, setSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState(searchQuery);
   const [loading, setLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [suggestions, setSuggestions] = useState([]);
+  const [suggestions, setSuggestions] = useState(sug || []);
 
   const debounceRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -41,6 +42,7 @@ export const SearchBar = ({
         setShowDropdown(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -68,11 +70,6 @@ export const SearchBar = ({
 
       setLoading(false);
     }, 500);
-    if (setShowDropdown) {
-      setTimeout(() => {
-        setShowDropdown(false);
-      }, 5000);
-    }
 
     return () => clearTimeout(debounceRef.current);
   }, [searchTerm]);

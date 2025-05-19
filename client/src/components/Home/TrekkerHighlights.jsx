@@ -37,7 +37,7 @@ const TrekkersHighlights = () => {
     setLoading(false);
   };
   useEffect(() => {
-    if (homeHighlight == false || error == true) {
+    if (homeSuccess == false || error == true || homeHighlight.length == 0) {
       fetchHighlight();
     } else {
       setHighlight(homeHighlight);

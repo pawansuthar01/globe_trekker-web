@@ -15,7 +15,7 @@ const uploadToCloudinary = async (file, folder) => {
 };
 
 export const addHighlight = async (req, res, next) => {
-  const { avatar } = req.user;
+  const { avatar, role, fullName } = req.user;
   const {
     name,
     isPublished,
@@ -73,6 +73,12 @@ export const addHighlight = async (req, res, next) => {
     }
 
     await highlight.save();
+    await Activity.create({
+      action: "new Highlight upload",
+      role: role,
+      type: "add",
+      detail: fullName,
+    });
     res.status(201).json({
       success: true,
       message: "successfully highlight create...",
@@ -85,7 +91,7 @@ export const addHighlight = async (req, res, next) => {
 // Update Controller
 export const updateHighlight = async (req, res, next) => {
   const { id } = req.params;
-  const { avatar } = req.user;
+  const { avatar, role, fullName } = req.user;
 
   const {
     name,
@@ -143,6 +149,12 @@ export const updateHighlight = async (req, res, next) => {
 
     await highlight.save();
 
+    await Activity.create({
+      action: "update Highlight",
+      role: role,
+      type: "update",
+      detail: fullName,
+    });
     res.status(200).json({
       success: true,
       message: "Highlight updated successfully.",
@@ -330,6 +342,7 @@ export const getAllHighlight = async (req, res, next) => {
 
 export const deleteHighlight = async (req, res, next) => {
   try {
+    const { role, fullName } = req.user;
     const { id } = req.params;
     if (!id) {
       return next(new AppError("id is required to delete Highlight..", 400));
@@ -338,6 +351,12 @@ export const deleteHighlight = async (req, res, next) => {
     if (!highlight) {
       return next(new AppError("Highlight not found.", 404));
     }
+    await Activity.create({
+      action: "Delete Highlight",
+      role: role,
+      type: "Delete",
+      detail: fullName,
+    });
     res.status(200).json({
       success: true,
       message: "successfully delete Highlight... ",

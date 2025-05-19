@@ -23,7 +23,7 @@ const categories = [
 
 const StoriesPage = () => {
   const {
-    stories: story,
+    stories: storyData,
     success,
     error,
     totalPages,
@@ -32,7 +32,7 @@ const StoriesPage = () => {
   const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = useState(page);
   const [loading, setLoading] = useState(false);
-  const [stories, setStories] = useState(story || []);
+  const [stories, setStories] = useState([]);
   const [search, setSearch] = useState(false);
   const [searchError, setSearchError] = useState(true);
   const [activeCategory, setActiveCategory] = useState("all");
@@ -44,10 +44,13 @@ const StoriesPage = () => {
     setLoading(true);
     const res = await dispatch(fetchStories({ page, limit: 25 }));
     if (res?.payload?.success) {
-      setStories(res?.payload?.data);
+      const fetched = res?.payload?.data;
+      setFeaturedStory(fetched[0]);
+      setStories(fetched.slice(1));
     }
     setLoading(false);
   };
+
   const filteredStories = stories?.filter((story) => {
     // Agar category match ho ya search term match ho title/excerpt me
     const matchesCategory =
@@ -62,11 +65,7 @@ const StoriesPage = () => {
     // Ab condition: category match ho ya search term match ho
     return matchesCategory || matchesSearch;
   });
-  useEffect(() => {
-    if (stories.length > 0) {
-      setFeaturedStory(stories[0]);
-    }
-  }, [stories]);
+  useEffect(() => {}, [stories]);
 
   const SearchData = (Data) => {
     setStories(Data);
@@ -83,8 +82,11 @@ const StoriesPage = () => {
   };
 
   useEffect(() => {
-    if (!success || error == true || story) {
+    if (!success || error == true || storyData?.length == 0) {
       fetchStoriesData(currentPage);
+    } else {
+      setFeaturedStory(storyData[0]);
+      setStories(storyData.slice(1));
     }
   }, []);
 

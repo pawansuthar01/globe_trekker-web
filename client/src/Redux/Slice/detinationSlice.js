@@ -6,6 +6,9 @@ const initialState = {
   destinations: localStorage.getItem("destinations")
     ? JSON.parse(localStorage.getItem("destinations"))
     : [],
+  AllDestinations: localStorage.getItem("AllDestinations") //admin //
+    ? JSON.parse(localStorage.getItem("AllDestinations"))
+    : [],
   homeDestination: localStorage.getItem("homeDestination")
     ? JSON.parse(localStorage.getItem("homeDestination"))
     : [],
@@ -19,7 +22,7 @@ const initialState = {
 
 // -------------------- USER-SIDE REQUESTS --------------------
 
-// Get all destinations
+// Get all pub. destinations
 export const fetchAllDestinations = createAsyncThunk(
   "destination/fetchAll",
   async ({ page = 1, limit = 12 }) => {
@@ -37,9 +40,11 @@ export const fetchAllDestinations = createAsyncThunk(
 // Get all destinations
 export const fetchDestinations = createAsyncThunk(
   "destination/fetchAll/admin",
-  async () => {
+  async ({ page = 1, limit = 12 }) => {
     try {
-      const { data } = await axiosInstance.get("/api/v3/destination/admin");
+      const { data } = await axiosInstance.get(
+        `/api/v3/destination/admin?page=${page}&limit=${limit}`
+      );
       return data;
     } catch (err) {
       return err.response?.data?.message;
@@ -264,6 +269,32 @@ const destinationSlice = createSlice({
           state.destinations = action.payload?.data;
           localStorage.setItem(
             "destinations",
+            JSON.stringify(action.payload?.data)
+          );
+        } else {
+          localStorage.setItem("success", false);
+          localStorage.setItem("error", true);
+        }
+      })
+      .addCase(fetchDestinations.fulfilled, (state, action) => {
+        if (action?.payload?.success) {
+          console.log(action?.payload);
+          state.page = Number(action?.payload?.page);
+          state.limit = Number(action?.payload?.limit);
+          state.totalPages = Number(action?.payload?.totalPages);
+          state.loading = false;
+          state.success = true;
+          state.error = false;
+          localStorage.setItem("success", true);
+          localStorage.setItem("page", Number(action?.payload?.page));
+          localStorage.setItem("limit", Number(action?.payload?.limit));
+          localStorage.setItem(
+            "totalPages",
+            Number(action?.payload?.totalPages)
+          );
+          state.AllDestinations = action.payload?.data;
+          localStorage.setItem(
+            "AllDestinations",
             JSON.stringify(action.payload?.data)
           );
         } else {

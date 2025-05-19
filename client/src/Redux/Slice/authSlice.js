@@ -175,6 +175,33 @@ export const HandelPromotion = createAsyncThunk(
     }
   }
 );
+// ✅ 2. get  data (Admin)
+export const FetchActiveAdmin = createAsyncThunk(
+  "activity/get",
+  async ({ page = 1, limit = 10 }) => {
+    try {
+      const res = await axiosInstance.get(
+        `/api/v5/admin?page=${page}limit=${limit}`
+      );
+      return res.data;
+    } catch (err) {
+      return err.response?.data || err.message;
+    }
+  }
+);
+
+// ✅ 2. get data (Admin)
+export const FetchDashboardDetails = createAsyncThunk(
+  "activity/get",
+  async () => {
+    try {
+      const res = await axiosInstance.get(`/api/v5/admin/dashboard`);
+      return res.data;
+    } catch (err) {
+      return err.response?.data || err.message;
+    }
+  }
+);
 
 const authSliceRedux = createSlice({
   name: "auth",

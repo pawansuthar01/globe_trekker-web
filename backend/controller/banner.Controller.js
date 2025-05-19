@@ -2,14 +2,15 @@ import AppError from "../utils/AppError.js";
 import cloudinary from "cloudinary";
 import fs from "fs/promises";
 import Banner from "../module/banner.Module.js";
+import { Activity } from "../module/activity.module.js";
 // new banner add//
 export const newBanner = async (req, res, next) => {
-  console.log("yes");
+  const { role, fullName } = req.user;
   const { title, description, smallDescription, active } = req.body;
   if (!title || !description || !smallDescription || !req.files) {
     return next(
       new AppError("banner data is required to upload banner..."),
-      402
+      404
     );
   }
   try {
@@ -31,10 +32,10 @@ export const newBanner = async (req, res, next) => {
     }
     if (!images.length === 0) {
       return next(
-        new AppError("Image upload failed. No banner was Create..", 402)
+        new AppError("Image upload failed. No banner was Create..", 404)
       );
     }
-    if (active) {
+    if (active == true) {
       await Banner.updateMany({}, { $set: { active: false } });
     }
     const banner = new Banner({
@@ -42,13 +43,19 @@ export const newBanner = async (req, res, next) => {
       description,
       smallDescription,
       images,
-      active,
+      active: active == true,
     });
     if (!banner) {
-      new AppError("something wont wrong, No banner was Create..", 402);
+      new AppError("something wont wrong, No banner was Create..", 404);
     }
 
     await banner.save();
+    await Activity.create({
+      action: "add Banner",
+      role: role,
+      type: "add",
+      detail: fullName,
+    });
     res.status(200).json({
       success: true,
       message: "successfully banner create...",
@@ -81,17 +88,18 @@ export const activeBannerGet = async (req, res, next) => {
 };
 // update banner //
 export const updateBanner = async (req, res, next) => {
+  const { role, fullName } = req.user;
   const { id } = req.params;
 
   if (!id) {
-    return next(new AppError("id is required to update Banner..", 402));
+    return next(new AppError("id is required to update Banner..", 404));
   }
   const { title, description, smallDescription, index, active } = req.body;
 
   try {
     const banner = await Banner.findById(id);
     if (!banner) {
-      return next(new AppError("Banner is not Found, try again...", 402));
+      return next(new AppError("Banner is not Found, try again...", 404));
     }
     const updateImages = [...banner.images];
 
@@ -148,9 +156,15 @@ export const updateBanner = async (req, res, next) => {
     });
     if (!updateBanner) {
       return next(
-        new AppError("Failed to update the Banner. Please try again.", 402)
+        new AppError("Failed to update the Banner. Please try again.", 404)
       );
     }
+    await Activity.create({
+      action: "update Banner",
+      role: role,
+      type: "update",
+      detail: fullName,
+    });
     res.status(200).json({
       success: true,
       message: "Banner successfully updated.",
@@ -166,19 +180,26 @@ export const updateBanner = async (req, res, next) => {
 };
 // delete banner =//
 export const deleteBanner = async (req, res, next) => {
+  const { role, fullName } = req.user;
   try {
     const { id } = req.params;
     const BannerCount = await Banner.countDocuments({});
     if (BannerCount === 1) {
-      return next(new AppError("At least one Banner is required...", 402));
+      return next(new AppError("At least one Banner is required...", 404));
     }
     if (!id) {
-      return next(new AppError("id is required to delete Banner..", 402));
+      return next(new AppError("id is required to delete Banner..", 404));
     }
     const banner = await Banner.findByIdAndDelete(id);
     if (!banner) {
-      return next(new AppError("banner does not found...", 402));
+      return next(new AppError("banner does not found...", 404));
     }
+    await Activity.create({
+      action: "Delete banner",
+      role: role,
+      type: "Delete",
+      detail: fullName,
+    });
     res.status(200).json({
       success: true,
       message: "successfully delete Banner",
@@ -190,6 +211,7 @@ export const deleteBanner = async (req, res, next) => {
 // set active banner //
 export const ActiveBanner = async (req, res, next) => {
   try {
+    const { role, fullName } = req.user;
     const { id } = req.params;
     if (!id) {
       return next(new AppError("id is required to delete Banner..", 402));
@@ -213,6 +235,12 @@ export const ActiveBanner = async (req, res, next) => {
         )
       );
     }
+    await Activity.create({
+      action: "active Banner",
+      role: role,
+      type: "update",
+      detail: fullName,
+    });
     res.status(200).json({
       success: true,
       message: "successfully active Banner",

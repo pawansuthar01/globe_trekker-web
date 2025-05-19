@@ -23,7 +23,7 @@ const LatestStories = () => {
     }
   };
   useEffect(() => {
-    if (!homeSuccess || error == true || !HomeStories) {
+    if (!homeSuccess || error == true || HomeStories.length == 0) {
       fetchStories();
     } else {
       setStories(HomeStories);

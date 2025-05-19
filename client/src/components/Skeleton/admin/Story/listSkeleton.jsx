@@ -1,7 +1,5 @@
-import React from "react";
-
 const StoryListSkeleton = () => {
-  const rows = new Array(5).fill(null); // Adjust number of rows
+  const rows = new Array(3).fill(null); // Adjust number of rows
 
   return (
     <tbody className="animate-pulse">

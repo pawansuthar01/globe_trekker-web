@@ -58,7 +58,6 @@ const DestinationsPage = () => {
 
     if (res?.payload?.success) {
       setDestination(res.payload.data);
-      setCurrentPage(res.payload.page);
     }
 
     setLoading(false);
@@ -125,7 +124,7 @@ const DestinationsPage = () => {
   };
 
   useEffect(() => {
-    if (!success || error || !destinations) {
+    if (!success || error || destinations.length == 0) {
       fetchDestinationsData(currentPage);
     } else {
       setLoading(false);

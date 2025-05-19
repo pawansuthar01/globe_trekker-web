@@ -4,7 +4,9 @@ import axiosInstance from "../../helper/axiosInstance";
 const initialState = {
   results: [],
   highlightResults: [],
-  suggestions: [],
+  suggestions: localStorage.getItem("suggestions")
+    ? JSON.parse(localStorage.getItem("suggestions"))
+    : [],
   keywords: [],
   loading: false,
   error: null,
@@ -131,8 +133,14 @@ const searchSlice = createSlice({
         state.loading = true;
       })
       .addCase(suggestSearchKeywords.fulfilled, (state, action) => {
-        state.loading = false;
-        state.suggestions = action.payload;
+        if (action?.payload?.success) {
+          state.loading = false;
+          state.suggestions = action.payload?.data;
+          localStorage.setItem(
+            "suggestions",
+            JSON.stringify(action.payload?.data)
+          );
+        }
       })
       .addCase(suggestSearchKeywords.rejected, (state, action) => {
         state.loading = false;

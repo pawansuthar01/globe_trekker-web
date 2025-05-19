@@ -23,7 +23,7 @@ const TopDestinations = () => {
 
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-  const [destination, setDestination] = useState(homeDestination);
+  const [destination, setDestination] = useState();
   const navigate = useNavigate();
   const [hasAnimated, setHasAnimated] = useState(true);
   const containerRef = useRef(null);
@@ -57,7 +57,7 @@ const TopDestinations = () => {
   };
 
   useEffect(() => {
-    if (!homeSuccess || error == true || !homeDestination) {
+    if (!homeSuccess || error == true || homeDestination.length == 0) {
       fetchDestination();
     } else {
       setDestination(homeDestination);

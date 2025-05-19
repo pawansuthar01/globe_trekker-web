@@ -46,8 +46,8 @@ const StoryList = () => {
     setLoading(false);
   }
   useEffect(() => {
-    if (!story || !success || error == true) {
-      FetchStories();
+    if (story.length == 0 || !success || error == true) {
+      FetchStories(currentPage);
     } else {
       setStories(story);
     }

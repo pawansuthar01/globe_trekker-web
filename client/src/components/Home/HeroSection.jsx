@@ -19,8 +19,7 @@ const HeroSection = () => {
     setLoading(false);
   };
   useEffect(() => {
-    console.log(success);
-    if (!success || error == true || !banners) {
+    if (!success || error == true || !banner) {
       FetchActiveBanners();
     } else {
       setBanner(banners[0]);

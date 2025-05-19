@@ -4,6 +4,7 @@ import cloudinary from "cloudinary";
 /*<=  add =>*/
 export const newDestination = async (req, res, next) => {
   try {
+    const { role, fullName } = req.user;
     const { id } = req.user;
     if (!id) {
       return next(
@@ -122,7 +123,12 @@ export const newDestination = async (req, res, next) => {
     });
 
     await destination.save();
-
+    await Activity.create({
+      action: "new Destination Upload",
+      role: role,
+      type: "add",
+      detail: fullName,
+    });
     res.status(201).json({
       success: true,
       message: "Destination created successfully.",
@@ -136,6 +142,7 @@ export const newDestination = async (req, res, next) => {
 
 export const updateDestination = async (req, res, next) => {
   try {
+    const { role, fullName } = req.user;
     const { id } = req.params;
 
     const existing = await destinationModule.findById(id);
@@ -242,6 +249,12 @@ export const updateDestination = async (req, res, next) => {
 
     await existing.save();
 
+    await Activity.create({
+      action: "update Destination",
+      role: role,
+      type: "update",
+      detail: fullName,
+    });
     res.status(200).json({
       success: true,
       message: "Destination updated successfully.",
@@ -377,6 +390,7 @@ export const getAllDestination = async (req, res, next) => {
   try {
     const { page = 1, limit = 25 } = req.query; // default: page 1, 50 items
     const skip = (Number(page) - 1) * Number(limit);
+
     const Destination = await destinationModule
       .find()
       .sort({ createdAt: -1 }) // latest first
@@ -496,6 +510,7 @@ export const RemoveToSaveDestination = async (req, res, next) => {
 /*<=  delete destination by id =>*/
 
 export const deleteDestination = async (req, res, next) => {
+  const { role, fullName } = req.user;
   try {
     const { id } = req.params;
     if (!id) {
@@ -505,6 +520,12 @@ export const deleteDestination = async (req, res, next) => {
     if (!destination) {
       return next(new AppError("Destination not found.", 404));
     }
+    await Activity.create({
+      action: "Delete Destination",
+      role: role,
+      type: "Delete",
+      detail: fullName,
+    });
     res.status(200).json({
       success: true,
       message: "successfully delete destination... ",

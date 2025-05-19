@@ -3,7 +3,7 @@ import AppError from "../utils/AppError.js";
 import Story from "../module/stories.Module.js";
 export const newStory = async (req, res, next) => {
   try {
-    const { fullName, bio, avatar } = req.user;
+    const { fullName, bio, avatar, role } = req.user;
     const {
       title,
       content,
@@ -80,7 +80,12 @@ export const newStory = async (req, res, next) => {
     });
 
     await story.save();
-
+    await Activity.create({
+      action: "new Story",
+      role: role,
+      type: "add",
+      detail: fullName,
+    });
     res.status(201).json({
       success: true,
       message: "Story created successfully.",
@@ -93,7 +98,7 @@ export const newStory = async (req, res, next) => {
 
 export const updateStory = async (req, res, next) => {
   try {
-    const { fullName, bio, avatar } = req.user;
+    const { fullName, bio, avatar, role } = req.user;
     const story = await Story.findById(req.params.id);
     if (!story) {
       return next(new AppError("Story not found", 404));
@@ -189,7 +194,12 @@ export const updateStory = async (req, res, next) => {
     }
 
     await story.save();
-
+    await Activity.create({
+      action: "update Story",
+      role: role,
+      type: "update",
+      detail: fullName,
+    });
     res.status(200).json({
       success: true,
       message: "Story updated successfully.",
@@ -231,12 +241,18 @@ export const FeaturedStory = async (req, res, next) => {
 };
 export const deleteStory = async (req, res, next) => {
   try {
+    const { role, fullName } = req.user;
     const { id } = req.params;
     if (!id) {
       return next(new AppError("Id is required to delete story...", 400));
     }
     await Story.findByIdAndDelete(id);
-
+    await Activity.create({
+      action: "Delete Story",
+      role: role,
+      type: "Delete",
+      detail: fullName,
+    });
     res.status(200).json({
       success: true,
       message: "SuccessFully Delete Story...",
@@ -269,7 +285,7 @@ export const GetStory = async (req, res, next) => {
     const skip = (page - 1) * limit;
 
     const [stories, storiesCount, storiesFeaturedCount] = await Promise.all([
-      Story.findOne({ isPublished: true })
+      Story.find({ isPublished: true })
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit),

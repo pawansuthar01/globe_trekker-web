@@ -27,7 +27,12 @@ export const addContact = async (req, res, next) => {
     });
 
     await newContact.save();
-
+    await Activity.create({
+      action: "new contact Details ",
+      role: role,
+      type: "update",
+      detail: fullName,
+    });
     res.status(201).json({
       success: true,
       message: "Contact info added successfully",
@@ -40,6 +45,7 @@ export const addContact = async (req, res, next) => {
 
 export const updateContact = async (req, res, next) => {
   try {
+    const { role, fullName } = req.user;
     const { location, email1, email2, phone, workingHours, followLinks } =
       req.body;
 
@@ -60,6 +66,12 @@ export const updateContact = async (req, res, next) => {
       return next(new AppError("Contact data not found to update.", 404));
     }
 
+    await Activity.create({
+      action: "update contact Details",
+      role: role,
+      type: "update",
+      detail: fullName,
+    });
     res.status(200).json({
       success: true,
       message: "Contact updated successfully",
