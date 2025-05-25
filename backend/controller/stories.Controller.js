@@ -1,6 +1,8 @@
 import cloudinary from "cloudinary";
 import AppError from "../utils/AppError.js";
 import Story from "../module/stories.Module.js";
+import User from "../module/user.Module.js";
+import { Activity } from "../module/activity.module.js";
 export const newStory = async (req, res, next) => {
   try {
     const { fullName, bio, avatar, role } = req.user;
@@ -39,6 +41,17 @@ export const newStory = async (req, res, next) => {
         req.files["coverImage"][0].path,
         {
           folder: "stories/cover",
+          transformation: [
+            {
+              width: 1200,
+              height: 675,
+              crop: "fill",
+              gravity: "auto",
+            },
+            {
+              fetch_format: "webp",
+            },
+          ],
         }
       );
       coverImage = {
@@ -53,6 +66,17 @@ export const newStory = async (req, res, next) => {
         const file = req.files["image"][i];
         const result = await cloudinary.v2.uploader.upload(file.path, {
           folder: "stories/gallery",
+          transformation: [
+            {
+              width: 1200,
+              height: 675,
+              crop: "fill",
+              gravity: "auto",
+            },
+            {
+              fetch_format: "webp",
+            },
+          ],
         });
 
         images.push({
@@ -139,6 +163,10 @@ export const updateStory = async (req, res, next) => {
         req.files.coverImage[0].path,
         {
           folder: "stories/cover",
+          transformation: [
+            { width: 1200, height: 500, crop: "fill" }, // Resize and crop
+            { fetch_format: "webp", quality: "auto" }, // Format and quality
+          ],
         }
       );
       story.coverImage = {
@@ -177,6 +205,10 @@ export const updateStory = async (req, res, next) => {
     for (let i = 0; i < files.length; i++) {
       const result = await cloudinary.v2.uploader.upload(files[i].path, {
         folder: "stories/gallery",
+        transformation: [
+          { width: 1200, height: 500, crop: "fill" }, // Resize and crop
+          { fetch_format: "webp", quality: "auto" }, // Format and quality
+        ],
       });
 
       story.images.push({
@@ -374,5 +406,43 @@ export const getHomeStories = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Failed to fetch stories" });
+  }
+};
+
+export const favorites_Story = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const storyId = req.params.id;
+
+    const user = await User.findById(userId);
+    console.log(user);
+    if (!user.favoriteStories.includes(storyId)) {
+      user.favoriteStories.push(storyId);
+      await user.save();
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Story added to favorites",
+      data: user?.favoriteStories,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
+export const Removed_Story = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    user.favoriteStories = user.favoriteStories.filter(
+      (id) => id.toString() !== req.params.id
+    );
+    await user.save();
+    return res.json({
+      success: true,
+      message: "Removed from favorites",
+      data: user?.favoriteStories,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
   }
 };

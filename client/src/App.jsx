@@ -36,6 +36,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CheckLoggedIn from "./components/AdminComponent/auth/isLoogedIn";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import CookiePolicy from "./pages/CookiePolicy";
+import SavedPage from "./pages/FavoriteListPage";
 function App() {
   return (
     <Routes>
@@ -51,6 +52,7 @@ function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/auth/check-login" element={<CheckLogin />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/favorite" element={<SavedPage />} />
         <Route element={<CheckLoggedIn />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />

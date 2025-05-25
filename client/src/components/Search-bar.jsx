@@ -49,7 +49,7 @@ export const SearchBar = ({
 
   // Debounced suggestions
   useEffect(() => {
-    if (!searchTerm.trim()) {
+    if (searchTerm && !searchTerm.trim()) {
       setSuggestions([]);
       setShowDropdown(false);
       return;
@@ -125,7 +125,7 @@ export const SearchBar = ({
       <form onSubmit={handelSubmit} className="relative flex">
         <input
           type="text"
-          value={searchTerm}
+          value={searchTerm || ""}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search places, destinations..."
           className={
@@ -133,31 +133,32 @@ export const SearchBar = ({
             "w-full py-3 px-4 pl-10 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-300"
           }
         />
-        {search && (
+        {search ? (
           <button
             onClick={() => {
               handelOldData();
               setSearchTerm("");
             }}
-            className=" absolute   top-1  rounded-lg  z-30 right-28 text-white bg-red-500 p-2 text-2xl"
+            className=" absolute   top-1  rounded-lg  right-3 z-30  text-white bg-red-500 px-7 py-2 text-2xl"
           >
             <X />
           </button>
-        )}
-        {button && (
-          <>
-            <MapPin className="absolute left-3 top-3.5 h-5 w-5 text-neutral-400" />
-            <button
-              type="submit"
-              className="absolute right-3 top-1 border rounded-md bg-blue-500 px-7 py-2 hover:bg-blue-400"
-            >
-              <Search className="text-white" />
-            </button>
-          </>
+        ) : (
+          button && (
+            <>
+              <MapPin className="absolute left-3 top-3.5 h-5 w-5 text-neutral-400" />
+              <button
+                type="submit"
+                className="absolute right-3 top-1 border rounded-md bg-blue-500 px-7 py-2 hover:bg-blue-400"
+              >
+                <Search className="text-white" />
+              </button>
+            </>
+          )
         )}
       </form>
 
-      {searchTerm.trim() && showDropdown && (
+      {searchTerm && searchTerm.trim() && showDropdown && (
         <div className="absolute left-0 right-0 mt-2 bg-white border border-neutral-300 shadow-md rounded-md max-h-64 overflow-y-auto">
           {loading ? (
             <p className="p-3 text-sm text-gray-400">Searching...</p>

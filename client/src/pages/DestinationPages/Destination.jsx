@@ -34,7 +34,8 @@ const DestinationsPage = () => {
     (state) => state.destination
   );
   const dispatch = useDispatch();
-  const [currentPage, setCurrentPage] = useState(page);
+  const [currentPage, setCurrentPage] = useState(page || 1);
+
   const [loading, setLoading] = useState(false);
   const [destination, setDestination] = useState([]);
   const [activeCategory, setActiveCategory] = useState("all");

@@ -6,10 +6,13 @@ import {
   MapPin,
   Compass,
   ArrowUpRight,
+  Heart,
 } from "lucide-react";
 import formatDate from "../../utils/DataFormat";
+import { useNavigate } from "react-router-dom";
 
 const ProfileHeader = ({ user }) => {
+  const navigate = useNavigate();
   const getRoleBadgeColor = (role) => {
     switch (role) {
       case "ADMIN":
@@ -64,6 +67,12 @@ const ProfileHeader = ({ user }) => {
                   <span> GO Dashboard </span>
                 </div>
               )}
+              <span
+                onClick={() => navigate("/favorite")}
+                className={`px-4 flex py-1 items-center gap-2 rounded-full text-sm font-medium border ${"bg-teal-100 text-red-800 border-red-300"}`}
+              >
+                <Heart size={15} className="text-red-600" /> Favorites
+              </span>
               <span
                 className={`px-4 py-1 rounded-full text-sm font-medium border ${
                   user.isSubscribed

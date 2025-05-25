@@ -14,6 +14,12 @@ const initialState = {
   data: localStorage.getItem("data")
     ? JSON.parse(localStorage.getItem("data"))
     : {},
+  favoriteDestinations: localStorage.getItem("favoriteDestinations")
+    ? JSON.parse(localStorage.getItem("favoriteDestinations"))
+    : [],
+  favoriteStories: localStorage.getItem("favoriteStories")
+    ? JSON.parse(localStorage.getItem("favoriteStories"))
+    : [],
 };
 
 const User_basic_url = `/api/v3/auth`;
@@ -202,6 +208,53 @@ export const FetchDashboardDetails = createAsyncThunk(
     }
   }
 );
+export const FavoriteListAddDestination = createAsyncThunk(
+  "Favorite/post",
+  async (id) => {
+    try {
+      const res = await axiosInstance.post(`api/v3/destination/favorite/${id}`);
+      return res.data;
+    } catch (err) {
+      return err.response?.data || err.message;
+    }
+  }
+);
+export const FavoriteListRemoveDestination = createAsyncThunk(
+  "Favorite/destination/Delete",
+  async (id) => {
+    try {
+      const res = await axiosInstance.delete(
+        `api/v3/destination/favorite/${id}`
+      );
+      return res.data;
+    } catch (err) {
+      return err.response?.data || err.message;
+    }
+  }
+);
+export const FavoriteListAddStory = createAsyncThunk(
+  "Favorite/story/post",
+  async (id) => {
+    try {
+      const res = await axiosInstance.post(`story/favorite/${id}`);
+
+      return res.data;
+    } catch (err) {
+      return err.response?.data || err.message;
+    }
+  }
+);
+export const FavoriteRemoveStory = createAsyncThunk(
+  "Favorite/Delete",
+  async (id) => {
+    try {
+      const res = await axiosInstance.delete(`story/favorite/${id}`);
+      return res.data;
+    } catch (err) {
+      return err.response?.data || err.message;
+    }
+  }
+);
 
 const authSliceRedux = createSlice({
   name: "auth",
@@ -218,7 +271,12 @@ const authSliceRedux = createSlice({
       localStorage.setItem("exp", 0);
       localStorage.setItem("role", "");
       localStorage.setItem("userName", "");
+      localStorage.setItem("favoriteStories", null);
+      localStorage.setItem("favoriteDestinations", null);
+      state.favoriteDestinations = [];
 
+      state.favoriteDestinations = [];
+      state.favoriteStories = [];
       state.userName = "";
 
       state.exp = 0;
@@ -233,6 +291,7 @@ const authSliceRedux = createSlice({
     builder
       .addCase(CreateAccount.fulfilled, (state, action) => {
         if (action.payload.success) {
+          const { user } = action.payload;
           localStorage.setItem("data", JSON.stringify(action?.payload?.user));
           localStorage.setItem("isLoggedIn", true);
           localStorage.setItem("exp", Number(action?.payload?.exp));
@@ -244,7 +303,16 @@ const authSliceRedux = createSlice({
           );
           state.Authenticator = action?.payload?.AuthenticatorToken;
           state.userName = action?.payload?.user.userName;
-
+          localStorage.setItem(
+            "favoriteStories",
+            JSON.stringify(user.favoriteStories)
+          );
+          localStorage.setItem(
+            "favoriteDestinations",
+            JSON.stringify(user.favoriteDestinations)
+          );
+          state.favoriteDestinations = user.favoriteDestinations;
+          state.favoriteStories = user.favoriteStories;
           state.exp = Number(action?.payload?.exp);
           state.isLoggedIn = true;
           state.data = action?.payload?.user;
@@ -253,6 +321,7 @@ const authSliceRedux = createSlice({
       })
       .addCase(UpdateAccount.fulfilled, (state, action) => {
         if (action.payload.success) {
+          const { user } = action.payload;
           localStorage.setItem("data", JSON.stringify(action?.payload?.user));
           localStorage.setItem("role", action?.payload?.user.role);
           localStorage.setItem("userName", action?.payload?.user.userName);
@@ -260,8 +329,17 @@ const authSliceRedux = createSlice({
             "Authenticator",
             action?.payload?.AuthenticatorToken
           );
+          localStorage.setItem(
+            "favoriteStories",
+            JSON.stringify(user.favoriteStories)
+          );
+          localStorage.setItem(
+            "favoriteDestinations",
+            JSON.stringify(user.favoriteDestinations)
+          );
+          state.favoriteDestinations = user.favoriteDestinations;
+          state.favoriteStories = user.favoriteStories;
           state.Authenticator = action?.payload?.AuthenticatorToken;
-
           state.userName = action?.payload?.user.userName;
 
           state.role = state.data = action?.payload?.user;
@@ -273,6 +351,14 @@ const authSliceRedux = createSlice({
           localStorage.setItem("data", JSON.stringify(action?.payload?.user));
           localStorage.setItem("isLoggedIn", true);
           localStorage.setItem("exp", Number(action?.payload?.exp));
+          localStorage.setItem(
+            "favoriteStories",
+            JSON.stringify(action?.payload?.user.favoriteStories)
+          );
+          localStorage.setItem(
+            "favoriteDestinations",
+            JSON.stringify(action?.payload?.user?.favoriteDestinations)
+          );
           localStorage.setItem("role", action?.payload?.user.role);
           localStorage.setItem("userName", action?.payload?.user.userName);
           localStorage.setItem(
@@ -281,7 +367,9 @@ const authSliceRedux = createSlice({
           );
           state.Authenticator = action?.payload?.AuthenticatorToken;
           state.userName = action?.payload?.user.userName;
-
+          state.favoriteDestinations =
+            action?.payload?.user?.favoriteDestinations;
+          state.favoriteStories = action?.payload?.user?.favoriteStories;
           state.exp = Number(action?.payload?.exp);
           state.isLoggedIn = true;
           state.data = action?.payload?.user;
@@ -294,6 +382,14 @@ const authSliceRedux = createSlice({
           localStorage.setItem("data", JSON.stringify(user));
           localStorage.setItem("isLoggedIn", true);
           localStorage.setItem("exp", Number(exp));
+          localStorage.setItem(
+            "favoriteStories",
+            JSON.stringify(user.favoriteStories)
+          );
+          localStorage.setItem(
+            "favoriteDestinations",
+            JSON.stringify(user.favoriteDestinations)
+          );
           localStorage.setItem("role", user.role);
           localStorage.setItem("userName", user.userName);
           localStorage.setItem(
@@ -302,7 +398,8 @@ const authSliceRedux = createSlice({
           );
           state.Authenticator = action?.payload?.AuthenticatorToken;
           state.userName = user.userName;
-
+          state.favoriteDestinations = user.favoriteDestinations;
+          state.favoriteStories = user.favoriteStories;
           state.exp = Number(exp);
           state.isLoggedIn = true;
           state.data = user;
@@ -313,6 +410,14 @@ const authSliceRedux = createSlice({
         if (action.payload.success) {
           const { user, exp, AuthenticatorToken } = action.payload;
           localStorage.setItem("data", JSON.stringify(user));
+          localStorage.setItem(
+            "favoriteStories",
+            JSON.stringify(user.favoriteStories)
+          );
+          localStorage.setItem(
+            "favoriteDestinations",
+            JSON.stringify(user.favoriteDestinations)
+          );
           localStorage.setItem("isLoggedIn", true);
           localStorage.setItem("exp", Number(exp));
           localStorage.setItem("role", user.role);
@@ -320,11 +425,44 @@ const authSliceRedux = createSlice({
           localStorage.setItem("Authenticator", AuthenticatorToken);
           state.Authenticator = AuthenticatorToken;
           state.userName = user.userName;
-
+          state.favoriteDestinations = user.favoriteDestinations;
+          state.favoriteStories = user.favoriteStories;
           state.exp = Number(exp);
           state.isLoggedIn = true;
           state.data = user;
           state.role = user.role;
+        }
+      })
+      .addCase(FavoriteListRemoveDestination.fulfilled, (state, action) => {
+        if (action?.payload?.success) {
+          const { data } = action?.payload;
+
+          localStorage.setItem("favoriteDestinations", JSON.stringify(data));
+          state.favoriteDestinations = data;
+        }
+      })
+      .addCase(FavoriteListAddDestination.fulfilled, (state, action) => {
+        if (action?.payload?.success) {
+          const { data } = action?.payload;
+          console.log(action?.payload);
+          localStorage.setItem("favoriteDestinations", JSON.stringify(data));
+          state.favoriteDestinations = data;
+        }
+      })
+      .addCase(FavoriteListAddStory.fulfilled, (state, action) => {
+        if (action?.payload?.success) {
+          const { data } = action?.payload;
+
+          localStorage.setItem("favoriteStories", JSON.stringify(data));
+          state.favoriteStories = data;
+        }
+      })
+      .addCase(FavoriteRemoveStory.fulfilled, (state, action) => {
+        if (action?.payload?.success) {
+          const { data } = action?.payload;
+
+          localStorage.setItem("favoriteStories", JSON.stringify(data));
+          state.favoriteStories = data;
         }
       });
   },

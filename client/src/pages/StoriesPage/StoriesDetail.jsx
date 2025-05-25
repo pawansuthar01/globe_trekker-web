@@ -5,6 +5,7 @@ import ImageWithLoaderPercentage from "../../components/Skeleton/imageLoder";
 import formatDate from "../../utils/DataFormat";
 import { useDispatch } from "react-redux";
 import { fetchStoryById } from "../../Redux/Slice/storiesSlice";
+import { FavoriteButton, ShareButton } from "../../components/button";
 
 const StoryDetailPage = () => {
   const { id } = useParams();
@@ -106,14 +107,8 @@ const StoryDetailPage = () => {
           {/* Sidebar */}
           <div className="lg:col-span-2 lg:order-1">
             <div className="sticky top-24 space-y-4">
-              <button className="w-full bg-primary-600 hover:bg-primary-700 text-white p-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-                <Heart className="h-5 w-5" />
-                <span className="sr-only md:not-sr-only">Save</span>
-              </button>
-              <button className="w-full bg-neutral-100 hover:bg-neutral-200 text-neutral-700 p-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-                <Share2 className="h-5 w-5" />
-                <span className="sr-only md:not-sr-only">Share</span>
-              </button>
+              <FavoriteButton Id={story?._id} type="Story" />
+              <ShareButton description={story?.excerpt} title={story?.title} />
             </div>
           </div>
 

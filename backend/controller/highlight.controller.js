@@ -6,6 +6,10 @@ const uploadToCloudinary = async (file, folder) => {
   const result = await cloudinary.v2.uploader.upload(file.path, {
     folder,
     resource_type: file.mimetype.startsWith("video") ? "video" : "image",
+    transformation: [
+      { width: 1200, height: 500, crop: "fill" }, // Resize and crop
+      { fetch_format: "webp", quality: "auto" }, // Format and quality
+    ],
   });
   await fs.rm(file.path, { force: true });
   return {

@@ -11,6 +11,7 @@ import {
   LogIn,
   FanIcon,
   PenLine,
+  Heart,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 
@@ -33,6 +34,11 @@ const SidebarNav = ({ expanded, onMouseEnter, onMouseLeave }) => {
             icon: <PenLine size={20} />,
             label: "Admin Dashboard",
             path: "/admin",
+          },
+          {
+            icon: <Heart size={20} />,
+            label: "Favorite List",
+            path: "/favorite",
           },
         ]
       : []),

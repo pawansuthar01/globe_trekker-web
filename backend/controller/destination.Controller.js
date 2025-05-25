@@ -1,4 +1,5 @@
 import destinationModule from "../module/destination.Module.js";
+import User from "../module/user.Module.js";
 import AppError from "../utils/AppError.js";
 import cloudinary from "cloudinary";
 /*<=  add =>*/
@@ -66,6 +67,10 @@ export const newDestination = async (req, res, next) => {
         req.files["thumbnail"][0].path,
         {
           folder: "destination/cover",
+          transformation: [
+            { width: 1200, height: 500, crop: "fill" }, // Resize and crop
+            { fetch_format: "webp", quality: "auto" }, // Format and quality
+          ],
         }
       );
       thumbnail = {
@@ -80,6 +85,10 @@ export const newDestination = async (req, res, next) => {
       for (let file of req.files["image"]) {
         const result = await cloudinary.v2.uploader.upload(file.path, {
           folder: "destination/gallery",
+          transformation: [
+            { width: 1200, height: 500, crop: "fill" }, // Resize and crop
+            { fetch_format: "webp", quality: "auto" }, // Format and quality
+          ],
         });
         images.push({
           public_id: result.public_id,
@@ -184,7 +193,13 @@ export const updateDestination = async (req, res, next) => {
     if (req.files["thumbnail"]) {
       const result = await cloudinary.v2.uploader.upload(
         req.files["thumbnail"][0].path,
-        { folder: "destination/cover" }
+        {
+          folder: "destination/cover",
+          transformation: [
+            { width: 1200, height: 500, crop: "fill" }, // Resize and crop
+            { fetch_format: "webp", quality: "auto" }, // Format and quality
+          ],
+        }
       );
       thumbnail = {
         url: result.secure_url,
@@ -209,6 +224,10 @@ export const updateDestination = async (req, res, next) => {
       for (let file of req.files["image"]) {
         const result = await cloudinary.v2.uploader.upload(file.path, {
           folder: "destination/gallery",
+          transformation: [
+            { width: 1200, height: 500, crop: "fill" }, // Resize and crop
+            { fetch_format: "webp", quality: "auto" }, // Format and quality
+          ],
         });
         images.push({
           public_id: result.public_id,
@@ -659,6 +678,40 @@ export const getDestinationById = async (req, res, next) => {
       success: true,
       message: "successFully get destination...",
       data: destination,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
+//// Add destination to favorites
+export const favorites_Destination = async (req, res, next) => {
+  const userId = req.user.id;
+  const destinationId = req.params.id;
+
+  const user = await User.findById(userId);
+  if (!user.favoriteDestinations.includes(destinationId)) {
+    user.favoriteDestinations.push(destinationId);
+    await user.save();
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Destination added to favorites",
+    data: user.favoriteDestinations,
+  });
+};
+
+export const Removed_Destination = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    user.favoriteDestinations = user.favoriteDestinations.filter(
+      (id) => id.toString() !== req.params.id
+    );
+    await user.save();
+    return res.json({
+      success: true,
+      message: "Removed from favorites",
+      data: user.favoriteDestinations,
     });
   } catch (error) {
     return next(new AppError(error.message, 500));

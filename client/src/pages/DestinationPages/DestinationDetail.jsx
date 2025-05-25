@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { Calendar, MapPin, Star, Clock, Heart } from "lucide-react";
 import ImageWithLoaderPercentage from "../../components/Skeleton/imageLoder";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchDestinationById } from "../../Redux/Slice/detinationSlice";
 import ImageCarousel from "../../components/images";
+import { FavoriteButton, ShareButton } from "../../components/button";
 
 const DestinationDetailPage = () => {
   const { id } = useParams();
   const DataDestination = useLocation().state?.destination;
+
   const dispatch = useDispatch();
   const [destination, setDestination] = useState();
   const [loading, setLoading] = useState(true);
@@ -140,11 +142,11 @@ const DestinationDetailPage = () => {
                   <h2 className="text-2xl font-semibold mb-6 text-gray-800">
                     Travel Tips
                   </h2>
-                  <div className="grid gap-4">
+                  <div className="grid gap-2">
                     {destination.travelTips.map((tip, index) => (
                       <div
                         key={index}
-                        className="flex items-start group p-4 rounded-lg hover:bg-gray-50"
+                        className="flex items-start group p-2 rounded-lg hover:bg-gray-50"
                       >
                         <span className="inline-flex h-8 w-8 bg-blue-100 text-blue-600 rounded-full flex-shrink-0 items-center justify-center mr-4 transition-all group-hover:bg-blue-600 group-hover:text-white font-medium">
                           {index + 1}
@@ -166,7 +168,7 @@ const DestinationDetailPage = () => {
                     {destination.itinerary.map((day) => (
                       <div
                         key={day._id}
-                        className="relative pl-8 pb-8 last:pb-0"
+                        className="relative pl-8 pb-5 last:pb-0"
                       >
                         <div className="absolute left-0 top-0 bottom-0 w-px bg-blue-200" />
                         <div className="absolute left-[-8px] top-0 w-4 h-4 rounded-full bg-blue-600 border-4 border-white" />
@@ -218,7 +220,7 @@ const DestinationDetailPage = () => {
                         <Calendar className="h-5 w-5 text-blue-600 mr-3" />
                         <div>
                           <div className="font-medium">Best Time to Visit</div>
-                          <div className="text-gray-600">
+                          <div className="text-gray-600 text-[15px]">
                             {destination.bestTimeToVisit}
                           </div>
                         </div>
@@ -249,11 +251,12 @@ const DestinationDetailPage = () => {
                     </div>
                   </section>
                   {/* Action Button */}
-                  <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-all hover:shadow-lg flex items-center justify-center gap-2">
-                      <Heart className="h-5 w-5" />
-                      Save to Favorites
-                    </button>
+                  <div className="bg-white rounded-xl gap-2 flex flex-col shadow-sm p-4 border border-gray-100">
+                    <FavoriteButton Id={destination._id} />
+                    <ShareButton
+                      title={destination?.name}
+                      description={destination?.description}
+                    />
                   </div>
                 </div>
               </div>

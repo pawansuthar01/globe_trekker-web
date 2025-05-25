@@ -53,6 +53,10 @@ const userSchema = new mongoose.Schema(
         achievedAt: { type: Date, default: Date.now },
       },
     ],
+    favoriteDestinations: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Destination" },
+    ],
+    favoriteStories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Story" }],
   },
   { timestamps: true }
 );
