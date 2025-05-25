@@ -2,12 +2,13 @@ import cloudinary from "cloudinary";
 import AppError from "../utils/AppError.js";
 import Highlight from "../module/highlight.Module.js";
 import fs from "fs/promises";
+import { Activity } from "../module/activity.module.js";
 const uploadToCloudinary = async (file, folder) => {
   const result = await cloudinary.v2.uploader.upload(file.path, {
     folder,
     resource_type: file.mimetype.startsWith("video") ? "video" : "image",
     transformation: [
-      { width: 1200, height: 500, crop: "fill" }, // Resize and crop
+      { width: 768, height: 432, crop: "fill" }, // Resize and crop
       { fetch_format: "webp", quality: "auto" }, // Format and quality
     ],
   });
@@ -325,7 +326,12 @@ export const getHighlightById = async (req, res, next) => {
 
 export const getAllHighlight = async (req, res, next) => {
   try {
-    const highlight = await Highlight.find();
+    const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
+    const limit = parseInt(req.query.limit) || 30;
+    const skip = (page - 1) * limit;
+    const highlight = await Highlight.find({ isPublished: true })
+      .skip(skip)
+      .limit(limit);
     const highlightCount = await Highlight.countDocuments();
     const isPublishedCount = await Highlight.countDocuments({
       isPublished: true,
@@ -337,6 +343,8 @@ export const getAllHighlight = async (req, res, next) => {
       data: highlight,
       HighlightCount: highlightCount,
       isPublishedCount: isPublishedCount,
+      totalPages: Math.ceil(isPublishedCount / limit),
+      currentPage: page,
     });
   } catch (error) {
     return next(new AppError(error.message, 500));

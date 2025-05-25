@@ -142,6 +142,15 @@ const TrekkersHighlights = () => {
                         </Link>
                       </div>
                     </div>
+                    <div className="mt-8 sm:hidden text-center ">
+                      <Link
+                        to="/highlight"
+                        className="inline-flex items-center space-x-2 text-primary-600 hover:text-primary-700 font-medium"
+                      >
+                        <span>View all highlight</span>
+                        <ChevronRight className="h-4 w-4" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>

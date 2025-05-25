@@ -25,20 +25,23 @@ const SidebarNav = ({ expanded, onMouseEnter, onMouseLeave }) => {
     { icon: <BookOpen size={24} />, label: "Stories", path: "/stories" },
     { icon: <Compass size={24} />, label: "About", path: "/about" },
     { icon: <MessageSquare size={24} />, label: "Contact", path: "/contact" },
-    isLoggedIn
-      ? { icon: <User size={20} />, label: "Profile", path: "/profile" }
-      : { icon: <LogIn size={20} />, label: "Login", path: "/login" },
+    ...(isLoggedIn
+      ? [
+          { icon: <User size={20} />, label: "Profile", path: "/profile" },
+          {
+            icon: <Heart size={20} />,
+            label: "Favorite List",
+            path: "/favorite",
+          },
+        ]
+      : { icon: <LogIn size={20} />, label: "Login", path: "/login" }),
+
     ...(isLoggedIn && (role === "ADMIN" || role === "AUTHOR")
       ? [
           {
             icon: <PenLine size={20} />,
             label: "Admin Dashboard",
             path: "/admin",
-          },
-          {
-            icon: <Heart size={20} />,
-            label: "Favorite List",
-            path: "/favorite",
           },
         ]
       : []),

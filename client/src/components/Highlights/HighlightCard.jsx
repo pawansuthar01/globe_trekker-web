@@ -1,21 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Star, MapPin, ChevronDown, ChevronUp } from "lucide-react";
 import ImageWithLoaderPercentage from "../Skeleton/imageLoder";
 import ShortVideoCard, { VideoPlayIcon } from "./videoCard";
-const HighlightCard = ({ highlight }) => {
-  // Log the highlight to understand its structure
+import formatDate from "../../utils/DataFormat";
 
+const HighlightCard = ({ highlight }) => {
   const [expanded, setExpanded] = useState(false);
   const [showVideo, setShowVideo] = useState(null);
+  const contentRef = useRef(null);
+  const [maxHeight, setMaxHeight] = useState("440px");
 
   const toggleExpanded = () => {
     setExpanded(!expanded);
   };
 
-  // Ensure highlight.text is not undefined
-  const highlightText = highlight?.description || "";
+  useEffect(() => {
+    if (expanded && contentRef.current) {
+      setMaxHeight(`${contentRef.current.scrollHeight + 100}px`);
+    } else {
+      setMaxHeight("440px");
+    }
+  }, [expanded]);
 
-  // Determine if the highlight text should be truncated
+  const highlightText = highlight?.description || "";
   const shouldTruncate = highlightText.length > 150;
   const truncatedText =
     shouldTruncate && !expanded
@@ -23,7 +30,15 @@ const HighlightCard = ({ highlight }) => {
       : highlightText;
 
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group h-full flex flex-col">
+    <div
+      className="bg-white items-stretch rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group h-full flex flex-col"
+      style={{
+        transition: "max-height 0.3s ease",
+        overflow: "hidden",
+        maxHeight,
+      }}
+      ref={contentRef}
+    >
       <div className="relative h-48 overflow-hidden">
         <ImageWithLoaderPercentage
           src={highlight?.image}
@@ -36,11 +51,12 @@ const HighlightCard = ({ highlight }) => {
             <span className="text-sm font-medium">{highlight?.location}</span>
           </div>
         </div>
+
         {highlight?.video && (
           <div className="absolute top-0 right-0 p-4">
             <div
               onClick={() => setShowVideo(highlight?._id)}
-              className="flex items-center text-white"
+              className="flex items-center text-white cursor-pointer"
             >
               <VideoPlayIcon />
             </div>
@@ -58,7 +74,7 @@ const HighlightCard = ({ highlight }) => {
 
       <div className="p-5 flex-grow flex flex-col">
         <div className="flex items-center mb-3">
-          <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
+          <div className="w-12 h-10 rounded-full overflow-hidden mr-3">
             <ImageWithLoaderPercentage
               src={highlight?.avatar}
               alt={highlight?.name}
@@ -67,7 +83,9 @@ const HighlightCard = ({ highlight }) => {
           </div>
           <div>
             <h3 className="font-medium text-gray-900">{highlight?.name}</h3>
-            <p className="text-xs text-gray-500">{highlight?.date}</p>
+            <p className="text-xs text-gray-500">
+              {formatDate(highlight?.createdAt)}
+            </p>
           </div>
         </div>
 

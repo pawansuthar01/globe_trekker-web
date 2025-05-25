@@ -5,9 +5,9 @@ const initialState = {
   highlights: localStorage.getItem("highlights")
     ? JSON.parse(localStorage.getItem("highlights"))
     : [],
-  limit: localStorage.getItem("limit") || 0,
-  totalPages: localStorage.getItem("totalPages") || 0,
-  page: localStorage.getItem("page") || 0,
+  limit: Number(localStorage.getItem("limit")) || 25,
+  totalPages: Number(localStorage.getItem("totalPages")) || 1,
+  page: Number(localStorage.getItem("page")) || 1,
   homeHighlight: localStorage.getItem("homeHighlight")
     ? JSON.parse(localStorage.getItem("homeHighlight"))
     : [],
@@ -21,9 +21,11 @@ const initialState = {
 // Get all highlights (public)
 export const fetchHighlights = createAsyncThunk(
   "highlight/fetchAll",
-  async () => {
+  async ({ page = 1, limit = 30 }) => {
     try {
-      const res = await axiosInstance.get("/highlight");
+      const res = await axiosInstance.get(
+        `/highlight?page=${page}&limit=${limit}`
+      );
       return res.data;
     } catch (err) {
       return err.response?.data || err.message;
@@ -160,20 +162,18 @@ const highlightSlice = createSlice({
       })
       .addCase(fetchHighlights.fulfilled, (state, action) => {
         if (action?.payload?.success) {
-          state.page = Number(action?.payload?.page);
-          state.limit = Number(action?.payload?.limit);
-          state.totalPages = Number(action?.payload?.totalPages);
+          const { totalPages, currentPage } = action?.payload;
+          console.log(action);
+          state.page = Number(currentPage);
+          state.totalPages = Number(totalPages);
           state.loading = false;
           state.success = true;
           state.error = false;
           localStorage.setItem("success", true);
-          localStorage.setItem("page", Number(action?.payload?.page));
-          localStorage.setItem("limit", Number(action?.payload?.limit));
-          localStorage.setItem(
-            "totalPages",
-            Number(action?.payload?.totalPages)
-          );
-          state.highlights = JSON.stringify(action.payload?.data);
+          localStorage.setItem("error", false);
+          localStorage.setItem("page", Number(currentPage));
+          localStorage.setItem("totalPages", Number(totalPages));
+          state.highlights = action.payload?.data;
           localStorage.setItem(
             "highlights",
             JSON.stringify(action.payload?.data)
