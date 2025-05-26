@@ -37,15 +37,15 @@ export const FavoriteButton = ({
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
 
-  const {
-    favoriteDestinations = [],
-    favoriteStories = [],
-    isLoggedIn,
-  } = useSelector((state) => state?.auth);
+  const { favoriteDestinations, favoriteStories, isLoggedIn } = useSelector(
+    (state) => state?.auth
+  );
   const [isFavorited, setIsFavorited] = useState(() =>
-    type === "Destination"
-      ? favoriteDestinations.includes(Id)
-      : favoriteStories.includes(Id)
+    isLoggedIn
+      ? type === "Destination"
+        ? favoriteDestinations.includes(Id)
+        : favoriteStories.includes(Id)
+      : false
   );
 
   useEffect(() => {

@@ -35,46 +35,43 @@ const LoginPage = () => {
   return (
     <>
       <Helmet>
-        <title>Login - Trip Tales</title>
+        <title>Login - Globe Trekker</title>
         <meta
           name="description"
-          content="Login to your Trip Tales account to explore beautiful travel destinations, real stories, and helpful travel tips."
+          content="Login to your Globe Trekker account to explore beautiful travel destinations, real stories, and helpful travel tips."
         />
         <meta
           name="keywords"
-          content="Trip Tales login, travel login, explore destinations, travel stories, user account"
+          content="Globe Trekker login, travel login, explore destinations, travel stories, user account"
         />
-        <meta name="author" content="Trip Tales Team" />
+        <meta name="author" content="Globe Trekker Team" />
 
         {/* Open Graph */}
-        <meta property="og:title" content="Login - Trip Tales" />
+        <meta property="og:title" content="Login - Globe Trekker" />
         <meta
           property="og:description"
-          content="Access your Trip Tales account and dive into travel destinations, inspiring stories, and adventure tips."
+          content="Access your Globe Trekker account and dive into travel destinations, inspiring stories, and adventure tips."
         />
         <meta property="og:type" content="website" />
-        <meta
-          property="og:url"
-          content="https://triptales.pawansuthar.in/login"
-        />
+        <meta property="og:url" content="https://globetrekker.site/login" />
         <meta
           property="og:image"
-          content="https://triptales.pawansuthar.in/Logo.jpeg"
+          content="https://globetrekker.site/Logo.jpeg"
         />
 
         {/* Twitter */}
         <meta
           name="twitter:card"
-          content="https://triptales.pawansuthar.in/Logo.jpeg"
+          content="https://globetrekker.site/Logo.jpeg"
         />
-        <meta name="twitter:title" content="Login - Trip Tales" />
+        <meta name="twitter:title" content="Login - Globe Trekker" />
         <meta
           name="twitter:description"
           content="Securely login to Trip Tales and start planning your next journey."
         />
         <meta
           name="twitter:image"
-          content="https://triptales.pawansuthar.in/Logo.jpeg"
+          content="https://globetrekker.site/Logo.jpeg"
         />
       </Helmet>
 

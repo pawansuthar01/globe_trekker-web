@@ -34,8 +34,13 @@ const SidebarNav = ({ expanded, onMouseEnter, onMouseLeave }) => {
             path: "/favorite",
           },
         ]
-      : { icon: <LogIn size={20} />, label: "Login", path: "/login" }),
-
+      : [
+          {
+            icon: <LogIn size={20} />,
+            label: "Login",
+            path: "/login",
+          },
+        ]),
     ...(isLoggedIn && (role === "ADMIN" || role === "AUTHOR")
       ? [
           {

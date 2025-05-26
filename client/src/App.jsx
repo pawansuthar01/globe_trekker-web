@@ -37,6 +37,7 @@ import CheckLoggedIn from "./components/AdminComponent/auth/isLoogedIn";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import CookiePolicy from "./pages/CookiePolicy";
 import SavedPage from "./pages/FavoriteListPage";
+import AdminFeedbackPage from "./pages/Admin/feedback/feedback";
 function App() {
   return (
     <Routes>
@@ -81,6 +82,7 @@ function App() {
           <Route path="users" element={<UserList />} />
           <Route path="users/:id" element={<UserDetail />} />
           <Route path="contacts" element={<ContactList />} />
+          <Route path="feedback" element={<AdminFeedbackPage />} />
         </Route>
       </Route>
     </Routes>

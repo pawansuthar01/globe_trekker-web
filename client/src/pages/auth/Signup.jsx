@@ -52,40 +52,46 @@ const SignupPage = () => {
   return (
     <>
       <Helmet>
-        <title>Create Your Account - Trip Tales</title>
+        <title>Create Your Account - Globe Trekker</title>
         <meta
           name="description"
-          content="Sign up to Trip Tales and start discovering, saving, and sharing amazing travel destinations and stories."
+          content="Sign up to Globe Trekker and start discovering, saving, and sharing amazing travel destinations and stories."
         />
         <meta
           name="keywords"
-          content="Trip Tales signup, create account, travel app registration, travel blog signup, join Trip Tales"
+          content="Globe Trekker signup, create account, travel app registration, travel blog signup, Globe Trekker Tales"
         />
-        <meta name="author" content="Trip Tales Team" />
+        <meta name="author" content="Globe Trekker Team" />
 
         {/* Open Graph */}
-        <meta property="og:title" content="Create Your Account - Trip Tales" />
+        <meta
+          property="og:title"
+          content="Create Your Account - Globe Trekker"
+        />
         <meta
           property="og:description"
-          content="Join Trip Tales to explore and share unforgettable travel stories and destinations."
+          content="Join Globe Trekker to explore and share unforgettable travel stories and destinations."
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://triptales.com/signup" />
+        <meta property="og:url" content="https://globetrekker.site/signup" />
         <meta
           property="og:image"
-          content="https://triptales.com/assets/signup-preview.png"
+          content="https://globetrekker.site/Logo.jpeg"
         />
 
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Create Your Account - Trip Tales" />
+        <meta
+          name="twitter:title"
+          content="Create Your Account - Globe Trekker"
+        />
         <meta
           name="twitter:description"
           content="Sign up to explore top destinations, save favorites, and share your travel tales."
         />
         <meta
           name="twitter:image"
-          content="https://triptales.com/assets/signup-preview.png"
+          content="https://globetrekker.site/Logo.jpeg"
         />
       </Helmet>
       <div className="min-h-screen pt-24 pb-16 bg-neutral-50">

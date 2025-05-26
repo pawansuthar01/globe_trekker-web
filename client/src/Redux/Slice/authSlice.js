@@ -146,7 +146,6 @@ export const getAllUsers = createAsyncThunk("/auth/User", async () => {
 });
 export const setCookieCall = createAsyncThunk("/auth/cookie", async (token) => {
   try {
-    console.log(token);
     const res = await axiosInstance.post(`/api/v3/auth/set-cookie/${token}`);
 
     return res.data;
@@ -271,11 +270,10 @@ const authSliceRedux = createSlice({
       localStorage.setItem("exp", 0);
       localStorage.setItem("role", "");
       localStorage.setItem("userName", "");
-      localStorage.setItem("favoriteStories", null);
-      localStorage.setItem("favoriteDestinations", null);
+      localStorage.setItem("favoriteStories", []);
+      localStorage.setItem("favoriteDestinations", []);
       state.favoriteDestinations = [];
 
-      state.favoriteDestinations = [];
       state.favoriteStories = [];
       state.userName = "";
 

@@ -10,6 +10,7 @@ import {
   Settings,
   LucideHome,
   TableCellsMerge,
+  MessageCircle,
 } from "lucide-react";
 import { FcAbout } from "react-icons/fc";
 
@@ -78,6 +79,11 @@ const Sidebar = () => {
             to="/admin/contacts"
             icon={<MessageSquare size={20} />}
             label="Contacts"
+          />
+          <NavItem
+            to="/admin/feedback"
+            icon={<MessageCircle size={20} />}
+            label="Feedback"
           />
           <NavItem
             to="/admin/settings"

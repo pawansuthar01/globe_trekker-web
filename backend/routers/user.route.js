@@ -11,6 +11,11 @@ import {
 } from "../controller/user.controller.js";
 import { isLoggedIn } from "../middleware/authMiddlware.js";
 import upload from "../middleware/multerMiddleware.js";
+import {
+  addFeedback,
+  deleteFeedback,
+  getFeedbacks,
+} from "../controller/feedback.controller.js";
 // Initiate Google Login
 const user = Router();
 user.get(
@@ -40,4 +45,6 @@ user.get("/getProfile", isLoggedIn, getCurrentUser);
 user.post("/login", loginUser);
 user.post("/register", registerUser);
 user.put("/UpdateProfile", isLoggedIn, upload.single("avatar"), UpdateUser);
+user.route("/feedback").post(addFeedback).get(getFeedbacks);
+user.delete("/feedback/:id", isLoggedIn, deleteFeedback);
 export default user;
