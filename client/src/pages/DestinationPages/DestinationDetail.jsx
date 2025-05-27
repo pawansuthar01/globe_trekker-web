@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchDestinationById } from "../../Redux/Slice/detinationSlice";
 import ImageCarousel from "../../components/images";
 import { FavoriteButton, ShareButton } from "../../components/button";
+import ReviewSection from "../../components/Review/ReviewSection";
 
 const DestinationDetailPage = () => {
   const { id } = useParams();
@@ -205,7 +206,7 @@ const DestinationDetailPage = () => {
 
               {/* Sidebar */}
               <div className="lg:col-span-1">
-                <div className="sticky top-4">
+                <div className="sticky top-24">
                   {/* Sidebar Ad Space */}
                   {/* <div className="mb-8 p-4 bg-gray-100 rounded-lg text-center">
                   <div className="h-[600px] flex items-center justify-center text-gray-400">
@@ -260,6 +261,12 @@ const DestinationDetailPage = () => {
                   </div>
                 </div>
               </div>
+            </div>
+            <div className="mt-2">
+              <ReviewSection
+                destinationId={id}
+                reviews={destination?.reviews}
+              />
             </div>
           </div>
         </div>

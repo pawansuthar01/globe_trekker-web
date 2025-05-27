@@ -66,10 +66,14 @@ const destinationSchema = new mongoose.Schema(
     savedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     reviews: [
       {
+        userAvatar: String,
         user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         userName: String,
         rating: Number,
-        comment: String,
+        text: String,
+        category: String,
+        helpfulCount: { type: Number, default: 0 },
+        unhelpfulCount: { type: Number, default: 0 },
         createdAt: { type: Date, default: Date.now },
       },
     ],

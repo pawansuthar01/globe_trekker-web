@@ -288,10 +288,11 @@ export const updateDestination = async (req, res, next) => {
 export const addReview = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const { fullName, avatar, id: user } = req.user;
     if (!id) {
       return next(new AppError("id are required to add a review.", 400));
     }
-    const { user, userName, rating, comment } = req.body;
+    const { rating, text, category } = req.body;
     if (Number(rating) > 5 || Number(rating) < 0) {
       return next(
         new AppError(
@@ -300,7 +301,7 @@ export const addReview = async (req, res, next) => {
         )
       );
     }
-    if (!user || !userName || !rating || !comment) {
+    if (!user || !fullName || !rating || !text || !avatar || !category) {
       return next(
         new AppError("All fields are required to add a review.", 400)
       );
@@ -313,9 +314,11 @@ export const addReview = async (req, res, next) => {
 
     const newReview = {
       user,
-      userName,
+      userName: fullName,
+      userAvatar: avatar.secure_url,
+      category,
       rating: Number(rating),
-      comment,
+      text,
       createdAt: new Date(),
     };
 
@@ -329,7 +332,7 @@ export const addReview = async (req, res, next) => {
     const ratingCount = destination.reviews.length;
 
     destination.rating = {
-      value: totalRatings / ratingCount,
+      value: Number((totalRatings / ratingCount).toFixed(1)),
       count: ratingCount,
     };
 

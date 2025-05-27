@@ -95,12 +95,13 @@ export const fetchFeaturedDestinations = createAsyncThunk(
 export const addReview = createAsyncThunk(
   "destination/addReview",
   async ({ id, review }, { rejectWithValue }) => {
+    console.log(id, review);
     try {
-      const { data } = await axiosInstance.post(
+      const res = await axiosInstance.post(
         `/api/v3/destination/add-review/${id}`,
         review
       );
-      return data;
+      return res?.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message);
     }

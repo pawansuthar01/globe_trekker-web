@@ -15,7 +15,7 @@ import {
 import { isLoggedIn } from "../middleware/authMiddlware.js";
 
 const destination = Router();
-destination.route("/add-review/:id").post(addReview);
+destination.route("/add-review/:id").post(isLoggedIn, addReview);
 destination.route("/update-review/:destinationId/:reviewId").put(updateReview);
 destination.route("/save/:destinationId/:userId").put(saveDestination);
 destination
