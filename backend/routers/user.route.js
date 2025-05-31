@@ -3,9 +3,12 @@ import "../config/passport.js";
 import passport from "passport";
 import {
   checkUserValid,
+  forgotPassword,
   getCurrentUser,
   loginUser,
+  OtpSendTest,
   registerUser,
+  resetPassword,
   Subscribe,
   UpdateUser,
 } from "../controller/user.controller.js";
@@ -40,10 +43,13 @@ user.get(
 );
 // ✅ NEW: Authenticated user info route
 user.get("/me", isLoggedIn, checkUserValid);
+user.post("/otp:email", OtpSendTest);
 user.put("/subscribe/:id", Subscribe);
 user.get("/getProfile", isLoggedIn, getCurrentUser);
 user.post("/login", loginUser);
 user.post("/register", registerUser);
+user.post("/reset-Password:email", forgotPassword);
+user.post("/change-password:token", resetPassword);
 user.put("/UpdateProfile", isLoggedIn, upload.single("avatar"), UpdateUser);
 user.route("/feedback").post(addFeedback).get(getFeedbacks);
 user.delete("/feedback/:id", isLoggedIn, deleteFeedback);

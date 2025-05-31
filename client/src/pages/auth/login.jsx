@@ -20,6 +20,7 @@ const LoginPage = () => {
     setError(null);
     if (formData) {
       const res = await dispatch(LoginAccount(formData));
+      console.log(res);
       if (res?.payload?.success) {
         navigate("/");
       } else {
@@ -139,7 +140,7 @@ const LoginPage = () => {
                 )}
                 <div className="flex relative  items-center justify-between">
                   <Link
-                    to="/reset-password"
+                    to="/email/reset-password"
                     className="text-sm absolute right-0  text-primary-600 hover:text-primary-700"
                   >
                     Forgot password?

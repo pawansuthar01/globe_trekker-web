@@ -31,6 +31,18 @@ export const ContinueWithGoogle = createAsyncThunk("/auth/google", async () => {
     return error?.response?.data || error?.message || "Something went wrong";
   }
 });
+export const OtpSend = createAsyncThunk("/auth/otp", async (email) => {
+  try {
+    console.log(email);
+    const res = await axiosInstance.post(
+      `${User_basic_url}/otp${email}`,
+      email
+    );
+    return res.data;
+  } catch (error) {
+    return error?.response?.data || error?.message || "Something went wrong";
+  }
+});
 export const CreateAccount = createAsyncThunk(
   "/auth/register",
   async (data) => {
@@ -79,7 +91,7 @@ export const SendPasswordResatEmail = createAsyncThunk(
   async (email) => {
     try {
       const res = await axiosInstance.post(
-        `${User_basic_url}/resetPassword?email=${email}`
+        `${User_basic_url}/reset-Password${email}`
       );
 
       return res.data;
@@ -109,24 +121,8 @@ export const UpdateNewPassword = createAsyncThunk(
   async ({ resetToken, newPassword }) => {
     try {
       const res = await axiosInstance.post(
-        `${User_basic_url}/changePassword${resetToken}`,
+        `${User_basic_url}/change-password${resetToken}`,
         { newPassword }
-      );
-
-      return res.data;
-    } catch (error) {
-      return error?.response?.data || error?.message || "Something went wrong";
-    }
-  }
-);
-export const checkToken = createAsyncThunk(
-  "/auth/token",
-  async (resetToken) => {
-    try {
-      if (!resetToken) return;
-
-      const res = await axiosInstance.post(
-        `${User_basic_url}/TokenCheck${resetToken}`
       );
 
       return res.data;

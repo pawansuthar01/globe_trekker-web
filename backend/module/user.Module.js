@@ -53,6 +53,7 @@ const userSchema = new mongoose.Schema(
         achievedAt: { type: Date, default: Date.now },
       },
     ],
+    isGoogle: { type: Boolean, default: false },
     favoriteDestinations: [
       { type: mongoose.Schema.Types.ObjectId, ref: "Destination" },
     ],

@@ -5,7 +5,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { basic_url } from "../../helper/axiosInstance";
 import { useDispatch } from "react-redux";
-import { CreateAccount } from "../../Redux/Slice/authSlice";
+import { CreateAccount, OtpSend } from "../../Redux/Slice/authSlice";
 import { Helmet } from "react-helmet-async";
 const SignupPage = () => {
   const dispatch = useDispatch();
@@ -48,6 +48,11 @@ const SignupPage = () => {
   const handleGoogleLogin = () => {
     window.location.href = `${basic_url}/api/v3/auth/google`;
   };
+  // const otpSend = async () => {
+  //   console.log("ues");
+  //   const res = await dispatch(OtpSend(formData.email));
+  //   console.log(res);
+  // };
 
   return (
     <>
@@ -134,6 +139,7 @@ const SignupPage = () => {
                     <input
                       type="text"
                       id="name"
+                      name="name"
                       value={formData.name}
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
@@ -157,6 +163,7 @@ const SignupPage = () => {
                     <input
                       type="email"
                       id="email"
+                      name="email"
                       value={formData.email}
                       onChange={(e) =>
                         setFormData({ ...formData, email: e.target.value })
@@ -180,6 +187,7 @@ const SignupPage = () => {
                     <input
                       type="password"
                       id="password"
+                      name="password"
                       value={formData.password}
                       onChange={(e) =>
                         setFormData({ ...formData, password: e.target.value })
@@ -203,6 +211,7 @@ const SignupPage = () => {
                     <input
                       type="password"
                       id="confirmPassword"
+                      name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={(e) =>
                         setFormData({
@@ -222,13 +231,14 @@ const SignupPage = () => {
                   <input
                     type="checkbox"
                     id="acceptTerms"
+                    name="checkbox"
                     checked={formData.acceptTerms}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setFormData({
                         ...formData,
                         acceptTerms: e.target.checked,
-                      })
-                    }
+                      });
+                    }}
                     className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded mt-1"
                   />
                   <label

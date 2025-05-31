@@ -4,17 +4,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { getFeedbacks } from "../../Redux/Slice/feedbackSlice";
 import TestimonialCard from "./feedbackCart";
 
-const TestimonialSlider = ({ autoPlayInterval = 5000 }) => {
+const TestimonialSlider = () => {
   const dispatch = useDispatch();
   const { feedbacks, success, error } = useSelector((state) => state?.Feedback);
 
   const [testimonials, setTestimonials] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [cardsToShow, setCardsToShow] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPage, setTotalPage] = useState(1);
 
   // Update number of cards shown based on screen width
   useEffect(() => {
@@ -30,16 +27,13 @@ const TestimonialSlider = ({ autoPlayInterval = 5000 }) => {
 
   // Fetch testimonials
   const fetchTestimonials = async (page = 1) => {
-    if (isLoading || page > totalPage) return;
+    if (isLoading) return;
     setIsLoading(true);
     try {
       const res = await dispatch(getFeedbacks({ page, limit: 6 }));
       const data = res?.payload?.data || [];
-      const totalPages = res?.payload?.totalPage || 1;
 
       setTestimonials((prev) => [...prev, ...data]);
-      setCurrentPage(page);
-      setTotalPage(totalPages);
     } catch (err) {
       console.error("Failed to load testimonials:", err);
     } finally {
@@ -58,53 +52,17 @@ const TestimonialSlider = ({ autoPlayInterval = 5000 }) => {
   const maxIndex = Math.max(testimonials.length - cardsToShow, 0);
 
   const goToNext = () => {
-    if (isLoading) return;
+    if (isLoading || currentIndex === maxIndex) return;
 
     const nextIndex = currentIndex + cardsToShow;
 
-    // Fetch more if we are near the end and more pages are available
-    if (
-      nextIndex + cardsToShow > testimonials.length &&
-      currentPage < totalPage
-    ) {
-      fetchTestimonials(currentPage + 1);
-    }
-
-    if (nextIndex <= testimonials.length - cardsToShow) {
-      setCurrentIndex(nextIndex);
-    }
+    setCurrentIndex(nextIndex);
   };
 
   const goToPrevious = () => {
     if (isLoading || currentIndex === 0) return;
     setCurrentIndex((prev) => Math.max(prev - cardsToShow, 0));
   };
-
-  // Autoplay
-  useEffect(() => {
-    let interval;
-    if (isAutoPlaying) {
-      interval = setInterval(() => {
-        const nextIndex = currentIndex + cardsToShow;
-        if (nextIndex >= testimonials.length && currentPage < totalPage) {
-          fetchTestimonials(currentPage + 1);
-        } else if (nextIndex <= maxIndex) {
-          setCurrentIndex(nextIndex);
-        } else {
-          setCurrentIndex(0); // Loop
-        }
-      }, autoPlayInterval);
-    }
-    return () => interval && clearInterval(interval);
-  }, [
-    currentIndex,
-    isAutoPlaying,
-    autoPlayInterval,
-    cardsToShow,
-    maxIndex,
-    testimonials.length,
-    currentPage,
-  ]);
 
   return (
     <div className="relative w-full overflow-hidden px-4 py-8">
@@ -149,9 +107,9 @@ const TestimonialSlider = ({ autoPlayInterval = 5000 }) => {
           </button>
           <button
             onClick={goToNext}
-            disabled={isLoading}
+            disabled={currentIndex === 6 || isLoading}
             className={`p-2 rounded-full border-2 ${
-              isLoading
+              currentIndex === 6 || isLoading
                 ? "cursor-not-allowed border-gray-300 text-gray-400"
                 : "border-teal-500 text-teal-500 hover:bg-teal-500 hover:text-white"
             } transition-colors duration-300`}

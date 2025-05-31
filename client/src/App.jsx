@@ -10,7 +10,6 @@ import DestinationDetailPage from "./pages/DestinationPages/DestinationDetail";
 import StoryDetailPage from "./pages/StoriesPage/StoriesDetail";
 import LoginPage from "./pages/auth/login";
 import SignupPage from "./pages/auth/Signup";
-import ResetPasswordPage from "./pages/PasswordPages/ResetPasswordPage";
 import HighlightsPage from "./pages/HighlightsPage";
 import Profile from "./pages/auth/profile";
 import Layout from "./components/Layout/layout";
@@ -38,6 +37,8 @@ import TermsAndConditions from "./pages/TermsAndConditions";
 import CookiePolicy from "./pages/CookiePolicy";
 import SavedPage from "./pages/FavoriteListPage";
 import AdminFeedbackPage from "./pages/Admin/feedback/feedback";
+import EmailResetPasswordPage from "./pages/PasswordPages/EmailSendResetPasswordPage";
+import PasswordReset from "./pages/PasswordPages/PasswordReset";
 function App() {
   return (
     <Routes>
@@ -57,8 +58,12 @@ function App() {
         <Route element={<CheckLoggedIn />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route
+            path="/email/reset-password"
+            element={<EmailResetPasswordPage />}
+          />
+          <Route path="/reset-password" element={<PasswordReset />} />
         </Route>
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsAndConditions />} />

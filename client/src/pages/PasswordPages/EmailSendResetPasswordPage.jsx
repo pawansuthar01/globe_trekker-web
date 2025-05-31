@@ -1,15 +1,29 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail, ArrowLeft } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { SendPasswordResatEmail } from "../../Redux/Slice/authSlice";
 
-const ResetPasswordPage = () => {
+const EmailResetPasswordPage = () => {
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [error, setError] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Implement password reset logic here
-    setIsSubmitted(true);
+    setLoading(true);
+    setError(null);
+    const res = await dispatch(SendPasswordResatEmail(email));
+
+    if (res?.payload?.success) {
+      setIsSubmitted(true);
+    } else {
+      setError(res?.payload?.message);
+      setIsSubmitted(true);
+    }
+    setLoading(false);
   };
 
   return (
@@ -27,14 +41,22 @@ const ResetPasswordPage = () => {
           <div className="bg-white rounded-lg shadow-md p-8">
             {isSubmitted ? (
               <div className="text-center">
-                <div className="bg-green-50 text-green-800 p-4 rounded-lg mb-6">
+                <div
+                  className={`bg-green-50 ${
+                    error
+                      ? `bg-red-200 border-red-400`
+                      : " text-green-800 border-green-400"
+                  } p-4 rounded-lg mb-6 border-2`}
+                >
                   <h2 className="text-lg font-semibold mb-2">
-                    Check Your Email
+                    {error ? "Something want wrong" : "Check Your Email"}
                   </h2>
                   <p>
-                    We've sent password reset instructions to your email
+                    {error
+                      ? error
+                      : `We've sent password reset instructions to your email
                     address. Please check your inbox and follow the link to
-                    reset your password.
+                    reset your password.`}
                   </p>
                 </div>
                 <p className="text-neutral-600">
@@ -79,10 +101,13 @@ const ResetPasswordPage = () => {
                   </div>
 
                   <button
+                    disabled={loading}
                     type="submit"
                     className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 rounded-lg font-medium transition-colors"
                   >
-                    Send Reset Instructions
+                    {loading
+                      ? "Please wait Sending Email..."
+                      : "Send Reset Instructions"}
                   </button>
                 </form>
               </>
@@ -94,4 +119,4 @@ const ResetPasswordPage = () => {
   );
 };
 
-export default ResetPasswordPage;
+export default EmailResetPasswordPage;

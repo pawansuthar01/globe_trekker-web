@@ -3,7 +3,8 @@ import User from "../module/user.Module.js";
 import AppError from "../utils/AppError.js";
 import { uploadToCloudinary } from "../utils/cloudnary.js";
 import { cookieOptions } from "../utils/cookieOption.js";
-
+import SendEmail from "../utils/SendEmail.js";
+import crypto from "crypto";
 export const UpdateUser = async (req, res, next) => {
   const { id, role, fullName } = req.user;
   const { name, email, isSubscribed, phoneNumber } = req.body;
@@ -40,50 +41,99 @@ export const UpdateUser = async (req, res, next) => {
   });
 };
 export const registerUser = async (req, res, next) => {
-  const { name: fullName, email, password } = req.body;
-  if (!fullName || !email || !password) {
-    return next(new AppError("give All data to register...", 400));
+  try {
+    const { name: fullName, email, password } = req.body;
+
+    if (!fullName || !email || !password) {
+      return next(new AppError("Give all data to register...", 400));
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email already registered" });
+    }
+
+    const newUser = await User.create({ fullName, email, password });
+    const token = newUser.generate_JWT_TOKEN();
+
+    await Activity.create({
+      action: "new user Profile",
+      role: "USER",
+      type: "add",
+      detail: fullName,
+    });
+
+    // Immediately send response to client
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      AuthenticatorToken: token,
+      user: newUser,
+    });
+
+    // 🔁 Async background email task
+    (async () => {
+      try {
+        const profileLink = `${process.env.FRONTEND_URL}/profile`;
+        const unsubscribeLink = `${process.env.FRONTEND_URL}/unsubscribe?id=${newUser._id}`;
+
+        await SendEmail({
+          to: newUser.email,
+          userName: fullName,
+          subject: "Welcome to Globe Trekker!",
+          actionText: "Get Started",
+          actionLink: profileLink,
+          unsubscribeLink: unsubscribeLink,
+          message:
+            "Hi and welcome aboard! We're excited to have you as part of our travel community. Start exploring new adventures and destinations today.",
+        });
+      } catch (emailErr) {
+        console.error("❌ Failed to send welcome email:", emailErr.message);
+      }
+    })();
+  } catch (error) {
+    return next(new AppError(error.message, 500));
   }
-  const existingUser = await User.findOne({ email });
-  if (existingUser)
-    return res.status(400).json({ message: "Email already registered" });
-
-  const newUser = await User.create({
-    fullName,
-    email,
-    password,
-  });
-
-  const token = newUser.generate_JWT_TOKEN();
-  await Activity.create({
-    action: "new user Profile",
-    role: "USER",
-    type: "add",
-    detail: fullName,
-  });
-  res.status(201).json({
-    success: true,
-    message: "User registered successfully",
-    AuthenticatorToken: token,
-    user: newUser,
-  });
 };
+
 export const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email }).select("+password");
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-  const user = await User.findOne({ email }).select("+password");
-  if (!user) return res.status(404).json({ message: "User not found" });
+    const isMatch = await user.comparePassword(password);
 
-  const isMatch = await user.comparePassword(password);
-  if (!isMatch) return next(new AppError("password not match..."), 401);
+    if (!isMatch) return next(new AppError("password not match..."), 401);
 
-  const token = user.generate_JWT_TOKEN();
-  res.status(200).json({
-    success: true,
-    message: "Login successful",
-    AuthenticatorToken: token,
-    user: user,
-  });
+    const token = user.generate_JWT_TOKEN();
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      AuthenticatorToken: token,
+      user: user,
+    });
+    (async () => {
+      try {
+        const profileLink = `${process.env.FRONTEND_URL}/profile`;
+        const unsubscribeLink = `${process.env.FRONTEND_URL}/unsubscribe?id=${user._id}`;
+
+        await SendEmail({
+          to: user.email,
+          userName: user.fullName,
+          subject: "Successful Login to Your Globe Trekker Account",
+          message: `We noticed a successful login to your account. If this was you, no further action is needed. If you did not log in, please secure your account immediately.`,
+          actionText: "Secure Account",
+          actionLink: profileLink,
+          unsubscribeLink: unsubscribeLink,
+        });
+      } catch (emailErr) {
+        console.error("❌ Failed to send welcome email:", emailErr.message);
+      }
+    })();
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
 };
 
 export const getCurrentUser = async (req, res, next) => {
@@ -106,7 +156,29 @@ export const getCurrentUser = async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 };
-
+export const OtpSendTest = async (req, res, next) => {
+  try {
+    console.log(req.params);
+    const { email } = req.params;
+    const otp = Math.floor(111111, Math.random(999999));
+    console.log(otp);
+    await SendEmail({
+      to: email,
+      subject: "Reset Your Password - Globe Trekker",
+      userName: "pawan kumar",
+      message: otp,
+      actionLink: "",
+      actionText: "Reset Password",
+      unsubscribeLink: "",
+    });
+    res?.status(200).json({
+      success: true,
+      message: "send otp",
+    });
+  } catch (error) {
+    return next(new AppError(error.message));
+  }
+};
 export const checkUserValid = async (req, res, next) => {
   try {
     if (!req.user.id) {
@@ -132,15 +204,32 @@ export const checkUserValid = async (req, res, next) => {
 // if (profile.fullName && profile.email && profile.avatar && profile.phoneNumber) {
 //   await grantAchievement(user._id, "PROFILE_COMPLETE");
 // }
-export const forgotPassword = async (req, res) => {
-  const { email } = req.body;
-
+export const forgotPassword = async (req, res, next) => {
+  const { email } = req.params;
+  if (!email) {
+    return next(new AppError("email is required to send email...", 404));
+  }
   const user = await User.findOne({ email });
-  if (!user) return res.status(404).json({ message: "User not found" });
+  if (!user) return res.status(404).json({ message: "Email is not found" });
 
   const token = await user.generatePasswordResatToken();
   await user.save();
-
+  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+  const unsubscribeLink = `${process.env.FRONTEND_URL}/unsubscribe?id=${user._id}`;
+  try {
+    await SendEmail({
+      to: email,
+      subject: "Reset Your Password - Globe Trekker",
+      userName: user.fullName,
+      message:
+        " We received a request to reset your password. ⌛ This link is valid for only 10 minutes. If you did not request this, please ignore this email.",
+      actionLink: resetLink,
+      actionText: "Reset Password",
+      unsubscribeLink,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
   // Send reset link via email here (not included)
 
   res.status(200).json({
@@ -151,21 +240,23 @@ export const forgotPassword = async (req, res) => {
 };
 export const resetPassword = async (req, res) => {
   const { token } = req.params;
-  const { password } = req.body;
+  const { newPassword } = req.body;
 
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
   const user = await User.findOne({
     forgotPasswordToken: hashedToken,
     forgotPasswordExpiry: { $gt: Date.now() },
-  });
+  }).select("+password");
 
   if (!user)
     return res.status(400).json({ message: "Invalid or expired token" });
 
-  user.password = password;
-  user.forgotPasswordToken = undefined;
-  user.forgotPasswordExpiry = undefined;
+  user.password = newPassword;
+  user.markModified("password");
+  // user.forgotPasswordToken = undefined;
+  // user.forgotPasswordExpiry = undefined;
+
   await user.save();
 
   const jwtToken = user.generate_JWT_TOKEN();
