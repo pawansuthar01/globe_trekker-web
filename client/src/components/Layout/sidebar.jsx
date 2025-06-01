@@ -61,7 +61,7 @@ const SidebarNav = ({ expanded, onMouseEnter, onMouseLeave }) => {
     >
       {/* Logo */}
       <div className="flex items-center h-20 px-4">
-        <div className="flex items-center space-x-3">
+        <a href="/" className="flex cursor-pointer items-center space-x-3">
           <Search className="h-8 w-8 text-primary-600" />
           <span
             className={`text-xl font-bold text-neutral-800 transition-opacity duration-300 ${
@@ -70,7 +70,7 @@ const SidebarNav = ({ expanded, onMouseEnter, onMouseLeave }) => {
           >
             GLOBE TREKKER
           </span>
-        </div>
+        </a>
       </div>
 
       {/* Navigation Items */}

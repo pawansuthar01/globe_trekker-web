@@ -68,4 +68,7 @@ export default {
     },
   },
   plugins: [],
+  corePlugins: {
+    scrollSnapType: true,
+  },
 };

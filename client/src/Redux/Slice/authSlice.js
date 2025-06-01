@@ -166,9 +166,11 @@ export const HandelDelete = createAsyncThunk("delete/", async (data) => {
 });
 export const HandelPromotion = createAsyncThunk(
   "user/roleUpdate",
-  async (data) => {
+  async ({ id, newRole }) => {
     try {
-      const res = await axiosInstance.put("/api/v3/Admin/User", data);
+      const res = await axiosInstance.put(
+        `/api/v5/admin/user-role?id=${id}&UpdateRole=${newRole}`
+      );
 
       return res.data;
     } catch (error) {

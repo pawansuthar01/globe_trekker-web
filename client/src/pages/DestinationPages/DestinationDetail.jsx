@@ -214,14 +214,14 @@ const DestinationDetailPage = () => {
                   </div>
                 </div> */}
                   {/* Quick Info */}
-                  <div className="bg-white rounded-xl shadow-sm p-6 mb-6 border border-gray-100">
+                  <div className="bg-white rounded-xl shadow-sm sm:p-2 p-6 mb-6 border border-gray-100">
                     <h3 className="text-lg font-semibold mb-4">Quick Info</h3>
                     <div className="space-y-4">
                       <div className="flex items-center">
                         <Calendar className="h-5 w-5 text-blue-600 mr-3" />
                         <div>
                           <div className="font-medium">Best Time to Visit</div>
-                          <div className="text-gray-600 text-[15px]">
+                          <div className="text-gray-600 text-sm">
                             {destination.bestTimeToVisit}
                           </div>
                         </div>
@@ -244,7 +244,7 @@ const DestinationDetailPage = () => {
                       {destination.popularFor.map((item, index) => (
                         <span
                           key={index}
-                          className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm font-medium"
+                          className="bg-amber-100 text-amber-700 px-3 sm:px-2 sm:py-0 py-1 rounded-full sm:rounded-lg text-sm font-medium"
                         >
                           {item}
                         </span>

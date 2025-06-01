@@ -2,14 +2,24 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, Eye } from "lucide-react";
 import SearchBar from "../../../components/AdminComponent/common/SearchBar";
-import { useDispatch } from "react-redux";
-import { getAllUsers } from "../../../Redux/Slice/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllUsers, HandelPromotion } from "../../../Redux/Slice/authSlice";
+import ConfirmModal from "../../../components/AdminComponent/common/confirmModal";
+import toast from "react-hot-toast";
 
 const UserList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { role, data } = useSelector((state) => state?.auth);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
+  const [roleUpdateLoading, setRoleUpdateLoading] = useState(null);
+  const [isConfirm, SetIsConfirm] = useState(false);
+  const [roleUpdate, setRoleUpdate] = useState({
+    id: null,
+    currentRole: null,
+    newRole: null,
+  });
   const [loading, setLoading] = useState(false);
   const [users, setUser] = useState([]);
   async function FetchUsers() {
@@ -30,6 +40,46 @@ const UserList = () => {
   useEffect(() => {
     FetchUsers();
   }, []);
+  const handleRoleChange = async () => {
+    SetIsConfirm(false);
+    if (roleUpdate.currentRole === roleUpdate.newRole) return;
+
+    const adminCount = users.filter((u) => u.role === "ADMIN").length;
+    const authorCount = users.filter((u) => u.role === "AUTHOR").length;
+
+    if (roleUpdate.newRole === "ADMIN" && adminCount >= 5) {
+      return toast.error("Max 5 admins allowed.");
+    }
+    if (roleUpdate.newRole === "AUTHOR" && authorCount >= 2) {
+      return toast.error("Max 2 authors allowed.");
+    }
+
+    try {
+      setRoleUpdateLoading(roleUpdate.id);
+      const res = await dispatch(
+        HandelPromotion({ id: roleUpdate.id, newRole: roleUpdate.newRole })
+      );
+      if (res?.payload?.success) {
+        toast.success("Role updated successfully!");
+        setUser((prev) =>
+          prev.map((user) =>
+            user._id === roleUpdate.id
+              ? { ...user, role: res?.payload?.user.role }
+              : user
+          )
+        );
+      } else {
+        toast.error(res?.payload?.message || "Failed to update role");
+      }
+    } catch (err) {
+      console.error("Error updating role", err);
+      toast.error("An error occurred.");
+    } finally {
+      setRoleUpdate({ id: null, currentRole: null, newRole: null });
+      SetIsConfirm(false);
+      setRoleUpdateLoading(null);
+    }
+  };
 
   // Filter users based on search term and role filter
   const filteredUsers =
@@ -44,6 +94,15 @@ const UserList = () => {
               .includes(searchTerm.toLowerCase()))) &&
         (roleFilter === "" || user.role === roleFilter)
     );
+  const handleRoleUpdateClick = (id, currentRole, newRole) => {
+    setRoleUpdate({
+      id: id,
+      currentRole: currentRole,
+      newRole: newRole,
+    });
+    SetIsConfirm(true);
+  };
+
   if (loading) return;
 
   return (
@@ -187,6 +246,73 @@ const UserList = () => {
                         <Eye size={18} className="mr-1" />
                         View
                       </button>
+                      {data._id != user._id && role === "AUTHOR" && (
+                        <div className="flex gap-2 justify-end mt-2">
+                          {user?.role !== "ADMIN" && (
+                            <button
+                              disabled={roleUpdateLoading === user?._id}
+                              onClick={() =>
+                                handleRoleUpdateClick(
+                                  user?._id,
+                                  user?.role,
+                                  "ADMIN"
+                                )
+                              }
+                              className={`px-3 py-1 text-xs rounded-md text-white ${
+                                roleUpdateLoading === user?._id
+                                  ? "bg-gray-400"
+                                  : "bg-red-500 hover:bg-red-600"
+                              }`}
+                            >
+                              {roleUpdateLoading === user?._id
+                                ? "Updating..."
+                                : "Make Admin"}
+                            </button>
+                          )}
+                          {user?.role !== "AUTHOR" && (
+                            <button
+                              disabled={roleUpdateLoading === user?._id}
+                              onClick={() =>
+                                handleRoleUpdateClick(
+                                  user?._id,
+                                  user?.role,
+                                  "AUTHOR"
+                                )
+                              }
+                              className={`px-3 py-1 text-xs rounded-md text-white ${
+                                roleUpdateLoading === user?._id
+                                  ? "bg-gray-400"
+                                  : "bg-indigo-500 hover:bg-indigo-600"
+                              }`}
+                            >
+                              {roleUpdateLoading === user?._id
+                                ? "Updating..."
+                                : "Make Author"}
+                            </button>
+                          )}
+                          {user?.role !== "USER" && (
+                            <button
+                              disabled={roleUpdateLoading === user?._id}
+                              onClick={() =>
+                                handleRoleUpdateClick(
+                                  user?._id,
+                                  user?.role,
+                                  "USER"
+                                )
+                              }
+                              className={`px-3 py-1 text-xs rounded-md text-white ${
+                                roleUpdateLoading === user?._id
+                                  ? "bg-gray-400"
+                                  : "bg-green-500 hover:bg-green-600"
+                              }`}
+                            >
+                              {roleUpdateLoading === user?._id
+                                ? "Updating..."
+                                : "Make User"}
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -211,6 +337,20 @@ const UserList = () => {
           </div>
         </div>
       </div>
+      <ConfirmModal
+        isOpen={isConfirm}
+        onConfirm={handleRoleChange}
+        onClose={() => {
+          setRoleUpdate({
+            id: null,
+            currentRole: null,
+            newRole: null,
+          }),
+            SetIsConfirm(false);
+        }}
+        title={"Role Change"}
+        message={`Change role from ${roleUpdate.currentRole} to ${roleUpdate.newRole}`}
+      />
     </div>
   );
 };

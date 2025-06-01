@@ -254,8 +254,8 @@ export const resetPassword = async (req, res) => {
 
   user.password = newPassword;
   user.markModified("password");
-  // user.forgotPasswordToken = undefined;
-  // user.forgotPasswordExpiry = undefined;
+  user.forgotPasswordToken = undefined;
+  user.forgotPasswordExpiry = undefined;
 
   await user.save();
 
@@ -335,5 +335,94 @@ export const getAllUser = async (req, res, next) => {
     });
   } catch (error) {
     return next(new AppError(error.message, 500));
+  }
+};
+export const UpdateRoleById = async (req, res, next) => {
+  try {
+    const { role: requesterRole } = req.user;
+    const { id, UpdateRole } = req.query;
+
+    if (!id || !UpdateRole) {
+      return next(new AppError("User ID and UpdateRole are required", 400));
+    }
+
+    if (requesterRole !== "AUTHOR") {
+      return next(new AppError("Only AUTHOR can update roles", 403));
+    }
+
+    const validRoles = ["USER", "ADMIN", "AUTHOR"];
+    if (!validRoles.includes(UpdateRole)) {
+      return next(new AppError("Invalid role provided", 400));
+    }
+
+    const userToUpdate = await User.findById(id);
+    if (!userToUpdate) {
+      return next(new AppError("User not found", 404));
+    }
+
+    const currentRole = userToUpdate.role;
+
+    // Logic: allowed transitions
+    const allowedTransitions = {
+      USER: ["ADMIN", "AUTHOR"],
+      ADMIN: ["USER", "AUTHOR"],
+      AUTHOR: ["USER", "ADMIN"],
+    };
+
+    if (
+      !allowedTransitions[currentRole] ||
+      !allowedTransitions[currentRole].includes(UpdateRole)
+    ) {
+      return next(
+        new AppError(
+          `Role change from ${currentRole} to ${UpdateRole} is not allowed.`,
+          403
+        )
+      );
+    }
+
+    // Prevent violating role limits
+    const adminCount = await User.countDocuments({ role: "ADMIN" });
+    const authorCount = await User.countDocuments({ role: "AUTHOR" });
+
+    // if (currentRole === "ADMIN" && UpdateRole !== "ADMIN" && adminCount <= 5) {
+    //   return next(
+    //     new AppError("There must be at least 5 ADMINs in the system", 403)
+    //   );
+    // }
+
+    // if (
+    //   currentRole === "AUTHOR" &&
+    //   UpdateRole !== "AUTHOR" &&
+    //   authorCount <= 2
+    // ) {
+    //   return next(
+    //     new AppError("There must be at least 2 AUTHORs in the system", 402)
+    //   );
+    // }
+
+    userToUpdate.role = UpdateRole;
+    await userToUpdate.save();
+
+    // Send email
+    const profileLink = `${process.env.FRONTEND_URL}/admin`;
+    const unsubscribeLink = `${process.env.FRONTEND_URL}/unsubscribe?id=${userToUpdate._id}`;
+    await SendEmail({
+      to: userToUpdate.email,
+      userName: userToUpdate.fullName,
+      subject: "Your Globe Trekker Account Role Has Been Updated",
+      message: `Hi ${userToUpdate.fullName},\n\nYour account role on Globe Trekker has been updated from ${currentRole} to ${UpdateRole}.`,
+      actionText: "Review Account",
+      actionLink: profileLink,
+      unsubscribeLink,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "User role updated successfully",
+      user: userToUpdate,
+    });
+  } catch (err) {
+    return next(new AppError(err.message, 500));
   }
 };

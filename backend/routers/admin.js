@@ -43,7 +43,7 @@ import {
 } from "../controller/about.controller.js";
 import { addContact, updateContact } from "../controller/contact.controller.js";
 import { getAllSearchKeywords } from "../controller/search.controller.js";
-import { getAllUser } from "../controller/user.controller.js";
+import { getAllUser, UpdateRoleById } from "../controller/user.controller.js";
 import { isLoggedIn } from "../middleware/authMiddlware.js";
 import { getAllActive } from "../controller/activity.controller.js";
 import { DashboardDetails } from "../controller/Dashborad.controller.js";
@@ -177,6 +177,7 @@ Admin.route("/search").get(isLoggedIn, getAllSearchKeywords);
 // < **   routes -- End web -search-del** >
 // < **   routes -- Start web -user** >
 Admin.route("/users").get(isLoggedIn, getAllUser);
+Admin.route("/user-role").put(isLoggedIn, UpdateRoleById);
 // < **   routes -- Start web -User** >
 // < **   routes -- Start web -DashboardDetails** >
 Admin.route("/").get(isLoggedIn, getAllActive);

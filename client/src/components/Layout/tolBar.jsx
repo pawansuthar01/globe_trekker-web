@@ -17,12 +17,12 @@ const TopBar = ({ isScrolled }) => {
     >
       <div className="flex justify-between items-center px-4 md:px-6">
         {/* Left side - Search & Title on Mobile */}
-        <div className="flex items-center md:hidden">
+        <a href="/" className="flex items-center md:hidden cursor-pointer">
           <Search className="h-5 w-5 text-primary-600 mr-2" />
           <span className="text-lg font-bold text-neutral-800">
             GLOBE TREKKER
           </span>
-        </div>
+        </a>
 
         {/* Desktop Page Title - Hidden on Mobile */}
         <div className="hidden md:block">
