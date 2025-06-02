@@ -164,6 +164,20 @@ export const HandelDelete = createAsyncThunk("delete/", async (data) => {
     return error?.response?.data || error?.message || "Something went wrong";
   }
 });
+export const HandelSubscribe = createAsyncThunk(
+  "subscribe/put",
+  async (email) => {
+    try {
+      const res = await axiosInstance.put(
+        `/api/v3/auth/subscribe-email${email}`
+      );
+
+      return res.data;
+    } catch (error) {
+      return error?.response?.data || error?.message || "Something went wrong";
+    }
+  }
+);
 export const HandelPromotion = createAsyncThunk(
   "user/roleUpdate",
   async ({ id, newRole }) => {

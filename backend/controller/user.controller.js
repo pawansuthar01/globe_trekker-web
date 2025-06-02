@@ -47,13 +47,21 @@ export const registerUser = async (req, res, next) => {
     if (!fullName || !email || !password) {
       return next(new AppError("Give all data to register...", 400));
     }
-
-    const existingUser = await User.findOne({ email });
+    let newUser;
+    const existingUser = await User.findOne({ email }).select("+password");
     if (existingUser) {
-      return res.status(400).json({ message: "Email already registered" });
+      if (existingUser.isAccount) {
+        return res.status(400).json({ message: "Email already registered" });
+      } else {
+        existingUser.email = email;
+        existingUser.password = password;
+        existingUser.fullName = fullName;
+        newUser = existingUser;
+      }
+    } else {
+      newUser = await User.create({ fullName, email, password });
     }
 
-    const newUser = await User.create({ fullName, email, password });
     const token = newUser.generate_JWT_TOKEN();
 
     await Activity.create({
@@ -300,6 +308,45 @@ export const Subscribe = async (req, res, next) => {
       userFind.isSubscribed = true;
       await userFind.save();
       return res.status(200).json({
+        success: true,
+        message: "successFully Subscribe...",
+      });
+    }
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
+
+export const SubscribeByEmail = async (req, res, next) => {
+  try {
+    const { email } = req.params;
+    if (!email) {
+      return next(new AppError("email is required to UnSubscribe", 404));
+    }
+    const userFind = await User.findOne({ email });
+    if (userFind) {
+      if (userFind?.isSubscribed) {
+        return res.status(200).json({
+          success: false,
+          message: "Email already Subscribe...",
+        });
+      } else {
+        userFind.isSubscribed = true;
+        await userFind.save();
+        return res.status(200).json({
+          success: true,
+          message: "successFully Subscribe...",
+        });
+      }
+    }
+
+    if (!userFind) {
+      const user = await User.create({
+        email: email,
+        isSubscribed: true,
+        isAccount: false,
+      });
+      return res?.status(201).json({
         success: true,
         message: "successFully Subscribe...",
       });

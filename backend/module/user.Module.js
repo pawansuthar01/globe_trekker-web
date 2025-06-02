@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+    isAccount: { type: Boolean, default: true },
     phoneNumber: {
       type: String,
       trim: true,

@@ -1,20 +1,35 @@
 import React, { useState } from "react";
 import { Send } from "lucide-react";
 import bg_image from "../../assets/about_page_image.jpg";
+import { useDispatch } from "react-redux";
+import { HandelSubscribe } from "../../Redux/Slice/authSlice";
 
 const NewsletterSection = () => {
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const handleSubmit = (e) => {
+  const [success, setSuccess] = useState({
+    error: null,
+    message: null,
+  });
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // In a real app, this would connect to a backend API
-    // For now, just simulate a successful subscription
-    if (email) {
+
+    if (!email) {
+      document.getElementById("subscribe_email").style.borderColor = "red";
+    }
+    const res = await dispatch(HandelSubscribe(email));
+    if (res?.payload?.success) {
+      setSuccess({ message: "Thanks for subscribing! Check your inbox soon." });
       setIsSubmitted(true);
       setEmail("");
-      setTimeout(() => setIsSubmitted(false), 5000);
     }
+
+    if (!res?.payload?.success) {
+      setIsSubmitted(true);
+      setSuccess({ error: res?.payload?.message });
+    }
+    setTimeout(() => setIsSubmitted(false), 5000);
   };
 
   return (
@@ -39,8 +54,15 @@ const NewsletterSection = () => {
           </p>
 
           {isSubmitted ? (
-            <div className="bg-accent-500 text-white py-3 px-6 rounded-lg inline-block">
-              Thanks for subscribing! Check your inbox soon.
+            <div
+              onClick={() => setIsSubmitted(false)}
+              className={`${
+                success.message
+                  ? "bg-green-300 border-2 border-green-400 text-green-600"
+                  : "bg-red-300 border-2 border-red-400 text-red-600"
+              } py-3 px-6 rounded-lg inline-block`}
+            >
+              {success.message ? success.message : success.error}
             </div>
           ) : (
             <form
@@ -49,6 +71,8 @@ const NewsletterSection = () => {
             >
               <input
                 type="email"
+                id="subscribe_email"
+                name="subscribe_email"
                 placeholder="Your email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

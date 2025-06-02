@@ -186,38 +186,6 @@ const Footer = () => {
           </div>
         </div>
       </footer>
-
-      {/* Mobile App-style Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-neutral-800 text-white border-t border-neutral-700 flex justify-around items-center h-16 sm:hidden">
-        <Link
-          to="/"
-          className="flex flex-col items-center text-xs hover:text-primary-400"
-        >
-          <Home className="w-5 h-5" />
-          Home
-        </Link>
-        <Link
-          to="/destinations"
-          className="flex flex-col items-center text-xs hover:text-primary-400"
-        >
-          <MapPin className="w-5 h-5" />
-          Explore
-        </Link>
-        <Link
-          to="/stories"
-          className="flex flex-col items-center text-xs hover:text-primary-400"
-        >
-          <BookOpen className="w-5 h-5" />
-          Stories
-        </Link>
-        <Link
-          to="/about"
-          className="flex flex-col items-center text-xs hover:text-primary-400"
-        >
-          <User className="w-5 h-5" />
-          About
-        </Link>
-      </nav>
     </>
   );
 };

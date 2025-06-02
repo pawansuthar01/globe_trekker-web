@@ -15,9 +15,19 @@ passport.use(
     async (accessToken, refreshToken, profile, done) => {
       const email = profile.emails[0].value;
 
-      let user = await User.findOne({ email });
+      let user = await User.findOne({ email }).select("+password");
 
-      if (!user) {
+      if (user) {
+        if (!user.isAccount) {
+          console.log("user-isAccount-false");
+          user.isAccount = true;
+          user.email = email;
+          user.password = "";
+          user.avatar.secure_url = profile.photos[0].value;
+          user.fullName = profile.displayName;
+          await user.save();
+        }
+      } else {
         user = await User.create({
           fullName: profile.displayName,
           email,
@@ -27,7 +37,9 @@ passport.use(
           password: "",
           isGoogle: true,
         });
-        // 🔁 Async background email task
+        // 🔁 Async background email Send
+      }
+      if (!user) {
         (async () => {
           try {
             const profileLink = `${process.env.FRONTEND_URL}/profile`;
@@ -47,26 +59,27 @@ passport.use(
             console.error("❌ Failed to send welcome email:", emailErr.message);
           }
         })();
+      } else {
+        (async () => {
+          try {
+            const profileLink = `${process.env.FRONTEND_URL}/profile`;
+            const unsubscribeLink = `${process.env.FRONTEND_URL}/unsubscribe?id=${user._id}`;
+
+            await SendEmail({
+              to: user.email,
+              userName: user.fullName,
+              subject: "Successful Login to Your Globe Trekker Account",
+              message: `We noticed a successful login to your account. If this was you, no further action is needed. If you did not log in, please secure your account immediately.`,
+              actionText: "Secure Account",
+              actionLink: profileLink,
+              unsubscribeLink: unsubscribeLink,
+            });
+          } catch (emailErr) {
+            console.error("❌ Failed to send welcome email:", emailErr.message);
+          }
+        })();
       }
 
-      (async () => {
-        try {
-          const profileLink = `${process.env.FRONTEND_URL}/profile`;
-          const unsubscribeLink = `${process.env.FRONTEND_URL}/unsubscribe?id=${user._id}`;
-
-          await SendEmail({
-            to: user.email,
-            userName: user.fullName,
-            subject: "Successful Login to Your Globe Trekker Account",
-            message: `We noticed a successful login to your account. If this was you, no further action is needed. If you did not log in, please secure your account immediately.`,
-            actionText: "Secure Account",
-            actionLink: profileLink,
-            unsubscribeLink: unsubscribeLink,
-          });
-        } catch (emailErr) {
-          console.error("❌ Failed to send welcome email:", emailErr.message);
-        }
-      })();
       done(null, user);
     }
   )

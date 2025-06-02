@@ -10,6 +10,7 @@ import {
   registerUser,
   resetPassword,
   Subscribe,
+  SubscribeByEmail,
   UpdateUser,
 } from "../controller/user.controller.js";
 import { isLoggedIn } from "../middleware/authMiddlware.js";
@@ -44,6 +45,7 @@ user.get(
 // ✅ NEW: Authenticated user info route
 user.get("/me", isLoggedIn, checkUserValid);
 user.post("/otp:email", OtpSendTest);
+user.put("/subscribe-email:email", SubscribeByEmail);
 user.put("/subscribe/:id", Subscribe);
 user.get("/getProfile", isLoggedIn, getCurrentUser);
 user.post("/login", loginUser);
