@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Filter } from "lucide-react";
 import ReviewItem from "./reviewItem";
 
-const ReviewList = ({ reviews }) => {
+const ReviewList = ({ reviews, slug }) => {
   const [sortBy, setSortBy] = useState("newest");
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterRating, setFilterRating] = useState(null);
@@ -189,7 +189,7 @@ const ReviewList = ({ reviews }) => {
         {filteredAndSortedReviews.length > 0 ? (
           filteredAndSortedReviews.map((review) => (
             <div key={review._id} className="p-6">
-              <ReviewItem review={review} />
+              <ReviewItem review={review} slug={slug} />
             </div>
           ))
         ) : (

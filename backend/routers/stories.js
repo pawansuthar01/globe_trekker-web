@@ -13,7 +13,7 @@ const story = Router();
 story.route("/").get(GetStory);
 story.route("/featured").get(GetFeaturedStory);
 story.route("/home").get(getHomeStories);
-story.route("/:id").get(getStoriesById);
+story.route("/:slug").get(getStoriesById);
 story
   .route("/favorite/:id")
   .post(isLoggedIn, favorites_Story)

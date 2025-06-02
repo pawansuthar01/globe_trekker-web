@@ -72,9 +72,9 @@ export const fetchHomeStories = createAsyncThunk(
 
 export const fetchStoryById = createAsyncThunk(
   "stories/fetchById",
-  async (id, thunkAPI) => {
+  async (slug, thunkAPI) => {
     try {
-      const res = await axiosInstance.get(`/story/${id}`);
+      const res = await axiosInstance.get(`/story/${slug}`);
       return res.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || err.message);

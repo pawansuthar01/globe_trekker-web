@@ -8,7 +8,7 @@ import { fetchStoryById } from "../../Redux/Slice/storiesSlice";
 import { FavoriteButton, ShareButton } from "../../components/button";
 
 const StoryDetailPage = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const DataStory = useLocation().state?.story;
   const [story, setStory] = useState([]);
   const dispatch = useDispatch();
@@ -18,7 +18,7 @@ const StoryDetailPage = () => {
       const fetchStory = async () => {
         try {
           setLoading(true);
-          const res = await dispatch(fetchStoryById(id));
+          const res = await dispatch(fetchStoryById(slug));
           if (res?.payload?.success) {
             setStory(res?.payload.data);
           }
@@ -34,7 +34,7 @@ const StoryDetailPage = () => {
       setLoading(false);
       setStory(DataStory);
     }
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
     return (

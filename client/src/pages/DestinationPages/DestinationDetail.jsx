@@ -9,7 +9,7 @@ import { FavoriteButton, ShareButton } from "../../components/button";
 import ReviewSection from "../../components/Review/ReviewSection";
 
 const DestinationDetailPage = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const DataDestination = useLocation().state?.destination;
 
   const dispatch = useDispatch();
@@ -19,8 +19,7 @@ const DestinationDetailPage = () => {
     if (!DataDestination) {
       const fetchDestination = async () => {
         try {
-          const res = await dispatch(fetchDestinationById(id));
-
+          const res = await dispatch(fetchDestinationById(slug));
           if (res?.payload?.success) {
             setDestination(res?.payload.data);
           }
@@ -38,7 +37,7 @@ const DestinationDetailPage = () => {
 
       setLoading(false);
     }
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
     return (
@@ -263,10 +262,7 @@ const DestinationDetailPage = () => {
               </div>
             </div>
             <div className="mt-2">
-              <ReviewSection
-                destinationId={id}
-                reviews={destination?.reviews}
-              />
+              <ReviewSection slug={slug} reviews={destination?.reviews} />
             </div>
           </div>
         </div>

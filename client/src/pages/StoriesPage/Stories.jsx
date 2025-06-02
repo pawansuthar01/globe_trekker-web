@@ -147,7 +147,7 @@ const StoriesPage = () => {
               <h2 className="text-xl font-semibold mb-6">Featured Story</h2>
               <div
                 onClick={() =>
-                  navigate(`/stories/${featuredStory?._id}`, {
+                  navigate(`/stories/${featuredStory?.slug}`, {
                     state: { story: featuredStory },
                   })
                 }

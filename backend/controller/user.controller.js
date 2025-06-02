@@ -8,6 +8,7 @@ import crypto from "crypto";
 export const UpdateUser = async (req, res, next) => {
   const { id, role, fullName } = req.user;
   const { name, email, isSubscribed, phoneNumber } = req.body;
+  const lowerCaseEmail = email.toLowerCase();
   if (!id) {
     return next(new AppError("id is required to update user", 404));
   }
@@ -22,7 +23,7 @@ export const UpdateUser = async (req, res, next) => {
     existingUser.avatar.secure_url = avatar;
   }
   existingUser.fullName = name || existingUser.fullName;
-  existingUser.email = email || existingUser.email;
+  existingUser.email = lowerCaseEmail || existingUser.email;
   existingUser.phoneNumber = phoneNumber || existingUser.phoneNumber;
   existingUser.isSubscribed = isSubscribed || existingUser.isSubscribed;
   await existingUser.save();
@@ -47,19 +48,26 @@ export const registerUser = async (req, res, next) => {
     if (!fullName || !email || !password) {
       return next(new AppError("Give all data to register...", 400));
     }
+    const lowerCaseEmail = email.toLowerCase();
     let newUser;
-    const existingUser = await User.findOne({ email }).select("+password");
+    const existingUser = await User.findOne({ email: lowerCaseEmail }).select(
+      "+password"
+    );
     if (existingUser) {
       if (existingUser.isAccount) {
         return res.status(400).json({ message: "Email already registered" });
       } else {
-        existingUser.email = email;
+        existingUser.email = lowerCaseEmail;
         existingUser.password = password;
         existingUser.fullName = fullName;
         newUser = existingUser;
       }
     } else {
-      newUser = await User.create({ fullName, email, password });
+      newUser = await User.create({
+        fullName,
+        email: lowerCaseEmail,
+        password,
+      });
     }
 
     const token = newUser.generate_JWT_TOKEN();
@@ -86,7 +94,7 @@ export const registerUser = async (req, res, next) => {
         const unsubscribeLink = `${process.env.FRONTEND_URL}/unsubscribe?id=${newUser._id}`;
 
         await SendEmail({
-          to: newUser.email,
+          to: lowerCaseEmail,
           userName: fullName,
           subject: "Welcome to Globe Trekker!",
           actionText: "Get Started",
@@ -106,8 +114,11 @@ export const registerUser = async (req, res, next) => {
 
 export const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
+  const lowerCaseEmail = email.toLowerCase();
   try {
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email: lowerCaseEmail }).select(
+      "+password"
+    );
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const isMatch = await user.comparePassword(password);
@@ -127,7 +138,7 @@ export const loginUser = async (req, res, next) => {
         const unsubscribeLink = `${process.env.FRONTEND_URL}/unsubscribe?id=${user._id}`;
 
         await SendEmail({
-          to: user.email,
+          to: lowerCaseEmail,
           userName: user.fullName,
           subject: "Successful Login to Your Globe Trekker Account",
           message: `We noticed a successful login to your account. If this was you, no further action is needed. If you did not log in, please secure your account immediately.`,
@@ -166,10 +177,8 @@ export const getCurrentUser = async (req, res, next) => {
 };
 export const OtpSendTest = async (req, res, next) => {
   try {
-    console.log(req.params);
     const { email } = req.params;
     const otp = Math.floor(111111, Math.random(999999));
-    console.log(otp);
     await SendEmail({
       to: email,
       subject: "Reset Your Password - Globe Trekker",
@@ -319,7 +328,8 @@ export const Subscribe = async (req, res, next) => {
 
 export const SubscribeByEmail = async (req, res, next) => {
   try {
-    const { email } = req.params;
+    const email = req.params.email.toLowerCase();
+
     if (!email) {
       return next(new AppError("email is required to UnSubscribe", 404));
     }

@@ -47,9 +47,9 @@ function App() {
         <Route index element={<Home />} />
         <Route path="/destinations" element={<DestinationsPage />} />
         <Route path="/highlight" element={<HighlightsPage />} />
-        <Route path="/destinations/:id" element={<DestinationDetailPage />} />
+        <Route path="/destinations/:slug" element={<DestinationDetailPage />} />
         <Route path="/stories" element={<StoriesPage />} />
-        <Route path="/stories/:id" element={<StoryDetailPage />} />
+        <Route path="/stories/:slug" element={<StoryDetailPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/auth/check-login" element={<CheckLogin />} />

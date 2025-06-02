@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { ThumbsUp, ThumbsDown, Star, Flag } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import formatDate from "../../utils/DataFormat";
+import {
+  updateHelpfulCountInReview,
+  updateUnhelpfulCountInReview,
+} from "../../Redux/Slice/detinationSlice";
+import { useLocation } from "react-router-dom";
 
 const categoryColors = {
   experience: "bg-blue-100 text-blue-700",
@@ -19,8 +24,9 @@ const categoryLabels = {
   value: "Value for Money",
 };
 
-const ReviewItem = ({ review }) => {
+const ReviewItem = ({ review, slug }) => {
   const { isLoggedIn } = useSelector((state) => state?.auth);
+  const dispatch = useDispatch();
   const [helpfulCount, setHelpfulCount] = useState(review.helpfulCount || 0);
   const [unhelpfulCount, setUnhelpfulCount] = useState(
     review.unhelpfulCount || 0
@@ -34,28 +40,71 @@ const ReviewItem = ({ review }) => {
       ? review.text
       : `${review.text.substring(0, 300)}...`;
 
-  const handleVote = (voteType) => {
+  const handleVote = async (voteType) => {
     if (!isLoggedIn) {
       console.log("User must be logged in to vote");
       return;
     }
-    console.log(voteType);
     // Remove previous vote if changing vote
     if (userVote === "helpful" && voteType === "unhelpful") {
       setHelpfulCount((prev) => prev - 1);
       setUnhelpfulCount((prev) => prev + 1);
       setUserVote("unhelpful");
+      const res = await dispatch(
+        updateUnhelpfulCountInReview({
+          slug: slug,
+          reviewId: review._id,
+          isHelp: true,
+        })
+      );
+      if (res?.payload?.success) {
+        setHelpfulCount(res?.payload?.helpfulCount || helpfulCount);
+        setUnhelpfulCount(res?.payload?.unhelpfulCount || unhelpfulCount);
+      }
     } else if (userVote === "unhelpful" && voteType === "helpful") {
       setUnhelpfulCount((prev) => prev - 1);
       setHelpfulCount((prev) => prev + 1);
       setUserVote("helpful");
+      const res = await dispatch(
+        updateHelpfulCountInReview({
+          slug: slug,
+          reviewId: review._id,
+          isUnHelp: true,
+        })
+      );
+      if (res?.payload?.success) {
+        setHelpfulCount(res?.payload?.helpfulCount || helpfulCount);
+        setUnhelpfulCount(res?.payload?.unhelpfulCount || unhelpfulCount);
+      }
     }
     // Add new vote
     else if (userVote === null) {
       if (voteType === "helpful") {
         setHelpfulCount((prev) => prev + 1);
+        const res = await dispatch(
+          updateHelpfulCountInReview({
+            slug: slug,
+            reviewId: review._id,
+            isUnHelp: false,
+          })
+        );
+        if (res?.payload?.success) {
+          setHelpfulCount(res?.payload?.helpfulCount || helpfulCount);
+          setUnhelpfulCount(res?.payload?.unhelpfulCount || unhelpfulCount);
+        }
       } else {
         setUnhelpfulCount((prev) => prev + 1);
+        const res = await dispatch(
+          updateUnhelpfulCountInReview({
+            slug: slug,
+            reviewId: review._id,
+            isHelp: false,
+          })
+        );
+        if (res?.payload?.success) {
+          setHelpfulCount(res?.payload?.helpfulCount || helpfulCount);
+          setUnhelpfulCount(res?.payload?.unhelpfulCount || unhelpfulCount);
+        }
       }
       setUserVote(voteType);
     }

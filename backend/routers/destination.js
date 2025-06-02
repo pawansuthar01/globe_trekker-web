@@ -11,11 +11,19 @@ import {
   RemoveToSaveDestination,
   saveDestination,
   updateReview,
+  updateReviewHelp,
+  updateReviewUnHelp,
 } from "../controller/destination.Controller.js";
 import { isLoggedIn } from "../middleware/authMiddlware.js";
 
 const destination = Router();
-destination.route("/add-review/:id").post(isLoggedIn, addReview);
+destination.route("/add-review/:slug").post(isLoggedIn, addReview);
+destination
+  .route("/review-help/:slug/:reviewId/:isUnHelp")
+  .put(updateReviewHelp);
+destination
+  .route("/review-unHelp/:slug/:reviewId/:isHelp")
+  .put(updateReviewUnHelp);
 destination.route("/update-review/:destinationId/:reviewId").put(updateReview);
 destination.route("/save/:destinationId/:userId").put(saveDestination);
 destination
@@ -24,7 +32,7 @@ destination
 destination.get("/admin", getAllDestination);
 destination.get("/", getDestination);
 destination.get("/featured", getFeaturedDestination);
-destination.get("/:id", getDestinationById);
+destination.get("/:slug", getDestinationById);
 destination.get("/published", getPublishedDestination);
 destination
   .route("/favorite/:id")

@@ -97,7 +97,7 @@ const TopDestinations = () => {
             filteredDestinations.map((destination) => (
               <div
                 onClick={() =>
-                  navigate(`/destinations/${destination._id}`, {
+                  navigate(`/destinations/${destination.slug}`, {
                     state: { destination },
                   })
                 }

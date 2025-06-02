@@ -3,16 +3,9 @@ import ReviewForm from "./form";
 import ReviewList from "./list";
 import { useSelector } from "react-redux";
 
-const ReviewSection = ({
-  destinationId,
-  reviews,
-  loading = false,
-  error = false,
-}) => {
+const ReviewSection = ({ slug, reviews, loading = false, error = false }) => {
   const { isLoggedIn } = useSelector((state) => state?.auth);
-  //   const { reviews, loading, error } = useReviews(destinationId);
   const [showForm, setShowForm] = useState(false);
-  console.log(destinationId);
   const handleReviewSubmitted = () => {
     setShowForm(false);
     // You might want to refetch reviews here or handle optimistic updates
@@ -66,14 +59,14 @@ const ReviewSection = ({
       {showForm && (
         <div className="mb-8">
           <ReviewForm
-            destinationId={destinationId}
+            slug={slug}
             onReviewSubmitted={handleReviewSubmitted}
             isAuthenticated={isLoggedIn}
           />
         </div>
       )}
 
-      <ReviewList reviews={reviews} isAuthenticated={isLoggedIn} />
+      <ReviewList reviews={reviews} slug={slug} />
     </section>
   );
 };

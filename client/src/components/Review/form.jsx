@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { Star } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addReview } from "../../Redux/Slice/detinationSlice";
+import { useNavigate } from "react-router-dom";
 
-const ReviewForm = ({ destinationId, onReviewSubmitted }) => {
+const ReviewForm = ({ slug, onReviewSubmitted }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isLoggedIn } = useSelector((state) => state?.auth);
   const [rating, setRating] = useState(0);
@@ -65,9 +67,7 @@ const ReviewForm = ({ destinationId, onReviewSubmitted }) => {
         category,
         text: reviewText,
       };
-      const res = await dispatch(
-        addReview({ id: destinationId, review: form })
-      );
+      const res = await dispatch(addReview({ slug: slug, review: form }));
       if (res?.payload?.success) {
         setError("SuccessFully add , review...");
       } else {
@@ -95,7 +95,7 @@ const ReviewForm = ({ destinationId, onReviewSubmitted }) => {
         <p className="text-blue-600 mb-4">Please log in to leave a review</p>
         <button
           className="bg-blue-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-          onClick={() => console.log("Navigate to login")}
+          onClick={() => navigate("/login")}
         >
           Log In
         </button>

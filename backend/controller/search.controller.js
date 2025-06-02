@@ -46,7 +46,6 @@ export const searchDestinationsAndStories = async (req, res, next) => {
       data: { destinations, stories },
     });
   } catch (err) {
-    console.log(err.message);
     return next(new AppError(err.message, 500));
   }
 };

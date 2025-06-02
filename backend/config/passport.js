@@ -26,6 +26,28 @@ passport.use(
           user.avatar.secure_url = profile.photos[0].value;
           user.fullName = profile.displayName;
           await user.save();
+          (async () => {
+            try {
+              const profileLink = `${process.env.FRONTEND_URL}/profile`;
+              const unsubscribeLink = `${process.env.FRONTEND_URL}/unsubscribe?id=${user._id}`;
+
+              await SendEmail({
+                to: user.email,
+                userName: user.fullName,
+                subject: "Welcome to Globe Trekker!",
+                actionText: "Get Started",
+                actionLink: profileLink,
+                unsubscribeLink: unsubscribeLink,
+                message:
+                  "Hi and welcome aboard! We're excited to have you as part of our travel community. Start exploring new adventures and destinations today.",
+              });
+            } catch (emailErr) {
+              console.error(
+                "❌ Failed to send welcome email:",
+                emailErr.message
+              );
+            }
+          })();
         }
       } else {
         user = await User.create({

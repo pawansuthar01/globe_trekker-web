@@ -55,12 +55,40 @@ export const fetchDestinations = createAsyncThunk(
 // Get destination by ID
 export const fetchDestinationById = createAsyncThunk(
   "destination/fetchById",
-  async (id, { rejectWithValue }) => {
+  async (slug, { rejectWithValue }) => {
     try {
-      const { data } = await axiosInstance.get(`/api/v3/destination/${id}`);
+      const { data } = await axiosInstance.get(`/api/v3/destination/${slug}`);
       return data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message);
+    }
+  }
+);
+// Get destination by ID
+export const updateUnhelpfulCountInReview = createAsyncThunk(
+  "destination/updateReviewUnHelpCount",
+  async ({ slug, reviewId, isHelp }) => {
+    try {
+      const { data } = await axiosInstance.put(
+        `/api/v3/destination/review-unHelp/${slug}/${reviewId}/${isHelp}`
+      );
+      return data;
+    } catch (err) {
+      return err.response?.data?.message;
+    }
+  }
+);
+// Get destination by ID
+export const updateHelpfulCountInReview = createAsyncThunk(
+  "destination/updateReviewHelpCount",
+  async ({ slug, reviewId, isUnHelp }) => {
+    try {
+      const { data } = await axiosInstance.put(
+        `/api/v3/destination/review-Help/${slug}/${reviewId}/${isUnHelp}`
+      );
+      return data;
+    } catch (err) {
+      return err.response?.data?.message;
     }
   }
 );
@@ -94,11 +122,10 @@ export const fetchFeaturedDestinations = createAsyncThunk(
 // Add Review
 export const addReview = createAsyncThunk(
   "destination/addReview",
-  async ({ id, review }, { rejectWithValue }) => {
-    console.log(id, review);
+  async ({ slug, review }, { rejectWithValue }) => {
     try {
       const res = await axiosInstance.post(
-        `/api/v3/destination/add-review/${id}`,
+        `/api/v3/destination/add-review/${slug}`,
         review
       );
       return res?.data;

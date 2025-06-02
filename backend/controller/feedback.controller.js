@@ -4,7 +4,6 @@ import Feedback from "../module/feedback.module.js";
 export const addFeedback = async (req, res) => {
   try {
     const { name, email, message, ratting, location } = req.body;
-    console.log(req.body);
     const feedback = new Feedback({
       fullName: name,
       email,

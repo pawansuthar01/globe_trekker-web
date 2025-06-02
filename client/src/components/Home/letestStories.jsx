@@ -50,7 +50,7 @@ const LatestStories = () => {
             <div
               key={story._id}
               onClick={() =>
-                navigate(`/stories/${story._id}`, { state: { story: story } })
+                navigate(`/stories/${story.slug}`, { state: { story: story } })
               }
               className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow"
             >

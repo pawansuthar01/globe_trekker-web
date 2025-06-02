@@ -369,11 +369,11 @@ export const fetchAdminStories = async (req, res, next) => {
 
 export const getStoriesById = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    if (!id) {
-      return next(new AppError("id are required to get Story...", 400));
+    const { slug } = req.params;
+    if (!slug) {
+      return next(new AppError("slug are required to get Story...", 400));
     }
-    const story = await Story.findById(id);
+    const story = await Story.findOne({ slug: slug });
     if (!story) {
       return next(new AppError("story not found...", 404));
     }
@@ -415,7 +415,7 @@ export const favorites_Story = async (req, res, next) => {
     const storyId = req.params.id;
 
     const user = await User.findById(userId);
-    console.log(user);
+
     if (!user.favoriteStories.includes(storyId)) {
       user.favoriteStories.push(storyId);
       await user.save();

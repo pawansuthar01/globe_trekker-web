@@ -287,10 +287,10 @@ export const updateDestination = async (req, res, next) => {
 
 export const addReview = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { slug } = req.params;
     const { fullName, avatar, id: user } = req.user;
-    if (!id) {
-      return next(new AppError("id are required to add a review.", 400));
+    if (!slug) {
+      return next(new AppError("slug are required to add a review.", 400));
     }
     const { rating, text, category } = req.body;
     if (Number(rating) > 5 || Number(rating) < 0) {
@@ -307,7 +307,7 @@ export const addReview = async (req, res, next) => {
       );
     }
 
-    const destination = await destinationModule.findById(id);
+    const destination = await destinationModule.findOne({ slug: slug });
     if (!destination) {
       return next(new AppError("Destination not found.", 404));
     }
@@ -406,6 +406,82 @@ export const updateReview = async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 };
+export const updateReviewUnHelp = async (req, res, next) => {
+  try {
+    const { slug, reviewId, isHelp } = req.params;
+
+    if (!slug || !reviewId) {
+      return next(
+        new AppError("slug and reviewId are required to update a review.", 400)
+      );
+    }
+
+    const destination = await destinationModule.findOne({ slug: slug });
+    if (!destination) {
+      return next(new AppError("Destination not found.", 404));
+    }
+
+    const review = destination.reviews.id(reviewId);
+    if (!review) {
+      return next(new AppError("Review not found.", 404));
+    }
+
+    review.unhelpfulCount = (review.unhelpfulCount || 0) + 1;
+    if (isHelp === "true") {
+      review.helpfulCount = Math.max((review.helpfulCount || 0) - 1, 0);
+    }
+
+    await destination.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Review updated successfully",
+      helpfulCount: review.helpfulCount,
+      unhelpfulCount: review.unhelpfulCount,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
+
+export const updateReviewHelp = async (req, res, next) => {
+  try {
+    const { slug, reviewId, isUnHelp } = req.params;
+
+    if (!slug || !reviewId) {
+      return next(
+        new AppError("slug and reviewId are required to update a review.", 400)
+      );
+    }
+
+    const destination = await destinationModule.findOne({ slug: slug });
+    if (!destination) {
+      return next(new AppError("Destination not found.", 404));
+    }
+
+    const review = destination.reviews.id(reviewId);
+    if (!review) {
+      return next(new AppError("Review not found.", 404));
+    }
+
+    review.helpfulCount = (review.helpfulCount || 0) + 1;
+    if (isUnHelp === "true") {
+      review.unhelpfulCount = Math.max((review.unhelpfulCount || 0) - 1, 0);
+    }
+
+    await destination.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Review updated successfully",
+      helpfulCount: review.helpfulCount,
+      unhelpfulCount: review.unhelpfulCount,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
+
 /*<=  get All destination =>*/
 
 export const getAllDestination = async (req, res, next) => {
@@ -666,12 +742,12 @@ export const getPublishedDestination = async (req, res, next) => {
 };
 export const getDestinationById = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    if (!id) {
-      return next(new AppError("id are required to get destination...", 400));
+    const { slug } = req.params;
+    if (!slug) {
+      return next(new AppError("slug are required to get destination...", 400));
     }
     const destination = await destinationModule.findOne({
-      _id: id,
+      slug: slug,
       isPublished: true,
     });
     if (!destination) {

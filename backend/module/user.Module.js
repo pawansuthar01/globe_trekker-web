@@ -14,6 +14,8 @@ const userSchema = new mongoose.Schema(
         "Please provide a valid email address",
       ],
       unique: true,
+      lowercase: true,
+
       trim: true,
     },
     isAccount: { type: Boolean, default: true },
