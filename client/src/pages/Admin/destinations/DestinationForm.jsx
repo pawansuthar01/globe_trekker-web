@@ -199,8 +199,8 @@ const DestinationForm = () => {
       newErrors.thumbnail = "Thumbnail is required";
     }
 
-    if (formData.images.length === 0) {
-      newErrors.images = "AtLest one  is required";
+    if (formData.images.length <= 1) {
+      newErrors.images = "AtLest 2  is required";
     }
 
     if (!formData.description) {
@@ -474,23 +474,31 @@ const DestinationForm = () => {
               error={errors.images}
             >
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {formData.images.map((image, index) => (
-                  <div key={index} className="relative mt-4">
+                {formData.images.length > 0 ? (
+                  formData.images.map((image, index) => (
+                    <div key={index} className="relative mt-4">
+                      <FileUpload
+                        onChange={(file) => handleImagesChange(file)} // handle new image upload
+                        value={image.secure_url}
+                      />
+                      {index >= 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)} // Remove image on click
+                          className="absolute -top-2 right-1 bg-red-500 text-white p-1 rounded-full"
+                        >
+                          <X size={12} />
+                        </button>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="relative mt-4">
                     <FileUpload
                       onChange={(file) => handleImagesChange(file)} // handle new image upload
-                      value={image.secure_url}
                     />
-                    {index >= 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeImage(index)} // Remove image on click
-                        className="absolute -top-2 right-1 bg-red-500 text-white p-1 rounded-full"
-                      >
-                        <X size={12} />
-                      </button>
-                    )}
                   </div>
-                ))}
+                )}
               </div>
             </FormField>
             <FormField

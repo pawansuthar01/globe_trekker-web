@@ -56,7 +56,7 @@ App.use(morgan("dev"));
 setInterval(() => {
   const handelUpSever = async () => {
     try {
-      // await axios.get(`${process.env.BACKEND_URL}/ping`);
+      await axios.get(`${process.env.BACKEND_URL}/ping`);
     } catch (error) {
       console.log(error.massage);
     }

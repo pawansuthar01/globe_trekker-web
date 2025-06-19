@@ -145,7 +145,6 @@ export const newDestination = async (req, res, next) => {
       data: destination,
     });
   } catch (error) {
-    console.log(error);
     return next(new AppError(error.message, 500));
   }
 };
