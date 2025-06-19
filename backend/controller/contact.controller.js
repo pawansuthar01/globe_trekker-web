@@ -1,5 +1,6 @@
 import Contact from "../module/contact.Module.js";
 import AppError from "../utils/AppError.js";
+import { Activity } from "../module/activity.module.js";
 
 export const addContact = async (req, res, next) => {
   try {

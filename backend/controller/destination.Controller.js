@@ -1,3 +1,4 @@
+import { Activity } from "../module/activity.module.js";
 import destinationModule from "../module/destination.Module.js";
 import User from "../module/user.Module.js";
 import AppError from "../utils/AppError.js";

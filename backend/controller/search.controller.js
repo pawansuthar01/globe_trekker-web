@@ -4,6 +4,7 @@ import searchModule from "../module/search.module.js";
 import Story from "../module/stories.Module.js";
 import AppError from "../utils/AppError.js";
 import { grantAchievement } from "../utils/grantAchievement.js";
+import { Activity } from "../module/activity.module.js";
 
 export const searchDestinationsAndStories = async (req, res, next) => {
   try {

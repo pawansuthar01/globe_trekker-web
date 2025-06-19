@@ -320,8 +320,8 @@ const DestinationForm = () => {
         toast.success(res?.payload?.message);
         setFormData(res?.payload?.data);
       } else {
-        console.error("Error updating destination:", res?.payload?.message);
-        toast.error(res?.payload?.message);
+        console.error("Error updating destination:", res?.payload);
+        toast.error(res?.payload);
       }
     } catch (error) {
       toast.error(error.message);
