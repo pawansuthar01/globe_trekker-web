@@ -377,6 +377,15 @@ const DestinationForm = () => {
       itinerary: [...formData.itinerary, newDay],
     });
   };
+  const RemoveDay = (indexDay) => {
+    const updateDay = [...formData.itinerary];
+    updateDay.splice(indexDay, 1);
+
+    setFormData({
+      ...formData,
+      itinerary: updateDay,
+    });
+  };
 
   if (loadingData) return;
   return (
@@ -806,8 +815,17 @@ const DestinationForm = () => {
               {formData.itinerary.map((dayItem, dayIndex) => (
                 <div
                   key={dayIndex}
-                  className="mb-4 border p-4  rounded shadow-sm"
+                  className="mb-8 border p-4 relative rounded shadow-sm"
                 >
+                  {formData.itinerary.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => RemoveDay(dayIndex)}
+                      className="text-sm text-red-500 border border-red-400  absolute  right-0 -top-10 px-1 m-2 hover:bg-red-300  rounded-full"
+                    >
+                      <X />
+                    </button>
+                  )}
                   {/* Day Number Input */}
                   <input
                     type="text"

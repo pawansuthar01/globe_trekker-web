@@ -6,40 +6,46 @@ import { cookieOptions } from "../utils/cookieOption.js";
 import SendEmail from "../utils/SendEmail.js";
 import crypto from "crypto";
 export const UpdateUser = async (req, res, next) => {
-  const { id, role, fullName } = req.user;
-  const { name, email, isSubscribed, phoneNumber } = req.body;
-  const lowerCaseEmail = email.toLowerCase();
-  if (!id) {
-    return next(new AppError("id is required to update user", 404));
-  }
-  const existingUser = await User.findById(id);
-  if (!existingUser) return next(new AppError("user does not found...", 404));
-  if (req.file) {
-    let avatar = existingUser.avatar;
-    const uploadAvatar = await uploadToCloudinary(req.file, "user/avatar");
-    if (uploadAvatar) {
-      avatar = uploadAvatar.secure_url;
+  try {
+    const { id, role, fullName } = req.user;
+    const { name, email, isSubscribed, phoneNumber } = req.body;
+    const lowerCaseEmail = email.toLowerCase();
+    if (!id) {
+      return next(new AppError("id is required to update user", 404));
     }
-    existingUser.avatar.secure_url = avatar;
+    const existingUser = await User.findById(id);
+
+    if (!existingUser) return next(new AppError("user does not found...", 404));
+    if (req.file) {
+      let avatar = existingUser.avatar;
+      const uploadAvatar = await uploadToCloudinary(req.file, "user/avatar");
+      if (uploadAvatar) {
+        avatar = uploadAvatar.secure_url;
+      }
+      existingUser.avatar.secure_url = avatar;
+    }
+
+    existingUser.fullName = name || existingUser.fullName;
+    existingUser.email = lowerCaseEmail || existingUser.email;
+    existingUser.phoneNumber = phoneNumber || existingUser.phoneNumber;
+    existingUser.isSubscribed = isSubscribed || existingUser.isSubscribed;
+    await existingUser.save();
+    await Activity.create({
+      action: "Update user Profile",
+      role: role,
+      type: "update",
+      detail: fullName,
+    });
+    const token = existingUser.generate_JWT_TOKEN();
+    res.status(200).json({
+      success: true,
+      message: "User update successfully",
+      AuthenticatorToken: token,
+      user: existingUser,
+    });
+  } catch (error) {
+    return next(new AppError(error?.message, 500));
   }
-  existingUser.fullName = name || existingUser.fullName;
-  existingUser.email = lowerCaseEmail || existingUser.email;
-  existingUser.phoneNumber = phoneNumber || existingUser.phoneNumber;
-  existingUser.isSubscribed = isSubscribed || existingUser.isSubscribed;
-  await existingUser.save();
-  await Activity.create({
-    action: "Update user Profile",
-    role: role,
-    type: "update",
-    detail: fullName,
-  });
-  const token = existingUser.generate_JWT_TOKEN();
-  res.status(200).json({
-    success: true,
-    message: "User update successfully",
-    AuthenticatorToken: token,
-    user: existingUser,
-  });
 };
 export const registerUser = async (req, res, next) => {
   try {

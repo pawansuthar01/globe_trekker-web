@@ -14,7 +14,7 @@ export default function SavedPage() {
 
   const [destinationData, setDestinationData] = useState([]);
   const [storyData, setStoryData] = useState([]);
-
+  const [successLoad, setSuccessLoad] = useState(false);
   const [loading, setLoading] = useState(false);
   const [destinationLoaded, setDestinationLoaded] = useState(false);
   const [storyLoaded, setStoryLoaded] = useState(false);
@@ -27,15 +27,18 @@ export default function SavedPage() {
           const destinationResults = await Promise.all(
             favoriteDestinations.map(async (id) => {
               const result = await dispatch(fetchDestinationById(id));
-              return result.payload?.data;
+              setSuccessLoad(result?.payload?.success);
+              return result?.payload?.data;
             })
           );
+
           setDestinationData(destinationResults);
           setDestinationLoaded(true);
         } else if (activeTab === "stories" && !storyLoaded) {
           const storyResults = await Promise.all(
             favoriteStories.map(async (id) => {
               const result = await dispatch(fetchStoryById(id));
+              setSuccessLoad(result?.payload?.success);
               return result.payload?.data;
             })
           );
@@ -82,15 +85,15 @@ export default function SavedPage() {
       ) : (
         <div className=" items-stretch flex flex-wrap  justify-evenly gap-8">
           {activeTab === "destinations" ? (
-            destinationData.length > 0 ? (
-              destinationData.map((item) => (
-                <DestinationCard key={item._id} item={item} />
+            successLoad && destinationData?.length > 0 ? (
+              destinationData?.map((item) => (
+                <DestinationCard key={item?._id} item={item} />
               ))
             ) : (
               <EmptyMessage type="Destination" />
             )
-          ) : storyData.length > 0 ? (
-            storyData.map((item) => <StoryCard key={item._id} item={item} />)
+          ) : successLoad && storyData?.length > 0 ? (
+            storyData.map((item) => <StoryCard key={item?._id} item={item} />)
           ) : (
             <EmptyMessage type="Story" />
           )}
@@ -105,7 +108,7 @@ const DestinationCard = ({ item }) => {
   return (
     <div
       onClick={() =>
-        navigate(`/destinations/${item._id}`, {
+        navigate(`/destinations/${item.slug}`, {
           state: { item },
         })
       }
@@ -131,7 +134,7 @@ const StoryCard = ({ item }) => {
   return (
     <div
       onClick={() =>
-        navigate(`/stories/${item?._id}`, {
+        navigate(`/stories/${item?.slug}`, {
           state: { story: item },
         })
       }

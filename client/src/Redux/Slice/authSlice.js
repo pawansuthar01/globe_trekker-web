@@ -4,7 +4,6 @@ const getValidToken = () => {
   const token = localStorage.getItem("Authenticator");
   return token && token !== "undefined" ? token : null;
 };
-
 const initialState = {
   isLoggedIn: localStorage.getItem("isLoggedIn") === "true",
   role: localStorage.getItem("role") || "",
@@ -454,7 +453,7 @@ const authSliceRedux = createSlice({
       .addCase(FavoriteListAddDestination.fulfilled, (state, action) => {
         if (action?.payload?.success) {
           const { data } = action?.payload;
-          console.log(action?.payload);
+
           localStorage.setItem("favoriteDestinations", JSON.stringify(data));
           state.favoriteDestinations = data;
         }

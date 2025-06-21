@@ -5,6 +5,7 @@ import {
   getAllDestination,
   getDestination,
   getDestinationById,
+  getDestinationBySlug,
   getFeaturedDestination,
   getPublishedDestination,
   Removed_Destination,
@@ -32,7 +33,8 @@ destination
 destination.get("/admin", getAllDestination);
 destination.get("/", getDestination);
 destination.get("/featured", getFeaturedDestination);
-destination.get("/:slug", getDestinationById);
+destination.get("/:slug", getDestinationBySlug);
+
 destination.get("/published", getPublishedDestination);
 destination
   .route("/favorite/:id")

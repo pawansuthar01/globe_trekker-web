@@ -3,6 +3,7 @@ import AppError from "../utils/AppError.js";
 import Story from "../module/stories.Module.js";
 import User from "../module/user.Module.js";
 import { Activity } from "../module/activity.module.js";
+import mongoose from "mongoose";
 export const newStory = async (req, res, next) => {
   try {
     const { fullName, bio, avatar, role } = req.user;
@@ -373,7 +374,13 @@ export const getStoriesById = async (req, res, next) => {
     if (!slug) {
       return next(new AppError("slug are required to get Story...", 400));
     }
-    const story = await Story.findOne({ slug: slug });
+    let story;
+    if (mongoose.isValidObjectId(slug)) {
+      story = await Story.findOne({ _id: slug });
+    } else {
+      story = await Story.findOne({ slug: slug });
+    }
+
     if (!story) {
       return next(new AppError("story not found...", 404));
     }

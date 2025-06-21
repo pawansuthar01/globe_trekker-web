@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Activity } from "../module/activity.module.js";
 import destinationModule from "../module/destination.Module.js";
 import User from "../module/user.Module.js";
@@ -741,14 +742,49 @@ export const getPublishedDestination = async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 };
-export const getDestinationById = async (req, res, next) => {
+export const getDestinationBySlug = async (req, res, next) => {
   try {
     const { slug } = req.params;
+
     if (!slug) {
       return next(new AppError("slug are required to get destination...", 400));
     }
+    let destination;
+    if (mongoose.isValidObjectId(slug)) {
+      destination = await destinationModule.findOne({
+        _id: slug,
+        isPublished: true,
+      });
+    } else {
+      destination = await destinationModule.findOne({
+        slug: slug,
+        isPublished: true,
+      });
+    }
+
+    if (!destination) {
+      return next(new AppError("destination not found...", 404));
+    }
+    res.status(200).json({
+      success: true,
+      message: "successFully get destination...",
+      data: destination,
+    });
+  } catch (error) {
+    return next(new AppError(error.message, 500));
+  }
+};
+
+export const getDestinationById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    console.log(id);
+    if (!id) {
+      return next(new AppError("id are required to get destination...", 400));
+    }
+
     const destination = await destinationModule.findOne({
-      slug: slug,
+      _id: id,
       isPublished: true,
     });
     if (!destination) {
@@ -767,8 +803,11 @@ export const getDestinationById = async (req, res, next) => {
 export const favorites_Destination = async (req, res, next) => {
   const userId = req.user.id;
   const destinationId = req.params.id;
-
+  if (!userId || !destinationId) {
+    return next(new AppError("userId or destinationId is required...", 400));
+  }
   const user = await User.findById(userId);
+
   if (!user.favoriteDestinations.includes(destinationId)) {
     user.favoriteDestinations.push(destinationId);
     await user.save();
@@ -784,6 +823,7 @@ export const favorites_Destination = async (req, res, next) => {
 export const Removed_Destination = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
+
     user.favoriteDestinations = user.favoriteDestinations.filter(
       (id) => id.toString() !== req.params.id
     );
